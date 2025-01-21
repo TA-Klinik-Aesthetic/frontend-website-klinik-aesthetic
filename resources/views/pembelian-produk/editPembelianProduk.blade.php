@@ -3,14 +3,21 @@
 @section('content')
     <div class="container">
         <h1 class="mb-4">Edit Penjualan Produk</h1>
-        <form action="{{ route('pembelian-produk.update', $pembelian['id_pembelian_produk']) }}" method="POST">
+        <form action="{{ route('pembelian-produk.update', $pembelian['id_penjualan_produk']) }}" method="POST">
             @csrf
             @method('PUT')
 
             <div class="mb-3">
-                <label for="potongan_harga" class="form-label">Potongan Harga</label>
-                <input type="number" name="potongan_harga" id="potongan_harga" class="form-control"
-                    value="{{ $pembelian['potongan_harga'] }}" required>
+                <label for="id_promo" class="form-label">Promo</label>
+                <select name="id_promo" id="id_promo" class="form-control">
+                    <option value="">-- Pilih Promo --</option>
+                    @foreach ($promos as $promo)
+                        <option value="{{ $promo['id_promo'] }}"
+                            {{ $promo['id_promo'] == $pembelian['id_promo'] ? 'selected' : '' }}>
+                            {{ $promo['nama_promo'] }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
             <div id="produk-list">

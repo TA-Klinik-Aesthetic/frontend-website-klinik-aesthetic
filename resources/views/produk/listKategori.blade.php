@@ -10,7 +10,6 @@
                 <table class="table table-bordered" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>ID Kategori</th>
                             <th>Nama Kategori</th>
                             <th>Aksi</th>
 
@@ -19,7 +18,6 @@
                     <tbody>
                         @forelse ($kategoriProduk as $item)
                             <tr>
-                                <td>{{ $item['id_kategori'] }}</td>
                                 <td>{{ $item['nama_kategori'] }}</td>
                                 <td>
 

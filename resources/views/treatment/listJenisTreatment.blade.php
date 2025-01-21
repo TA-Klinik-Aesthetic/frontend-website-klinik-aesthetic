@@ -10,7 +10,6 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Nama Jenis Treatment</th>
                 <th>Aksi</th>
             </tr>
@@ -18,7 +17,6 @@
         <tbody>
             @foreach($jenisTreatments as $index => $jenis)
                 <tr>
-                    <td>{{ $jenis['id_jenis_treatment'] }}</td>
                     <td>{{ $jenis['nama_jenis_treatment'] }}</td>
                     <td>
                         <a href="{{ route('jenisTreatment.show', $jenis['id_jenis_treatment']) }}" class="btn btn-primary btn-sm" title="View">

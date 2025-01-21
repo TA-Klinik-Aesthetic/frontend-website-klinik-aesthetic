@@ -23,12 +23,12 @@
                 {{-- <td>{{ $index + 1 }}</td> --}}
                 <td>{{ $pembelian['nama_user'] }}</td>
                 <td>{{ $pembelian['tanggal_pembelian'] }}</td>
-                <td>{{ number_format($pembelian['harga_total'], 2, ',', '.') }}</td>
-                <td>{{ number_format($pembelian['potongan_harga'], 2, ',', '.') }}</td>
-                <td>{{ number_format($pembelian['harga_akhir'], 2, ',', '.') }}</td>
+                <td>Rp{{ number_format($pembelian['harga_total'], 2, ',', '.') }}</td>
+                <td>Rp{{ number_format($pembelian['potongan_harga'], 2, ',', '.') }}</td>
+                <td>Rp{{ number_format($pembelian['harga_akhir'], 2, ',', '.') }}</td>
                 <td>
-                    <a href="{{ route('pembelian-produk.show', $pembelian['id_pembelian_produk']) }}" class="btn btn-info btn-sm">Detail</a>
-                    <a href="{{ route('pembelian-produk.edit', $pembelian['id_pembelian_produk']) }}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{{ route('pembelian-produk.show', $pembelian['id_penjualan_produk']) }}" class="btn btn-info btn-sm">Detail</a>
+                    <a href="{{ route('pembelian-produk.edit', $pembelian['id_penjualan_produk']) }}" class="btn btn-warning btn-sm">Edit</a>
                 </td>
             </tr>
             @empty

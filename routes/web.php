@@ -31,7 +31,7 @@ use App\Http\Controllers\PembelianProdukController;
 */
 
 Route::get('/', function () {
-    return view('users-pages.landingpage');
+    return view('authentikasi.login');
 });
 
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register.form');
@@ -148,9 +148,15 @@ Route::prefix('detailBooking')->name('detailBooking.')->group(function () {
     Route::get('/', [DetailBookingTreatmentController::class, 'index'])->name('index');
     Route::post('/store', [DetailBookingTreatmentController::class, 'store'])->name('store');
     Route::get('/{id}', [DetailBookingTreatmentController::class, 'show'])->name('show');
-    Route::put('/{id}', [DetailBookingTreatmentController::class, 'update'])->name('update');
     Route::delete('/{id}', [DetailBookingTreatmentController::class, 'destroy'])->name('destroy');
 });
+
+Route::get('/booking/create', [DetailBookingTreatmentController::class, 'create'])->name('booking.create');
+Route::post('/booking', [DetailBookingTreatmentController::class, 'store'])->name('booking.store');
+Route::get('/booking/detail/{id}', [DetailBookingTreatmentController::class, 'show'])->name('booking.detail');
+Route::put('/detailBooking/update/{id}', [DetailBookingTreatmentController::class, 'update'])->name('detailBooking.update');
+
+
 
 
 // Route untuk halaman pembelian produk

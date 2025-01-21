@@ -10,7 +10,6 @@
                 <table class="table table-bordered" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Nama Produk</th>
                             <th>Harga</th>
                             <th>Status</th>
@@ -21,9 +20,8 @@
                     <tbody>
                         @forelse ($produkList as $produk)
                             <tr>
-                                <td>{{ $produk['id_produk'] }}</td>
                                 <td>{{ $produk['nama_produk'] }}</td>
-                                <td>{{ $produk['harga_produk'] }}</td>
+                                <td>Rp{{ number_format($produk['harga_produk'], 2, ',', '.') }}</td>
                                 <td>{{ $produk['status_produk'] }}</td>
                                 <td>{{ $produk['kategori']['nama_kategori'] }}</td>
                                 <td>

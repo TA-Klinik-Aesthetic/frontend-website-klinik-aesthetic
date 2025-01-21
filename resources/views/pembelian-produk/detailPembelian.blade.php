@@ -37,7 +37,7 @@
                     {{ $products[array_search($detail['id_produk'], array_column($products, 'id_produk'))]['nama_produk'] ?? 'Tidak Diketahui' }}
                 </td>
                 <td>{{ $detail['jumlah_produk'] }}</td>
-                <td>{{ number_format($detail['harga_pembelian_produk'], 2, ',', '.') }}</td>
+                <td>{{ number_format($detail['harga_penjualan_produk'], 2, ',', '.') }}</td>
             </tr>
             @endforeach
         </tbody>

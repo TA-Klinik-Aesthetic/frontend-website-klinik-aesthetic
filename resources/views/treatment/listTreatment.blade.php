@@ -10,7 +10,6 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Nama Treatment</th>
                 <th>Jenis Treatment</th>
                 <th>Aksi</th>
@@ -19,7 +18,6 @@
         <tbody>
             @foreach($treatments as $treatment)
                 <tr>
-                    <td>{{ $treatment['id_treatment'] }}</td>
                     <td>{{ $treatment['nama_treatment'] }}</td>
                     <td>{{ $treatment['jenis_treatment']['nama_jenis_treatment'] }}</td>
                     <td>

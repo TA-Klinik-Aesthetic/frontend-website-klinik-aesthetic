@@ -10,11 +10,11 @@ class PembelianProdukController extends Controller
     public function index()
     {
         // Fetch product purchases
-        $pembelianResponse = Http::get('https://backend-klinik-aesthetic-production.up.railway.app/api/products-purchase/pembelian');
+        $pembelianResponse = Http::get('http://127.0.0.1:8080/api/penjualan-produk');
         $pembelianProduk = $pembelianResponse->json();
 
         // Fetch user data
-        $userResponse = Http::get('https://backend-klinik-aesthetic-production.up.railway.app/api/users');
+        $userResponse = Http::get('http://127.0.0.1:8080/api/users');
         $users = collect($userResponse->json()['data']); // Adjust to access the 'data' key
 
         // Map id_user to user name
@@ -29,16 +29,20 @@ class PembelianProdukController extends Controller
     public function create()
     {
         // Fetch users
-        $userResponse = Http::get('https://backend-klinik-aesthetic-production.up.railway.app/api/users');
+        $userResponse = Http::get('http://127.0.0.1:8080/api/users');
         $users = $userResponse->json()['data'];
-
+    
         // Fetch products
-        $productResponse = Http::get('https://backend-klinik-aesthetic-production.up.railway.app/api/produk');
+        $productResponse = Http::get('http://127.0.0.1:8080/api/produk');
         $products = $productResponse->json('data');
-
-        return view('pembelian-produk.createPembelian', compact('users', 'products'));
+    
+        // Fetch promos
+        $promoResponse = Http::get('http://127.0.0.1:8080/api/promos');
+        $promos = $promoResponse->json('data');
+    
+        return view('pembelian-produk.createPembelian', compact('users', 'products', 'promos'));
     }
-
+    
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -46,31 +50,32 @@ class PembelianProdukController extends Controller
             'produk' => 'required|array',
             'produk.*.id_produk' => 'required|integer',
             'produk.*.jumlah_produk' => 'required|integer',
-            'potongan_harga' => 'required|numeric',
+            'id_promo' => 'nullable|integer',
         ]);
-
+    
         // Kirim data ke API
-        $response = Http::post('https://backend-klinik-aesthetic-production.up.railway.app/api/products-purchase/pembelian', $data);
-
+        $response = Http::post('http://127.0.0.1:8080/api/penjualan-produk', $data);
+    
         if ($response->ok()) {
             return redirect()->route('pembelianProduk.index')->with('success', 'Data berhasil ditambahkan!');
         } else {
             return back()->withErrors('Gagal menambahkan data. Silakan coba lagi.');
         }
     }
+    
 
     public function show($id)
     {
         // Fetch the detail of the purchase
-        $purchaseResponse = Http::get("https://backend-klinik-aesthetic-production.up.railway.app/api/products-purchase/pembelian/$id");
+        $purchaseResponse = Http::get("http://127.0.0.1:8080/api/penjualan-produk/$id");
         $pembelian = $purchaseResponse->json();
     
         // Fetch users
-        $userResponse = Http::get('https://backend-klinik-aesthetic-production.up.railway.app/api/users');
+        $userResponse = Http::get('http://127.0.0.1:8080/api/users');
         $users = $userResponse->json()['data'];
     
         // Fetch products
-        $productResponse = Http::get('https://backend-klinik-aesthetic-production.up.railway.app/api/produk');
+        $productResponse = Http::get('http://127.0.0.1:8080/api/produk');
         $products = $productResponse->json('data');
     
         // Check if the API responses are successful
@@ -88,7 +93,7 @@ class PembelianProdukController extends Controller
 
     public function edit($id)
     {
-        $purchaseResponse = Http::get("https://backend-klinik-aesthetic-production.up.railway.app/api/products-purchase/pembelian/$id");
+        $purchaseResponse = Http::get("http://127.0.0.1:8080/api/penjualan-produk/$id");
         $pembelian = $purchaseResponse->json();
     
         // Map detail_pembelian ke produk
@@ -99,13 +104,17 @@ class PembelianProdukController extends Controller
             ];
         })->toArray();
     
-        $productResponse = Http::get('https://backend-klinik-aesthetic-production.up.railway.app/api/produk');
-        $products = $productResponse->json();
+        $productResponse = Http::get('http://127.0.0.1:8080/api/produk');
+        $products = $productResponse->json('data');
+
+        $promoResponse = Http::get('http://127.0.0.1:8080/api/promos');
+        $promos = $promoResponse->json('data');
     
         if ($purchaseResponse->successful() && $productResponse->successful()) {
             return view('pembelian-produk.editPembelianProduk', [
                 'pembelian' => $pembelian,
-                'products' => $products
+                'products' => $products,
+                'promos' => $promos
             ]);
         }
     
@@ -115,14 +124,14 @@ class PembelianProdukController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->validate([
-            'potongan_harga' => 'required|numeric',
+            'id_promo' => 'nullable|integer',
             'produk' => 'required|array',
             'produk.*.id_produk' => 'required|integer',
             'produk.*.jumlah_produk' => 'required|integer',
         ]);
 
         // Kirim data ke API
-        $response = Http::put("https://backend-klinik-aesthetic-production.up.railway.app/api/products-purchase/pembelian/$id", $data);
+        $response = Http::put("http://127.0.0.1:8080/api/penjualan-produk/$id", $data);
 
         if ($response->ok()) {
             return redirect()->route('pembelianProduk.index')->with('success', 'Data berhasil diperbarui!');

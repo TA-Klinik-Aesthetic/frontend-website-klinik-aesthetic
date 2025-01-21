@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Http;
 
 class TreatmentController extends Controller
 {
-    protected $baseApiUrl = 'https://backend-klinik-aesthetic-production.up.railway.app/api/treatments';
-    protected $apiJenisTreatment ='https://backend-klinik-aesthetic-production.up.railway.app/api/jenisTreatments';
+    protected $baseApiUrl = 'http://127.0.0.1:8080/api/treatments';
+    protected $apiJenisTreatment ='http://127.0.0.1:8080/api/jenisTreatments';
 
 
     public function index()

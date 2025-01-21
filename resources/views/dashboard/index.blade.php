@@ -39,9 +39,9 @@
                 @include('dashboard.navbar')
 
                 <div class="container-fluid">
-                <!-- Begin Page Content -->
+                    <!-- Begin Page Content -->
                     @yield('content')
-                <!-- End Page Content -->
+                    <!-- End Page Content -->
                 </div>
             </div>
             <!-- End of Main Content -->
@@ -90,6 +90,10 @@
     <!-- Bootstrap core JavaScript-->
     <script src="{{ asset('backend/vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('backend/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+    <script src="{{ asset('backend/https://code.jquery.com/jquery-3.6.0.min.js') }}"></script>
+    <script src="{{ asset('backend/https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js') }}"></script>
+
 
 
     <!-- Core plugin JavaScript-->
