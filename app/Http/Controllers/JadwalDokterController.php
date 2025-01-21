@@ -10,7 +10,7 @@ class JadwalDokterController extends Controller
     public function index()
     {
         // Ambil data dari API
-        $response = Http::withoutVerifying()->get('https://backend-klinik-aesthetic-production.up.railway.app/api/jadwal-dokter');
+        $response = Http::withoutVerifying()->get('http://127.0.0.1:8080/api/jadwal-dokter');
         // $jadwalDokter = $response->json();
         $data = $response->json();
         // dd($data);
@@ -31,7 +31,7 @@ class JadwalDokterController extends Controller
             'jam_selesai' => 'required',
         ]);
 
-        Http::withoutVerifying()->post('https://backend-klinik-aesthetic-production.up.railway.app/api/jadwal-dokter', $data);
+        Http::withoutVerifying()->post('http://127.0.0.1:8080/api/jadwal-dokter', $data);
 
         return redirect()->route('jadwal-dokter.index')->with('success', 'Jadwal berhasil ditambahkan!');
     }

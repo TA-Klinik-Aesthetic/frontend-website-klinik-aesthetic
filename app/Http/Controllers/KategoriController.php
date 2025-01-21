@@ -10,7 +10,7 @@ class KategoriController extends Controller
     public function index()
     {
         // Mengambil data dari API
-        $response = Http::get('https://backend-klinik-aesthetic-production.up.railway.app/api/kategori/');
+        $response = Http::get('http://127.0.0.1:8080/api/kategori/');
 
         // Periksa apakah permintaan API berhasil
         if ($response->successful()) {
@@ -33,7 +33,7 @@ class KategoriController extends Controller
     {
         $data = $request->all();
 
-        $response = Http::post("https://backend-klinik-aesthetic-production.up.railway.app/api/kategori", $data);
+        $response = Http::post("http://127.0.0.1:8080/api/kategori", $data);
 
         if ($response->successful()) {
             return redirect()->route('kategori.index')->with('success', 'Kategori berhasil ditambahkan');
@@ -44,7 +44,7 @@ class KategoriController extends Controller
 
     public function edit($id)
     {
-        $response = Http::get("https://backend-klinik-aesthetic-production.up.railway.app/api/kategori/{$id}");
+        $response = Http::get("http://127.0.0.1:8080/api/kategori/{$id}");
 
         if ($response->successful()) {
             // Ambil data langsung dari respons
@@ -62,7 +62,7 @@ class KategoriController extends Controller
         ]);
 
         // Kirim data kategori untuk diperbarui ke API
-        $response = Http::put("https://backend-klinik-aesthetic-production.up.railway.app/api/kategori/{$id}", [
+        $response = Http::put("http://127.0.0.1:8080/api/kategori/{$id}", [
             'nama_kategori' => $validated['nama_kategori'],
         ]);
 
@@ -78,7 +78,7 @@ class KategoriController extends Controller
 
     public function destroy($id)
     {
-        $response = Http::delete("https://backend-klinik-aesthetic-production.up.railway.app/api/kategori/{$id}");
+        $response = Http::delete("http://127.0.0.1:8080/api/kategori/{$id}");
 
         if ($response->successful()) {
             return redirect()->route('kategori.index')->with('success', 'Data berhasil dihapus');

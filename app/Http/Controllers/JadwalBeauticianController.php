@@ -12,7 +12,7 @@ class JadwalBeauticianController extends Controller
     {
         try {
             // Ambil data dari API
-            $response = Http::withoutVerifying()->get('https://backend-klinik-aesthetic-production.up.railway.app/api/jadwal-beautician');
+            $response = Http::withoutVerifying()->get('http://127.0.0.1:8080/api/jadwal-beautician');
             $data = $response->json();
 
             // Kelompokkan data berdasarkan hari

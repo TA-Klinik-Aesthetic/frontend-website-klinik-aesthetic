@@ -4,7 +4,7 @@
 <div class="container mt-5">
     <h1 class="mb-4">Jadwal Praktik Beautician</h1>
 
-    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addJadwalModal" onclick="showAddModal()">Tambah Jadwal</button>
+    {{-- <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addJadwalModal" onclick="showAddModal()">Tambah Jadwal</button> --}}
 
     @if (isset($grouped) && $grouped->isNotEmpty())
         @foreach ($grouped as $hari => $jadwals)
@@ -12,30 +12,28 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>ID Beautician</th>
                         <th>Nama Beautician</th>
                         <th>Tanggal</th>
                         <th>Jam Mulai</th>
                         <th>Jam Selesai</th>
-                        <th>Aksi</th>
+                        {{-- <th>Aksi</th> --}}
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($jadwals as $jadwal)
                         <tr>
-                            <td>{{ $jadwal['id_beautician'] }}</td>
                             <td>{{ $jadwal['beautician']['nama_beautician'] ?? 'Tidak Diketahui' }}</td>
                             <td>{{ $jadwal['tgl_kerja'] }}</td>
                             <td>{{ $jadwal['jam_mulai'] }}</td>
                             <td>{{ $jadwal['jam_selesai'] }}</td>
-                            <td>
+                            {{-- <td>
                                 <button class="btn btn-warning btn-sm" onclick="showEditModal({{ json_encode($jadwal) }})">Edit</button>
                                 <form action="{{ route('jadwal-beautician.destroy', $jadwal['id_jadwal_praktik_beautician']) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus jadwal ini?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
                                 </form>
-                            </td>
+                            </td> --}}
                         </tr>
                     @endforeach
                 </tbody>
@@ -45,7 +43,7 @@
         <p class="text-muted">Belum ada jadwal yang tersedia.</p>
     @endif
 
-    <!-- Modal Tambah -->
+    {{-- <!-- Modal Tambah -->
     <div class="modal fade" id="addJadwalModal" tabindex="-1" aria-labelledby="addJadwalModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -84,9 +82,9 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div> --}}
 
-    <!-- Modal Edit -->
+    {{-- <!-- Modal Edit -->
     <div class="modal fade" id="editJadwalModal" tabindex="-1" aria-labelledby="editJadwalModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -128,9 +126,9 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 
-<script>
+{{-- <script>
 function showEditModal(jadwal) {
     document.getElementById('editJadwalId').value = jadwal.id_jadwal_praktik_beautician;
     document.getElementById('editIdBeautician').value = jadwal.id_beautician;
@@ -156,5 +154,5 @@ function showAddModal() {
     // Show the "Tambah Jadwal" modal
     new bootstrap.Modal(document.getElementById('addJadwalModal')).show();
 }
-</script>
+</script> --}}
 @endsection

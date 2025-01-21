@@ -14,7 +14,7 @@ class KonsultasiController extends Controller
         // $response = Http::withToken($token)->get('http://127.0.0.1:8080/api/konsultasi');
         // $data = $response->json();
 
-        $response = Http::get('https://backend-klinik-aesthetic-production.up.railway.app/api/konsultasi');
+        $response = Http::get('http://127.0.0.1:8080/api/konsultasi');
         $data = $response->json();
 
         // Filter data untuk konsultasi dengan dokter
@@ -33,7 +33,7 @@ class KonsultasiController extends Controller
         // $response = Http::withToken($token)->get('http://127.0.0.1:8080/api/konsultasi');
         // $data = $response->json();
 
-        $response = Http::get('https://backend-klinik-aesthetic-production.up.railway.app/api/konsultasi');
+        $response = Http::get('http://127.0.0.1:8080/api/konsultasi');
         $data = $response->json();
 
         // Filter data untuk konsultasi tanpa dokter
@@ -54,8 +54,8 @@ class KonsultasiController extends Controller
         // $usersResponse = Http::withToken($token)->get('http://127.0.0.1:8080/api/users');
         // $doktersResponse = Http::withToken($token)->get('http://127.0.0.1:8080/api/dokters');
 
-        $usersResponse = Http::get('https://backend-klinik-aesthetic-production.up.railway.app/api/users');
-        $doktersResponse = Http::get('https://backend-klinik-aesthetic-production.up.railway.app/api/dokters');
+        $usersResponse = Http::get('http://127.0.0.1:8080/api/users');
+        $doktersResponse = Http::get('http://127.0.0.1:8080/api/dokters');
 
         $users = $usersResponse->json()['data'];
         $dokters = $doktersResponse->json()['data'];
@@ -74,7 +74,7 @@ class KonsultasiController extends Controller
 
         // $response = Http::withToken($token)->post('http://127.0.0.1:8080/api/konsultasi', [
 
-        $response = Http::post('https://backend-klinik-aesthetic-production.up.railway.app/api/konsultasi', [
+        $response = Http::post('http://127.0.0.1:8080/api/konsultasi', [
             'id_user' => $request->id_user,
             'id_dokter' => $request->id_dokter,
             'waktu_konsultasi' => $request->waktu_konsultasi,
@@ -101,12 +101,12 @@ class KonsultasiController extends Controller
         // // Ambil semua dokter
         // $dokters = Http::withToken($token)->get('http://127.0.0.1:8080/api/dokters')->json()['data'];
 
-        $response =Http::get("https://backend-klinik-aesthetic-production.up.railway.app/api/konsultasi/{$id}");
+        $response =Http::get("http://127.0.0.1:8080/api/konsultasi/{$id}");
 
         $konsultasi = $response->json()['data'];
 
         // Ambil semua dokter
-        $dokters = Http::get('https://backend-klinik-aesthetic-production.up.railway.app/api/dokters')->json()['data'];
+        $dokters = Http::get('http://127.0.0.1:8080/api/dokters')->json()['data'];
 
         return view('konsultasi.edit', compact('konsultasi', 'dokters'));
     }
@@ -119,7 +119,7 @@ class KonsultasiController extends Controller
         //     'id_dokter' => $request->id_dokter,
         // ]);
 
-        $response = Http::put("https://backend-klinik-aesthetic-production.up.railway.app/api/konsultasi/{$id}", [
+        $response = Http::put("http://127.0.0.1:8080/api/konsultasi/{$id}", [
             'id_dokter' => $request->id_dokter,
         ]);
 
@@ -138,7 +138,7 @@ class KonsultasiController extends Controller
 
         // $response = Http::withToken($token)->delete("http://127.0.0.1:8080/api/konsultasi/{$id}");
 
-        $response = Http::delete("https://backend-klinik-aesthetic-production.up.railway.app/api/konsultasi/{$id}");
+        $response = Http::delete("http://127.0.0.1:8080/api/konsultasi/{$id}");
 
         if ($response->successful()) {
             return redirect()->route('konsultasi.with-doctor')->with('success', 'Data berhasil dihapus');
@@ -157,14 +157,14 @@ class KonsultasiController extends Controller
         // $detailKonsultasiResponse = Http::withToken($token)->get("http://127.0.0.1:8080/api/detail-konsultasi/{$id}");
 
          // Ambil data konsultasi berdasarkan ID
-         $konsultasiResponse = Http::get("https://backend-klinik-aesthetic-production.up.railway.app/api/konsultasi/{$id}");
+         $konsultasiResponse = Http::get("http://127.0.0.1:8080/api/konsultasi/{$id}");
         
          // Ambil data semua pengguna dan dokter
-         $usersResponse = Http::get('https://backend-klinik-aesthetic-production.up.railway.app/api/users');
-         $doktersResponse = Http::get('https://backend-klinik-aesthetic-production.up.railway.app/api/dokters');
+         $usersResponse = Http::get('http://127.0.0.1:8080/api/users');
+         $doktersResponse = Http::get('http://127.0.0.1:8080/api/dokters');
          
          // Ambil data detail konsultasi dari API
-         $detailKonsultasiResponse = Http::get("https://backend-klinik-aesthetic-production.up.railway.app/api/detail-konsultasi/{$id}");
+         $detailKonsultasiResponse = Http::get("http://127.0.0.1:8080/api/detail-konsultasi/{$id}");
 
         if ($konsultasiResponse->successful() && $usersResponse->successful() && $doktersResponse->successful() && $detailKonsultasiResponse->successful()) {
             $konsultasi = $konsultasiResponse->json('data');
@@ -191,7 +191,7 @@ class KonsultasiController extends Controller
 
         // $response = Http::withToken($token)->get("http://127.0.0.1:8080/api/detail-konsultasi/{$id}");
 
-        $response = Http::get("https://backend-klinik-aesthetic-production.up.railway.app/api/detail-konsultasi/{$id}");
+        $response = Http::get("http://127.0.0.1:8080/api/detail-konsultasi/{$id}");
 
         if ($response->successful()) {
             $data = $response->json()['data'];
@@ -207,7 +207,7 @@ class KonsultasiController extends Controller
 
         // $response = Http::withToken($token)->put("http://127.0.0.1:8080/api/detail-konsultasi/{$id}", [
 
-        $response = Http::put("https://backend-klinik-aesthetic-production.up.railway.app/api/detail-konsultasi/{$id}", [
+        $response = Http::put("http://127.0.0.1:8080/api/detail-konsultasi/{$id}", [
             'keluhan_pelanggan' => $request->input('keluhan_pelanggan'),
             'saran_tindakan' => $request->input('saran_tindakan'),
         ]);

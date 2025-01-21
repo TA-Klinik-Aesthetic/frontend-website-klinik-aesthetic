@@ -30,7 +30,7 @@ class AuthController extends Controller
             'password' => 'required|string|min:8',
         ]);
 
-        $response = Http::post('https://backend-klinik-aesthetic-production.up.railway.app/api/register', [
+        $response = Http::post('http://127.0.0.1:8080/api/register', [
             'nama_user' => $request->name,
             'no_telp' => $request->phone,
             'email' => $request->email,
@@ -52,7 +52,7 @@ class AuthController extends Controller
             'password' => 'required|string|min:8',
         ]);
 
-        $response = Http::post('https://backend-klinik-aesthetic-production.up.railway.app/api/login', [
+        $response = Http::post('http://127.0.0.1:8080/api/login', [
             'email' => $request->email,
             'password' => $request->password,
         ]);

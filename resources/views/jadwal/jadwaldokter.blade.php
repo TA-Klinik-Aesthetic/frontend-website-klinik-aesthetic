@@ -4,7 +4,7 @@
 <div class="container mt-5">
     <h1 class="mb-4">Jadwal Praktik Dokter</h1>
 
-    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#jadwalModal"  onclick="showAddModal()">Tambah Jadwal</button>
+    {{-- <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#jadwalModal"  onclick="showAddModal()">Tambah Jadwal</button> --}}
 
     @if (isset($jadwals) && $jadwals->count() > 0)
         <div id="jadwalTable">
@@ -13,30 +13,28 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>ID Dokter</th>
                             <th>Nama Dokter</th>
                             <th>Tanggal</th>
                             <th>Jam Mulai</th>
                             <th>Jam Selesai</th>
-                            <th>Aksi</th>
+                            {{-- <th>Aksi</th> --}}
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($jadwalPerHari as $jadwal)
                             <tr>
-                                <td>{{ $jadwal['id_dokter'] }}</td>
                                 <td>{{ $jadwal['dokter']['nama_dokter'] ?? 'Tidak Diketahui' }}</td>
                                 <td>{{ $jadwal['tgl_kerja'] }}</td>
                                 <td>{{ $jadwal['jam_mulai'] }}</td>
                                 <td>{{ $jadwal['jam_selesai'] }}</td>
-                                <td>
+                                {{-- <td>
                                     <button class="btn btn-warning btn-sm" onclick="showEditModal({{ json_encode($jadwal) }})">Edit</button>
                                     <form action="{{ route('jadwal-dokter.destroy', $jadwal['id_jadwal_praktik_dokter']) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus jadwal ini?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
                                     </form>
-                                </td>
+                                </td> --}}
                             </tr>
                         @endforeach
                     </tbody>
@@ -47,7 +45,7 @@
         <p>Tidak ada jadwal ditemukan.</p>
     @endif
 
-    <!-- Modal Tambah -->
+    {{-- <!-- Modal Tambah -->
     <div class="modal fade" id="jadwalModal" tabindex="-1" aria-labelledby="jadwalModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -131,9 +129,9 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 
-<script>  
+{{-- <script>  
 function showEditModal(jadwal) {
     document.getElementById('editIdJadwal').value = jadwal.id_jadwal_praktik_dokter;
     document.getElementById('editIdDokter').value = jadwal.id_dokter;
@@ -160,5 +158,5 @@ function showAddModal() {
     new bootstrap.Modal(document.getElementById('jadwalModal')).show();
 }
 
-</script>
+</script> --}}
 @endsection

@@ -18,7 +18,7 @@
             <tbody>
                 @foreach ($feedbacks as $feedback)
                     <tr>
-                        <td>{{ $feedback['id_booking_treatment'] }}</td>
+                        <td>{{ $feedback['id_detail_booking_treatment'] }}</td>
                         <td>{{ $feedback['rating'] }}</td>
                         <td>{{ $feedback['teks_feedback'] }}</td>
                         <td>
