@@ -4,45 +4,44 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Redirect;
 
 class DetailBookingTreatmentController extends Controller
 {
 
     public function index()
     {
-        // Ambil data booking treatment
         $bookingResponse = Http::get('http://127.0.0.1:8080/api/detailBookingTreatments');
-        $bookingTreatments = $bookingResponse->json()['booking_treatments'];
+        $bookingTreatments = $bookingResponse->json()['booking_treatments'] ?? [];
 
-        // Ambil data pengguna
-        $usersResponse = Http::get('http://127.0.0.1:8080/api/users');
-        $users = $usersResponse->json()['data'];
+        $users = Http::get('http://127.0.0.1:8080/api/users')->json()['data'];
+        $promos = Http::get('http://127.0.0.1:8080/api/promos')->json()['data'];
+        $treatments = Http::get('http://127.0.0.1:8080/api/treatments')->json()['data'];
+        $dokters = Http::get('http://127.0.0.1:8080/api/dokters')->json()['data'];
+        $beauticians = Http::get('http://127.0.0.1:8080/api/beauticians')->json()['data'];
+        $kompensasis = Http::get('http://127.0.0.1:8080/api/kompensasi-diberikan')->json() ?? [];
 
-        // Membuat array untuk memetakan id_user ke nama_user
+        // Gabungkan nama user
         $usersMap = [];
         foreach ($users as $user) {
             $usersMap[$user['id_user']] = $user['nama_user'];
         }
-
-        // Gabungkan data booking dan nama pengguna
         foreach ($bookingTreatments as &$booking) {
             $booking['user_name'] = $usersMap[$booking['id_user']] ?? 'Unknown';
         }
 
-        return view('treatment.bookingTreatment', compact('bookingTreatments'));
+        return view('treatment.bookingTreatment', compact(
+            'bookingTreatments',
+            'users',
+            'promos',
+            'treatments',
+            'dokters',
+            'beauticians',
+            'kompensasis'
+        ));
     }
 
-    public function create()
-    {
-        // Mengambil data dari API untuk pengisian form
-        $users = Http::get('http://127.0.0.1:8080/api/users')->json('data');
-        $promos = Http::get('http://127.0.0.1:8080/api/promos')->json('data');
-        $treatments = Http::get('http://127.0.0.1:8080/api/treatments')->json('data');
-        $dokters = Http::get('http://127.0.0.1:8080/api/dokters')->json('data');
-        $beauticians = Http::get('http://127.0.0.1:8080/api/beauticians')->json('data');
-
-        return view('treatment.addBooking', compact('users', 'promos', 'treatments', 'dokters', 'beauticians'));
-    }
 
     // Menyimpan data booking treatment
     public function store(Request $request)
@@ -73,11 +72,12 @@ class DetailBookingTreatmentController extends Controller
         }
     }
 
+
     public function show($id)
     {
         // Mengambil detail booking treatment dari API
         $bookingDetail = Http::get("http://127.0.0.1:8080/api/detailBookingTreatments/{$id}")->json();
-        
+
         // Mengambil data dokter dan beautician dari API
         $dokters = Http::get('http://127.0.0.1:8080/api/dokters')->json('data');
         $beauticians = Http::get('http://127.0.0.1:8080/api/beauticians')->json('data');
@@ -106,79 +106,23 @@ class DetailBookingTreatmentController extends Controller
 
         return redirect()->back()->with('error', 'Gagal memperbarui detail booking.');
     }
-    
-//     public function store(Request $request)
-//     {
 
-//         $details = [];
+    // public function autocompleteKompensasi(Request $request)
+    // {
+    //     $term = $request->input('term');
 
-//         foreach ($request->details as $detail) {
-//             $details[] = [
-//                 'id_treatment' => $detail['id_treatment'],
-//                 'id_dokter' => $detail['id_dokter'],
-//                 'id_beautician' => $detail['id_beautician'],
-//             ];
-//         }
+    //     $results = KompensasiDiberikan::where('kode_kompensasi', 'like', '%' . $term . '%')
+    //         ->limit(10)
+    //         ->get();
 
-//         $response = Http::post($this->baseApiUrl, [
-//             'id_user' => $request->id_user,
-//             'waktu_treatment' => $request->waktu_treatment,
-//             'status_booking_treatment' => $request->status_booking_treatment,
-//             'potongan_harga' => $request->potongan_harga,
-//             'details' => $details,
-//         ]);
-
-//         if ($response->successful()) {
-//             return back()->with('success', 'Data berhasil dikirim');
-//         } else {
-//             return back()->with('error', 'Gagal mengirim data');
-//         }
-//     }
-
-//     public function show($id)
-//     {
-//         // Ambil detail booking treatment berdasarkan id_detail_booking_treatment
-//         $responseDetailBooking = Http::get("{$this->baseApiUrl}/{$id}");
-
-//         if ($responseDetailBooking->successful()) {
-//             $detail = $responseDetailBooking->json();
-//         } else {
-//             return redirect()->back()->with('error', 'Detail Booking Treatment tidak ditemukan.');
-//         }
-
-//         // Ambil data dokter dari API
-//         $responseDokter = Http::get($this->apiDokters);
-//         $dokters = $responseDokter->successful() ? $responseDokter->json()['data'] : [];
-
-//         // Ambil data beautician dari API
-//         $responseBeautician = Http::get($this->apiBeauticians);
-//         $beauticians = $responseBeautician->successful() ? $responseBeautician->json()['data'] : [];
-
-//         // Kirim data ke view untuk ditampilkan dalam form modal
-//         return view('treatment.detailBookingTreatment', [
-//             'detail' => $detail,
-//             'dokters' => $dokters,
-//             'beauticians' => $beauticians,
-//         ]);
-//     }
-
-//     public function update(Request $request, $id)
-//     {
-//         // Kirim data yang akan diupdate ke API backend tanpa validasi
-//         $response = Http::put("{$this->baseApiUrl}/{$id}", [
-//             'id_dokter' => $request->id_dokter,
-//             'id_beautician' => $request->id_beautician,
-//             'status_booking_treatment' => $request->status_booking_treatment,
-//         ]);
-
-//         // Periksa apakah respons API berhasil
-//         if ($response->successful()) {
-//             return back()->with('success', 'Data berhasil diperbarui');
-//         } else {
-//             // Ambil pesan error dari API jika ada
-//             $errorMessage = $response->json('message') ?? 'Gagal memperbarui data';
-//             return back()->with('error', $errorMessage);
-//         }
-//     }
-// }
+    //     return response()->json(
+    //         $results->map(function ($item) {
+    //             return [
+    //                 'id' => $item->id_kompensasi_diberikan,
+    //                 'label' => $item->kode_kompensasi,
+    //                 'value' => $item->kode_kompensasi, // ini yang ditampilkan di input
+    //             ];
+    //         })
+    //     );
+    // }
 }

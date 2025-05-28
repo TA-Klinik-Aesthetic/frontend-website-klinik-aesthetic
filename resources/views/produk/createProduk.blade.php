@@ -5,7 +5,7 @@
 
     <div class="card shadow mb-4">
         <div class="card-body">
-            <form action="{{ route('produk.store') }}" method="POST">
+            <form action="{{ route('produk.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <div class="mb-3">
@@ -36,11 +36,11 @@
                     </select>
                 </div>
 
-                <div class="mb-3">
-                    <label for="gambar_produk">Gambar Produk (URL)</label>
-                    <input type="url" name="gambar_produk" class="form-control" id="gambar_produk" required>
+                <div>
+                    <label for="gambar_produk">Upload Gambar:</label>
+                    <input type="file" name="gambar_produk" id="gambar_produk" required>
                 </div>
-
+                
                 <div class="mb-3">
                     <label for="id_kategori" class="form-label">Kategori Produk</label>
                     <select class="form-control" id="id_kategori" name="id_kategori" required>

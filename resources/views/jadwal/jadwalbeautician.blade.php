@@ -42,7 +42,7 @@
     @else
         <p class="text-muted">Belum ada jadwal yang tersedia.</p>
     @endif
-
+</div>
     {{-- <!-- Modal Tambah -->
     <div class="modal fade" id="addJadwalModal" tabindex="-1" aria-labelledby="addJadwalModalLabel" aria-hidden="true">
         <div class="modal-dialog">

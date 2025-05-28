@@ -9,20 +9,52 @@ class FeedbackTreatmentController extends Controller
 {
     protected $baseApiUrl = 'http://127.0.0.1:8080/api/feedbackTreatments';
 
-    // Display Feedback Treatments
     public function index()
     {
-        $response = Http::get($this->baseApiUrl);
-
-        if ($response->successful()) {
-            // $feedbacks = $response->json();
-            $feedbacks = $response->json()['data'] ?? []; // Ambil hanya 'data'
-
-            return view('feedback.feedbackTreatment', compact('feedbacks'));
-        } else {
-            return view('feedback.feedbackTreatment', ['error' => 'Failed to fetch feedbacks']);
+        // Ambil data feedback treatment
+        $feedbackResponse = Http::get($this->baseApiUrl);
+        $feedbacks = $feedbackResponse->json()['data'] ?? [];
+        
+        // Ambil data detail booking treatment
+        $detailBookingResponse = Http::get('http://127.0.0.1:8080/api/detailBookingTreatments');
+        $detailBookingData = $detailBookingResponse->json()['booking_treatments'][0]['detail_booking'] ?? [];  // Sesuaikan dengan struktur JSON
+    
+        // Buat mapping id_detail_booking_treatment ke detail booking
+        $detailBookingMap = [];
+        foreach ($detailBookingData as $detail) {
+            $detailBookingMap[$detail['id_detail_booking_treatment']] = $detail;
         }
+        
+        // Gabungkan data feedback dengan detail booking treatment
+        foreach ($feedbacks as &$feedback) {
+            $idDetail = $feedback['id_detail_booking_treatment'];
+            
+            if (isset($detailBookingMap[$idDetail])) {
+                $detail = $detailBookingMap[$idDetail];
+    
+                // Ambil nama dokter atau beautician
+                $dokter = $detail['dokter'] ? $detail['dokter']['nama_dokter'] : '-';
+                $beautician = $detail['beautician'] ? $detail['beautician']['nama_beautician'] : '-';
+        
+                // Ambil nama treatment
+                $treatment = $detail['treatment'] ? $detail['treatment']['nama_treatment'] : '-';
+        
+                $feedback['nama_dokter'] = $dokter;
+                $feedback['nama_beautician'] = $beautician;
+                $feedback['nama_treatment'] = $treatment;  // Menambahkan nama treatment
+            } else {
+                // Jika tidak ditemukan, set default '-'
+                $feedback['nama_dokter'] = '-';
+                $feedback['nama_beautician'] = '-';
+                $feedback['nama_treatment'] = '-';
+            }
+        }
+        
+        return view('feedback.feedbackTreatment', compact('feedbacks'));
     }
+    
+
+    
 
     public function show($id)
     {

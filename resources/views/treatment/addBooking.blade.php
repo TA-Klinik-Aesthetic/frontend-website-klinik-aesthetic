@@ -1,4 +1,4 @@
-@extends('dashboard.index')
+{{-- @extends('dashboard.index')
 
 @section('content')
 <div class="container">
@@ -112,4 +112,4 @@
             document.getElementById('treatmentDetails').appendChild(newGroup);
         });
     });
-</script>
+</script> --}}

@@ -11,6 +11,38 @@ class TreatmentController extends Controller
     protected $apiJenisTreatment ='http://127.0.0.1:8080/api/jenisTreatments';
 
 
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'id_jenis_treatment' => 'required',
+            'nama_treatment' => 'required',
+            'deskripsi_treatment' => 'required',
+            'biaya_treatment' => 'required|numeric',
+            'estimasi_treatment' => 'required',
+            'gambar_treatment' => 'required|image|mimes:jpeg,png,jpg,gif',
+        ]);
+    
+        // Kirim file langsung ke backend
+        $response = Http::attach(
+            'gambar_treatment',
+            file_get_contents($request->file('gambar_treatment')->getRealPath()),
+            $request->file('gambar_treatment')->getClientOriginalName()
+        )->post($this->baseApiUrl, [
+            'id_jenis_treatment' => $request->id_jenis_treatment,
+            'nama_treatment' => $request->nama_treatment,
+            'deskripsi_treatment' => $request->deskripsi_treatment,
+            'biaya_treatment' => $request->biaya_treatment,
+            'estimasi_treatment' => $request->estimasi_treatment,
+        ]);
+    
+        if ($response->successful()) {
+            return redirect()->route('treatment.index')->with('success', 'Treatment berhasil ditambahkan');
+        }
+    
+        return back()->with('error', 'Gagal menambahkan treatment');
+    }
+
     public function index()
     {
         $response = Http::get($this->baseApiUrl);
@@ -30,27 +62,21 @@ class TreatmentController extends Controller
     {
         $response = Http::get("{$this->baseApiUrl}/{$id}");
         $treatment = $response->json()['data'] ?? null;
-
+    
         if ($treatment) {
-            return view('treatment.detailTreatment', ['treatment' => $treatment]);
-        } else {
-            return back()->with('error', 'Data treatment tidak ditemukan');
+            if (!empty($treatment['gambar_treatment'])) {
+                // Gunakan URL backend langsung agar bisa diakses dari frontend
+                $treatment['gambar_treatment'] = "http://127.0.0.1:8080/storage/" . ltrim($treatment['gambar_treatment'], '/');
+            }
+    
+            return view('treatment.detailTreatment', compact('treatment'));
         }
+    
+        return back()->with('error', 'Data treatment tidak ditemukan');
     }
+    
 
-    public function store(Request $request)
-    {
-        $data = $request->all();
-
-        $response = Http::post($this->baseApiUrl, $data);
-
-        if ($response->successful()) {
-            return redirect()->route('treatment.index')->with('success', 'Treatment berhasil ditambahkan');
-        }
-
-        return back()->with('error', 'Gagal menambahkan treatment');
-    }
-
+    
     public function update(Request $request, $id)
     {
         $data = $request->all();

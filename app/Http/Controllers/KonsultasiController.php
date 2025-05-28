@@ -50,7 +50,7 @@ class KonsultasiController extends Controller
         // $token = session('token'); // Mendapatkan token dari session
 
         // Ambil data dari API untuk dropdown
-        
+
         // $usersResponse = Http::withToken($token)->get('http://127.0.0.1:8080/api/users');
         // $doktersResponse = Http::withToken($token)->get('http://127.0.0.1:8080/api/dokters');
 
@@ -78,6 +78,7 @@ class KonsultasiController extends Controller
             'id_user' => $request->id_user,
             'id_dokter' => $request->id_dokter,
             'waktu_konsultasi' => $request->waktu_konsultasi,
+            'keluhan_pelanggan' => $request->keluhan_pelanggan
         ]);
 
         if ($response->successful()) {
@@ -95,13 +96,13 @@ class KonsultasiController extends Controller
 
         // // Ambil data konsultasi berdasarkan ID
         // $response = Http::withToken($token)->get("http://127.0.0.1:8080/api/konsultasi/{$id}");
-        
+
         // $konsultasi = $response->json()['data'];
 
         // // Ambil semua dokter
         // $dokters = Http::withToken($token)->get('http://127.0.0.1:8080/api/dokters')->json()['data'];
 
-        $response =Http::get("http://127.0.0.1:8080/api/konsultasi/{$id}");
+        $response = Http::get("http://127.0.0.1:8080/api/konsultasi/{$id}");
 
         $konsultasi = $response->json()['data'];
 
@@ -149,73 +150,102 @@ class KonsultasiController extends Controller
 
     public function show($id)
     {
-        // $token = session('token'); // Mendapatkan token dari session
+        // Ambil data konsultasi berdasarkan ID
+        $konsultasiResponse = Http::get("http://127.0.0.1:8080/api/konsultasi/{$id}");
 
-        // $konsultasiResponse = Http::withToken($token)->get("http://127.0.0.1:8080/api/konsultasi/{$id}");
-        // $usersResponse = Http::withToken($token)->get('http://127.0.0.1:8080/api/users');
-        // $doktersResponse = Http::withToken($token)->get('http://127.0.0.1:8080/api/dokters');
-        // $detailKonsultasiResponse = Http::withToken($token)->get("http://127.0.0.1:8080/api/detail-konsultasi/{$id}");
-
-         // Ambil data konsultasi berdasarkan ID
-         $konsultasiResponse = Http::get("http://127.0.0.1:8080/api/konsultasi/{$id}");
-        
-         // Ambil data semua pengguna dan dokter
-         $usersResponse = Http::get('http://127.0.0.1:8080/api/users');
-         $doktersResponse = Http::get('http://127.0.0.1:8080/api/dokters');
-         
-         // Ambil data detail konsultasi dari API
-         $detailKonsultasiResponse = Http::get("http://127.0.0.1:8080/api/detail-konsultasi/{$id}");
-
-        if ($konsultasiResponse->successful() && $usersResponse->successful() && $doktersResponse->successful() && $detailKonsultasiResponse->successful()) {
+        // Cek apakah request ke API berhasil
+        if ($konsultasiResponse->successful()) {
+            // Ambil data JSON dari respons
             $konsultasi = $konsultasiResponse->json('data');
-            $users = $usersResponse->json('data');
-            $dokters = $doktersResponse->json('data');
-            $detailKonsultasi = $detailKonsultasiResponse->json('data');
 
-            $user = collect($users)->firstWhere('id_user', $konsultasi['id_user']);
-            $dokter = collect($dokters)->firstWhere('id_dokter', $konsultasi['id_dokter']);
+            // Jika data konsultasi tidak ditemukan, tampilkan pesan error
+            if (!$konsultasi) {
+                return redirect()->route('konsultasi.with-doctor')->with('error', 'Data konsultasi tidak ditemukan.');
+            }
 
+            // Dapatkan informasi user dan dokter dari data konsultasi
+            $user = $konsultasi['user'] ?? null;
+            $dokter = $konsultasi['dokter'] ?? null;
+
+            // Tambahkan informasi user dan dokter ke dalam data konsultasi
             $konsultasi['nama_user'] = $user['nama_user'] ?? 'Tidak diketahui';
             $konsultasi['nama_dokter'] = $dokter['nama_dokter'] ?? 'Tidak diketahui';
-            $konsultasi['detail_konsultasi'] = $detailKonsultasi;
+
+            // Jika tidak ada detail konsultasi, beri pesan
+            $konsultasi['detail_konsultasi'] = $konsultasi['detail_konsultasi'] ?? [];
 
             return view('konsultasi.detail', compact('konsultasi'));
         }
 
+        // Jika gagal mengambil data konsultasi, arahkan ke halaman daftar konsultasi
         return redirect()->route('konsultasi.with-doctor')->with('error', 'Gagal mengambil data konsultasi.');
     }
 
-    public function editKeluhan($id)
+    // public function editKeluhan($id)
+    // {
+    //     // Ambil data detail konsultasi berdasarkan ID konsultasi
+    //     $response = Http::get("http://127.0.0.1:8080/api/detail-konsultasi/{$id}");
+
+    //     // Ambil daftar treatment dari API
+    //     $treatmentsResponse = Http::get("http://127.0.0.1:8080/api/treatments");
+
+    //     if ($response->successful() && $treatmentsResponse->successful()) {
+    //         $data = $response->json()['data'];
+    //         $treatments = $treatmentsResponse->json()['data']; // Ambil daftar treatment
+
+    //         return view('konsultasi.editKeluhan', compact('data', 'id', 'treatments'));
+    //     } else {
+    //         return redirect()->route('konsultasi.with-doctor')->with('error', 'Data tidak ditemukan.');
+    //     }
+    // }
+
+
+    // public function updateKeluhan(Request $request, $id)
+    // {
+    //     $response = Http::post("http://127.0.0.1:8080/api/detail-konsultasi", [
+    //         'id_konsultasi' => $id,
+    //         'keluhan_pelanggan' => $request->input('keluhan_pelanggan'),
+    //         'saran_tindakan' => $request->input('saran_tindakan'),
+    //         'id_treatment' => $request->input('id_treatment'),
+    //     ]);
+
+    //     if ($response->successful()) {
+    //         return redirect()->route('konsultasi.with-doctor')->with('success', 'Detail konsultasi berhasil ditambahkan.');
+    //     } else {
+    //         return back()->with('error', 'Gagal menambahkan detail konsultasi.');
+    //     }
+    // }
+
+    public function tambahDetail($id)
     {
-        // $token = session('token'); // Mendapatkan token dari session
+        // Ambil data konsultasi berdasarkan ID
+        $konsultasiResponse = Http::get("http://127.0.0.1:8080/api/konsultasi/{$id}");
 
-        // $response = Http::withToken($token)->get("http://127.0.0.1:8080/api/detail-konsultasi/{$id}");
+        if ($konsultasiResponse->successful()) {
+            $konsultasi = $konsultasiResponse->json()['data'];
+            $treatmentsResponse = Http::get('http://127.0.0.1:8080/api/treatments');
+            $treatments = $treatmentsResponse->json()['data'];
 
-        $response = Http::get("http://127.0.0.1:8080/api/detail-konsultasi/{$id}");
-
-        if ($response->successful()) {
-            $data = $response->json()['data'];
-            return view('konsultasi.editKeluhan', ['data' => $data]);
-        } else {
-            return redirect()->route('konsultasi.with-doctor')->with('error', 'Data tidak ditemukan.');
+            return view('konsultasi.tambahDetail', compact('konsultasi', 'treatments', 'id'));
         }
+
+        return redirect()->route('konsultasi.with-doctor')->with('error', 'Data konsultasi tidak ditemukan.');
     }
 
-    public function updateKeluhan(Request $request, $id)
+    public function simpanDetail(Request $request, $id)
     {
-        // $token = session('token'); // Mendapatkan token dari session
+        // Menyiapkan array 'details' sesuai dengan format yang diinginkan API
+        $details = $request->input('details');
 
-        // $response = Http::withToken($token)->put("http://127.0.0.1:8080/api/detail-konsultasi/{$id}", [
-
-        $response = Http::put("http://127.0.0.1:8080/api/detail-konsultasi/{$id}", [
-            'keluhan_pelanggan' => $request->input('keluhan_pelanggan'),
-            'saran_tindakan' => $request->input('saran_tindakan'),
+        // Mengirimkan data dalam format yang diinginkan API
+        $response = Http::post("http://127.0.0.1:8080/api/detail-konsultasi/{$id}", [
+            'details' => $details
         ]);
 
         if ($response->successful()) {
-            return redirect()->route('konsultasi.with-doctor')->with('success', 'Data berhasil diperbarui.');
-        } else {
-            return back()->with('error', 'Gagal memperbarui data.');
+            return redirect()->route('konsultasi.with-doctor')->with('success', 'Detail konsultasi berhasil ditambahkan.');
         }
+
+        return back()->with('error', 'Gagal menambahkan detail konsultasi. ' . $response->body());
     }
 }

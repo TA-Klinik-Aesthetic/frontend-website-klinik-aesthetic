@@ -24,34 +24,59 @@ class ProdukController extends Controller
     // Menampilkan form untuk membuat produk baru
     public function create()
     {
-        $kategoriList = Http::get('hhttp://127.0.0.1:8080/api/kategori')->json();
+        $kategoriList = Http::get('http://127.0.0.1:8080/api/kategori')->json();
         return view('produk.createProduk', compact('kategoriList'));
     }
+
 
     // Menyimpan data produk baru
     public function store(Request $request)
     {
-        $response = Http::post('http://127.0.0.1:8080/api/produk', $request->all());
+        $request->validate([
+            'id_kategori' => 'required',
+            'nama_produk' => 'required',
+            'deskripsi_produk' => 'required',
+            'harga_produk' => 'required',
+            'stok_produk' => 'required',
+            'status_produk' => 'required',
+            'gambar_produk' => 'required|image|mimes:jpeg,png,jpg,gif',
+        ]);
+
+        $response = Http::attach(
+            'gambar_produk',
+            file_get_contents($request->file('gambar_produk')->getRealPath()),
+            $request->file('gambar_produk')->getClientOriginalName()
+        )->post('http://127.0.0.1:8080/api/produk', [
+            'id_kategori' => $request->id_kategori,
+            'nama_produk' => $request->nama_produk,
+            'deskripsi_produk' => $request->deskripsi_produk,
+            'harga_produk' => $request->harga_produk,
+            'stok_produk' => $request->stok_produk,
+            'status_produk' => $request->status_produk,
+        ]);
 
         if ($response->successful()) {
-            return redirect()->route('produk.index')->with('success', 'Produk berhasil ditambahkan.');
+            return redirect()->route('produk.index')->with('success', 'Produk berhasil ditambahkan');
         }
 
-        return back()->with('error', 'Gagal menambahkan produk.');
+        return back()->with('error', 'Gagal menambahkan produk');
     }
 
     // Method untuk menampilkan detail produk
     public function show($id)
     {
-        // Mengambil data produk dari API
         $response = Http::get("http://127.0.0.1:8080/api/produk/{$id}");
-
-        if ($response->successful()) {
-            $produk = $response->json('data'); // Mendapatkan data produk
+        $produk = $response->json()['data'] ?? null;
+    
+        if ($produk) {
+            // Jika gambar tersimpan di storage server backend, pastikan URL gambar sesuai
+            if (!empty($produk['gambar_produk'])) {
+                $produk['gambar_produk'] = "http://127.0.0.1:8080/storage/" . ltrim($produk['gambar_produk'], '/');
+            }
+    
             return view('produk.detailProduk', compact('produk'));
         }
-
-        // Jika produk tidak ditemukan
+    
         return redirect()->route('produk.index')->with('error', 'Produk tidak ditemukan.');
     }
 

@@ -50,7 +50,7 @@
     <div class="modal fade" id="tambahTreatmentModal" tabindex="-1" role="dialog" aria-labelledby="tambahTreatmentModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form action="{{ route('treatment.store') }}" method="POST">
+                <form action="{{ route('treatment.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title" id="tambahTreatmentModalLabel">Tambah Treatment</h5>
@@ -86,9 +86,9 @@
                             <label for="estimasi_treatment">Estimasi Treatment (HH:MM)</label>
                             <input type="time" name="estimasi_treatment" class="form-control" id="estimasi_treatment" required>
                         </div>
-                        <div class="form-group">
-                            <label for="gambar_treatment">Gambar Treatment (URL)</label>
-                            <input type="url" name="gambar_treatment" class="form-control" id="gambar_treatment" required>
+                        <div>
+                            <label for="gambar_treatment">Upload Gambar:</label>
+                            <input type="file" name="gambar_treatment" id="gambar_treatment" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -104,7 +104,7 @@
     <div class="modal fade" id="editTreatmentModal" tabindex="-1" role="dialog" aria-labelledby="editTreatmentModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form id="editTreatmentForm" method="POST">
+                <form id="editTreatmentForm" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="modal-header">

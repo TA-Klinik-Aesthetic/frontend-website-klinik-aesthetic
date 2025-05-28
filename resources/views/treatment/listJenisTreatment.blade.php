@@ -19,9 +19,9 @@
                 <tr>
                     <td>{{ $jenis['nama_jenis_treatment'] }}</td>
                     <td>
-                        <a href="{{ route('jenisTreatment.show', $jenis['id_jenis_treatment']) }}" class="btn btn-primary btn-sm" title="View">
+                        {{-- <a href="{{ route('jenisTreatment.show', $jenis['id_jenis_treatment']) }}" class="btn btn-primary btn-sm" title="View">
                             <i class="fas fa-eye"></i>
-                        </a>
+                        </a> --}}
 
                         <button type="button" class="btn btn-warning btn-sm" title="Edit" 
                                 data-toggle="modal" data-target="#editJenisTreatmentModal-{{ $index }}">

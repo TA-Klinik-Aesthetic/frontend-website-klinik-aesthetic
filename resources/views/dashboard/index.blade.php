@@ -13,6 +13,7 @@
 
     <!-- Custom fonts for this template-->
     <link href="{{ asset('backend/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
+
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
@@ -20,12 +21,21 @@
     <!-- Custom styles for this template-->
     <link href="{{ asset('backend/css/sb-admin-2.min.css') }}" rel="stylesheet">
 
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 
 </head>
 
 <body id="page-top">
+
+    <!-- jQuery (harus duluan) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -41,10 +51,14 @@
                 <div class="container-fluid">
                     <!-- Begin Page Content -->
                     @yield('content')
+                    @stack('scripts')
                     <!-- End Page Content -->
                 </div>
             </div>
             <!-- End of Main Content -->
+
+
+
 
             <!-- Footer -->
             <footer class="sticky-footer bg-white">
@@ -87,14 +101,9 @@
         </div>
     </div>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="{{ asset('backend/vendor/jquery/jquery.min.js') }}"></script>
+
+
     <script src="{{ asset('backend/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-
-    <script src="{{ asset('backend/https://code.jquery.com/jquery-3.6.0.min.js') }}"></script>
-    <script src="{{ asset('backend/https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js') }}"></script>
-
-
 
     <!-- Core plugin JavaScript-->
     <script src="{{ asset('backend/vendor/jquery-easing/jquery.easing.min.js') }}"></script>

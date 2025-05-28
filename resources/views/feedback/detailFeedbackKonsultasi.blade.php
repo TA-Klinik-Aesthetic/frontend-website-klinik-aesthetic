@@ -9,27 +9,23 @@
     
         <div class="form-group">
             <label for="rating">Rating</label>
-            <input type="number" name="rating" id="rating" class="form-control" value="{{ $feedback['rating'] }}" required>
+            <input type="number" id="rating" class="form-control" value="{{ $feedback['rating'] }}" min="1" max="5" disabled>
+            <input type="hidden" name="rating" value="{{ $feedback['rating'] }}">
         </div>
-    
+        
         <div class="form-group">
             <label for="teks_feedback">Teks Feedback</label>
-            <textarea name="teks_feedback" id="teks_feedback" class="form-control" required>{{ $feedback['teks_feedback'] }}</textarea>
+            <textarea id="teks_feedback" class="form-control" disabled>{{ $feedback['teks_feedback'] }}</textarea>
+            <input type="hidden" name="teks_feedback" value="{{ $feedback['teks_feedback'] }}">
         </div>
-    
+        
         <div class="form-group">
             <label for="balasan_feedback">Balasan Feedback</label>
-            <textarea name="balasan_feedback" id="balasan_feedback" class="form-control">{{ $feedback['balasan_feedback'] }}</textarea>
+            <textarea name="balasan_feedback" id="balasan_feedback" class="form-control" required>{{ $feedback['balasan_feedback'] }}</textarea>
         </div>
     
-        <button type="submit" class="btn btn-success">Update</button>
+        <button type="submit" class="btn btn-success">Kirim</button>
     </form>
     
-
-    <form action="{{ route('feedback.feedbackKonsultasi.destroy', $feedback['id_feedback_konsultasi']) }}" method="POST">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="btn btn-danger" onclick="return confirm('Yakin ingin menghapus feedback ini?')">Hapus</button>
-    </form>
     
 @endsection

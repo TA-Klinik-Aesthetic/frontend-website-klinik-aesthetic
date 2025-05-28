@@ -44,6 +44,7 @@
     @else
         <p>Tidak ada jadwal ditemukan.</p>
     @endif
+</div>
 
     {{-- <!-- Modal Tambah -->
     <div class="modal fade" id="jadwalModal" tabindex="-1" aria-labelledby="jadwalModalLabel" aria-hidden="true">

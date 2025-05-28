@@ -27,7 +27,7 @@
             <tr>
                 <th>Nama Produk</th>
                 <th>Jumlah Produk</th>
-                <th>Harga Pembelian</th>
+                <th>Harga Produk</th>
             </tr>
         </thead>
         <tbody>

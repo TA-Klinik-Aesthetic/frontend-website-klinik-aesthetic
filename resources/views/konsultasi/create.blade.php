@@ -39,6 +39,10 @@
                 @endforeach
             </select>
         </div>
+        <div class="form-group">
+            <label for="keluhan_pelanggan">Keluhan Pelanggan</label>
+            <textarea class="form-control" id="keluhan_pelanggan" name="keluhan_pelanggan" required></textarea>
+        </div>
         <div class="d-flex gap-2">
             <a href="{{ route('konsultasi.with-doctor') }}" class="btn btn-primary">Kembali</a>
             <button type="submit" class="btn btn-success">Submit</button>

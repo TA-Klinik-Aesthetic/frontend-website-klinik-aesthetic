@@ -1,0 +1,192 @@
+@extends('dashboard.index')
+
+@section('content')
+    <h1>List Komplain</h1>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nama Pengguna</th>
+                <th>Teks Komplain</th>
+                <th>Balasan Komplain</th>
+                <th>Pemberian Kompensasi</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($komplainList as $komplain)
+                <tr>
+                    <td>{{ $komplain['user']['nama_user'] }}</td>
+                    <td>{{ $komplain['teks_komplain'] }}</td>
+                    <td>{{ $komplain['balasan_komplain'] }}</td>
+                    <td>{{ $komplain['pemberian_kompensasi'] ?? 'Menunggu pengiriman' }}</td>
+                    <td>
+                        <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
+                            data-target="#editKomplainModal" data-komplain='@json($komplain)'
+                            onclick="populateEditModalFromButton(this)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+    <!-- Modal Edit Komplain -->
+    <div class="modal fade" id="editKomplainModal" tabindex="-1" role="dialog" aria-labelledby="editKomplainModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form id="editKomplainForm" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editKomplainModalLabel">Edit Komplain</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Nama Pengguna -->
+                        <div class="form-group">
+                            <label for="edit_nama_user">Nama Pengguna</label>
+                            <input type="text" class="form-control" id="edit_nama_user" disabled>
+                        </div>
+
+                        <!-- Waktu Treatment -->
+                        <div class="form-group">
+                            <label for="edit_waktu_treatment">Waktu Treatment</label>
+                            <input type="text" class="form-control" id="edit_waktu_treatment" disabled>
+                        </div>
+
+                        <!-- Treatment -->
+                        <div class="form-group">
+                            <label for="edit_treatment">Treatment</label>
+                            <ul id="edit_treatment_list" class="list-group">
+                                <!-- List treatment akan dimasukkan di sini -->
+                            </ul>
+                        </div>
+
+                        <!-- Teks Komplain -->
+                        <div class="form-group">
+                            <label for="edit_teks_komplain">Teks Komplain</label>
+                            <textarea name="teks_komplain" class="form-control" id="edit_teks_komplain" rows="3" disabled></textarea>
+                        </div>
+
+                        <!-- Link Download Gambar Komplain -->
+                        <div class="form-group">
+                            <label>Unduh Gambar Komplain</label><br>
+                            <div id="gambar_komplain_links"></div>
+                        </div>
+
+                        <!-- Balasan Komplain -->
+                        <div class="form-group">
+                            <label for="edit_balasan_komplain">Balasan Komplain</label>
+                            <textarea name="balasan_komplain" class="form-control" id="edit_balasan_komplain" rows="3" required></textarea>
+                        </div>
+
+                        <!-- Input Kompensasi -->
+                        <div class="form-group">
+                            <label for="edit_id_kompensasi">ID Kompensasi</label>
+                            <select class="form-control" id="edit_id_kompensasi" name="id_kompensasi" required>
+                                <option value="">Pilih Kompensasi</option>
+                                @foreach ($kompensasiList as $kompensasi)
+                                    <option value="{{ $kompensasi['id_kompensasi'] }}">
+                                        {{ $kompensasi['nama_kompensasi'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit_kode_kompensasi">Kode Kompensasi</label>
+                            <input type="text" class="form-control" id="edit_kode_kompensasi" name="kode_kompensasi" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit_tanggal_berakhir_kompensasi">Tanggal Berakhir Kompensasi</label>
+                            <input type="date" class="form-control" id="edit_tanggal_berakhir_kompensasi" name="tanggal_berakhir_kompensasi" required>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function populateEditModalFromButton(button) {
+            const komplain = JSON.parse(button.getAttribute('data-komplain'));
+            populateEditModal(komplain);
+        }
+
+        function populateEditModal(komplain) {
+            const form = document.getElementById('editKomplainForm');
+            form.action = `/komplain/${komplain.id_komplain}`;
+
+            document.getElementById('edit_nama_user').value = komplain.user.nama_user;
+            document.getElementById('edit_teks_komplain').value = komplain.teks_komplain;
+            document.getElementById('edit_balasan_komplain').value = komplain.balasan_komplain ?? '';
+            document.getElementById('edit_waktu_treatment').value = komplain.waktu_treatment;
+
+            // Set Treatment List
+            const treatmentListContainer = document.getElementById('edit_treatment_list');
+            treatmentListContainer.innerHTML = ''; // Clear previous treatment list
+
+            komplain.treatments.forEach(function(treatment, index) {
+                const treatmentItem = document.createElement('li');
+                treatmentItem.classList.add('list-group-item');
+                treatmentItem.innerHTML = treatment; // Menampilkan nama treatment
+                treatmentListContainer.appendChild(treatmentItem);
+            });
+
+            // Jika ada kompensasi, set input kompensasi
+            if (komplain.kompensasi_diberikan) {
+                document.getElementById('edit_id_kompensasi').value = komplain.kompensasi_diberikan.id_kompensasi;
+                document.getElementById('edit_kode_kompensasi').value = komplain.kompensasi_diberikan.kode_kompensasi;
+                document.getElementById('edit_tanggal_berakhir_kompensasi').value = komplain.kompensasi_diberikan.tanggal_berakhir_kompensasi;
+            }
+            
+            const baseUrl = 'http://127.0.0.1:8080/storage/';
+
+            // Debugging gambar_komplain
+            console.log('gambar_komplain:', komplain.gambar_komplain);
+
+            // Pastikan gambar_komplain adalah array yang valid
+            let gambarKomplainArray = [];
+            try {
+                gambarKomplainArray = JSON.parse(komplain.gambar_komplain); // Mengonversi string menjadi array
+            } catch (e) {
+                console.error('Gagal parsing gambar_komplain:', e);
+            }
+
+            // Kosongkan dulu link download sebelumnya
+            const gambarKomplainContainer = document.getElementById('gambar_komplain_links');
+            gambarKomplainContainer.innerHTML = '';
+
+            if (Array.isArray(gambarKomplainArray) && gambarKomplainArray.length > 0) {
+                gambarKomplainArray.forEach(function(gambarPath, index) {
+                    // Menghapus tanda kutip ganda atau escape karakter dalam path gambar
+                    gambarPath = gambarPath.replace(/['"]+/g, '');
+
+                    const link = document.createElement('a');
+                    link.href = baseUrl + gambarPath;
+                    link.className = 'btn btn-outline-primary btn-sm m-1';
+                    link.target = '_blank';
+                    link.download = '';
+                    link.innerHTML = `<i class="fas fa-download"></i> Gambar Komplain ${index + 1}`;
+                    gambarKomplainContainer.appendChild(link);
+                });
+            } else {
+                gambarKomplainContainer.innerHTML = '<p class="text-muted">Tidak ada gambar komplain.</p>';
+            }
+
+            // document.getElementById('download_gambar_bukti_transaksi').href = komplain.gambar_bukti_transaksi ? (baseUrl +
+            //     komplain.gambar_bukti_transaksi) : '#';
+        }
+    </script>
+@endsection

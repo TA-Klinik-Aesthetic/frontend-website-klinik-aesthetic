@@ -8,25 +8,31 @@ use Illuminate\Support\Facades\Http;
 class FeedbackKonsultasiController extends Controller
 {
     protected $baseApiUrl = 'http://127.0.0.1:8080/api/feedbacks';
-
-    // Display Feedback Konsultasi
+    protected $konsultasiApiUrl = 'http://127.0.0.1:8080/api/konsultasi/';
+    
     public function index()
     {
         $response = Http::get($this->baseApiUrl);
-
+    
         if ($response->successful()) {
-            // $feedbacks = $response->json();
-            $feedbacks = $response->json()['data']; // Ambil key 'data' saja
-
-
-            // dd($feedbacks);
-
+            $feedbacks = $response->json()['data'];
+    
+            // Ambil nama dokter untuk setiap konsultasi
+            foreach ($feedbacks as &$feedback) {
+                $konsultasiResponse = Http::get($this->konsultasiApiUrl . $feedback['id_konsultasi']);
+                if ($konsultasiResponse->successful()) {
+                    $feedback['nama_dokter'] = $konsultasiResponse->json()['data']['dokter']['nama_dokter'] ?? 'Tidak Diketahui';
+                } else {
+                    $feedback['nama_dokter'] = 'Tidak Diketahui';
+                }
+            }
+    
             return view('feedback.feedbackKonsultasi', compact('feedbacks'));
         } else {
             return view('feedback.feedbackKonsultasi', ['error' => 'Failed to fetch feedbacks']);
         }
     }
-
+    
     // public function show($id)
     // {
     //     $response = Http::get("{$this->baseApiUrl}/{$id}");

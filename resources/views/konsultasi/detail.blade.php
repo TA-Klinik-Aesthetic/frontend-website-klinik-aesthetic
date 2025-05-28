@@ -20,13 +20,47 @@
                 </tr>
                 <tr>
                     <th>Keluhan Pelanggan</th>
-                    <td>{{ $konsultasi['detail_konsultasi']['keluhan_pelanggan'] ?? 'Tidak ada keluhan' }}</td>
-                </tr>
-                <tr>
-                    <th>Saran Tindakan</th>
-                    <td>{{ $konsultasi['detail_konsultasi']['saran_tindakan'] ?? 'Tidak ada saran' }}</td>
+                    <td>{{ $konsultasi['keluhan_pelanggan'] ?? 'Tidak ada keluhan' }}</td>
                 </tr>
             </table>
+
+            <h4 class="mt-4">Detail Konsultasi</h4>
+            
+            <!-- Menampilkan pesan jika tidak ada detail konsultasi -->
+            @if(count($konsultasi['detail_konsultasi']) === 0)
+                <p class="text-muted">Belum ada detail konsultasi yang ditambahkan.</p>
+            @else
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Saran Tindakan</th>
+                            <th>Treatment</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($konsultasi['detail_konsultasi'] as $detail)
+                            <tr>                               
+                                <td>{{ $detail['saran_tindakan'] ?? 'Tidak ada saran' }}</td>
+                                <td>
+                                    {{ $detail['treatment']['nama_treatment'] ?? 'Tidak ada treatment' }}
+                                </td>
+                                <td>
+                                    @if ($detail['treatment'])
+                                        <a href="{{ route('treatment.show', ['id' => $detail['treatment']['id_treatment']]) }}"
+                                            class="btn btn-primary btn-sm">
+                                            Lihat Detail
+                                        </a>
+                                    @else
+                                        <span class="text-muted">Tidak tersedia</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+
             <a href="{{ route('konsultasi.with-doctor') }}" class="btn btn-secondary mt-3">Kembali</a>
         </div>
     </div>

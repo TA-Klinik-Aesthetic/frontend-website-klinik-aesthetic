@@ -5,7 +5,7 @@
         <h2>Detail Produk</h2>
 
         <!-- Menampilkan pesan sukses atau error -->
-        @if(session('success'))
+        @if (session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}
             </div>
@@ -25,7 +25,12 @@
                 <p class="card-text"><strong>Stok:</strong> {{ $produk['stok_produk'] }}</p>
 
                 <!-- Gambar Produk -->
-                <img src="{{ $produk['gambar_produk'] }}" alt="{{ $produk['nama_produk'] }}" class="img-fluid">
+                @if (!empty($produk['gambar_produk']))
+                    <p><strong>Gambar Produk:</strong></p>
+                    <img src="{{ $produk['gambar_produk'] }}" alt="{{ $produk['nama_produk'] }}" class="img-fluid">
+                @else
+                    <p>Gambar tidak tersedia.</p>
+                @endif
 
                 <a href="{{ route('produk.index') }}" class="btn btn-secondary mt-3">Kembali ke List Produk</a>
             </div>
