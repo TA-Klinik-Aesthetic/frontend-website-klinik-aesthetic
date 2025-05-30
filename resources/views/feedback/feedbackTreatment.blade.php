@@ -14,8 +14,8 @@
                     <th>Treatment</th>
                     <th>Rating</th>
                     <th>Teks Feedback</th>
-                    <th>Balasan Feedback</th>
-                    <th>Aksi</th>
+                    {{-- <th>Balasan Feedback</th>
+                    <th>Aksi</th> --}}
                 </tr>
             </thead>
             <tbody>
@@ -26,10 +26,10 @@
                         <td>{{ $feedback['nama_treatment'] }}</td>  <!-- Menampilkan nama treatment -->
                         <td>{{ $feedback['rating'] }}</td>
                         <td>{{ $feedback['teks_feedback'] }}</td>
-                        <td>{{ $feedback['balasan_feedback'] ?? '-' }}</td>
+                        {{-- <td>{{ $feedback['balasan_feedback'] ?? '-' }}</td>
                         <td>
                             <a href="{{ route('feedback.feedbackTreatment.show', $feedback['id_feedback_treatment']) }}" class="btn btn-primary btn-sm">Detail</a>
-                        </td>
+                        </td> --}}
                     </tr>
                 @endforeach
             </tbody>

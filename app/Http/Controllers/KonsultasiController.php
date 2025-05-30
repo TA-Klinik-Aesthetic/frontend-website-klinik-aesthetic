@@ -26,24 +26,24 @@ class KonsultasiController extends Controller
         return view('konsultasi.tambahBooking', ['data' => $dataWithDoctor]);
     }
 
-    public function indexWithoutDoctor()
-    {
-        // $token = session('token'); // Mendapatkan token dari session
+    // public function indexWithoutDoctor()
+    // {
+    //     // $token = session('token'); // Mendapatkan token dari session
 
-        // $response = Http::withToken($token)->get('http://127.0.0.1:8080/api/konsultasi');
-        // $data = $response->json();
+    //     // $response = Http::withToken($token)->get('http://127.0.0.1:8080/api/konsultasi');
+    //     // $data = $response->json();
 
-        $response = Http::get('http://127.0.0.1:8080/api/konsultasi');
-        $data = $response->json();
+    //     $response = Http::get('http://127.0.0.1:8080/api/konsultasi');
+    //     $data = $response->json();
 
-        // Filter data untuk konsultasi tanpa dokter
-        $dataWithoutDoctor = collect($data['data'])->filter(function ($item) {
-            return !isset($item['dokter']); // Data tidak memiliki dokter
-        });
+    //     // Filter data untuk konsultasi tanpa dokter
+    //     $dataWithoutDoctor = collect($data['data'])->filter(function ($item) {
+    //         return !isset($item['dokter']); // Data tidak memiliki dokter
+    //     });
 
-        // Mengirim data ke tampilan
-        return view('konsultasi.lihatBooking', ['data' => $dataWithoutDoctor]);
-    }
+    //     // Mengirim data ke tampilan
+    //     return view('konsultasi.lihatBooking', ['data' => $dataWithoutDoctor]);
+    // }
 
     public function create()
     {
@@ -90,48 +90,48 @@ class KonsultasiController extends Controller
         return redirect()->back();
     }
 
-    public function edit($id)
-    {
-        // $token = session('token'); // Mendapatkan token dari session
+    // public function edit($id)
+    // {
+    //     // $token = session('token'); // Mendapatkan token dari session
 
-        // // Ambil data konsultasi berdasarkan ID
-        // $response = Http::withToken($token)->get("http://127.0.0.1:8080/api/konsultasi/{$id}");
+    //     // // Ambil data konsultasi berdasarkan ID
+    //     // $response = Http::withToken($token)->get("http://127.0.0.1:8080/api/konsultasi/{$id}");
 
-        // $konsultasi = $response->json()['data'];
+    //     // $konsultasi = $response->json()['data'];
 
-        // // Ambil semua dokter
-        // $dokters = Http::withToken($token)->get('http://127.0.0.1:8080/api/dokters')->json()['data'];
+    //     // // Ambil semua dokter
+    //     // $dokters = Http::withToken($token)->get('http://127.0.0.1:8080/api/dokters')->json()['data'];
 
-        $response = Http::get("http://127.0.0.1:8080/api/konsultasi/{$id}");
+    //     $response = Http::get("http://127.0.0.1:8080/api/konsultasi/{$id}");
 
-        $konsultasi = $response->json()['data'];
+    //     $konsultasi = $response->json()['data'];
 
-        // Ambil semua dokter
-        $dokters = Http::get('http://127.0.0.1:8080/api/dokters')->json()['data'];
+    //     // Ambil semua dokter
+    //     $dokters = Http::get('http://127.0.0.1:8080/api/dokters')->json()['data'];
 
-        return view('konsultasi.edit', compact('konsultasi', 'dokters'));
-    }
+    //     return view('konsultasi.edit', compact('konsultasi', 'dokters'));
+    // }
 
-    public function update(Request $request, $id)
-    {
-        // $token = session('token'); // Mendapatkan token dari session
+    // public function update(Request $request, $id)
+    // {
+    //     // $token = session('token'); // Mendapatkan token dari session
 
-        // $response = Http::withToken($token)->put("http://127.0.0.1:8080/api/konsultasi/{$id}", [
-        //     'id_dokter' => $request->id_dokter,
-        // ]);
+    //     // $response = Http::withToken($token)->put("http://127.0.0.1:8080/api/konsultasi/{$id}", [
+    //     //     'id_dokter' => $request->id_dokter,
+    //     // ]);
 
-        $response = Http::put("http://127.0.0.1:8080/api/konsultasi/{$id}", [
-            'id_dokter' => $request->id_dokter,
-        ]);
+    //     $response = Http::put("http://127.0.0.1:8080/api/konsultasi/{$id}", [
+    //         'id_dokter' => $request->id_dokter,
+    //     ]);
 
-        if ($response->successful()) {
-            session()->flash('success', 'Data dokter berhasil diperbarui!');
-            return redirect()->route('konsultasi.without-doctor');
-        }
+    //     if ($response->successful()) {
+    //         session()->flash('success', 'Data dokter berhasil diperbarui!');
+    //         return redirect()->route('konsultasi.without-doctor');
+    //     }
 
-        session()->flash('error', 'Terjadi kesalahan saat memperbarui data dokter!');
-        return redirect()->back();
-    }
+    //     session()->flash('error', 'Terjadi kesalahan saat memperbarui data dokter!');
+    //     return redirect()->back();
+    // }
 
     public function destroy($id)
     {

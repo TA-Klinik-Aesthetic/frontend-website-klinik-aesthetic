@@ -1,4 +1,4 @@
-@extends('dashboard.index')
+{{-- @extends('dashboard.index')
 
 @section('content')
     <h1 class="h3 mb-2 text-gray-800">Update Dokter</h1>
@@ -33,4 +33,4 @@
         </div>
         <button type="submit" class="btn btn-primary">Update</button>
     </form>
-@endsection
+@endsection --}}

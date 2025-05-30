@@ -79,11 +79,11 @@ Route::get('/konsultasi', function () {
 })->name('users.konsultasi');
 
 Route::get('/konsultasi/with-doctor', [KonsultasiController::class, 'indexWithDoctor'])->name('konsultasi.with-doctor');
-Route::get('/konsultasi/without-doctor', [KonsultasiController::class, 'indexWithoutDoctor'])->name('konsultasi.without-doctor');
+// Route::get('/konsultasi/without-doctor', [KonsultasiController::class, 'indexWithoutDoctor'])->name('konsultasi.without-doctor');
 Route::get('/konsultasi/create', [KonsultasiController::class, 'create'])->name('konsultasi.create');
 Route::post('/konsultasi', [KonsultasiController::class, 'store'])->name('konsultasi.store');
-Route::get('/konsultasi/{id}/edit', [KonsultasiController::class, 'edit'])->name('konsultasi.edit');
-Route::put('/konsultasi/{id}', [KonsultasiController::class, 'update'])->name('konsultasi.update');
+// Route::get('/konsultasi/{id}/edit', [KonsultasiController::class, 'edit'])->name('konsultasi.edit');
+// Route::put('/konsultasi/{id}', [KonsultasiController::class, 'update'])->name('konsultasi.update');
 Route::delete('/konsultasi/{id}', [KonsultasiController::class, 'destroy'])->name('konsultasi.destroy');
 Route::get('/konsultasi/{id}/detail', [KonsultasiController::class, 'show'])->name('konsultasi.show');
 // Route::get('/konsultasi/edit-keluhan/{id}', [KonsultasiController::class, 'editKeluhan'])->name('konsultasi.editKeluhan');

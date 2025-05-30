@@ -34,23 +34,14 @@
         </div>
     </li>
 
-
     <!-- Divider -->
     <hr class="sidebar-divider">
 
-    <!-- Nav Item - Konsultasi -->
+    <!-- Nav Item - Promo -->
     <li class="nav-item">
-        <a class="nav-link" data-toggle="collapse" data-target="#collapseKonsultasi" aria-expanded="true"
-            aria-controls="collapseKonsultasi">
-            <span>Konsultasi</span>
+        <a class="nav-link" href="{{ url('/konsultasi/with-doctor') }}">
+            <span>Booking Konsultasi</span>
         </a>
-        <div id="collapseKonsultasi" class="collapse" aria-labelledby="headingKonsultasi"
-            data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" href="{{ url('/konsultasi/without-doctor') }}">Konsultasi Pelanggan</a>
-                <a class="collapse-item" href="{{ url('/konsultasi/with-doctor') }}">Booking Konsultasi</a>
-            </div>
-        </div>
     </li>
 
     <!-- Divider -->
@@ -180,8 +171,7 @@
             aria-controls="collapseLaporan">
             <span>Laporan</span>
         </a>
-        <div id="collapseLaporan" class="collapse" aria-labelledby="headingLaporan"
-            data-parent="#accordionSidebar">
+        <div id="collapseLaporan" class="collapse" aria-labelledby="headingLaporan" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <!-- Menggunakan nama rute -->
                 {{-- <a class="collapse-item" href="{{ route('inventaris-stok.index') }}">Inventaris Stok</a> --}}

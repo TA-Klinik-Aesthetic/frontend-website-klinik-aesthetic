@@ -49,6 +49,8 @@ class DetailBookingTreatmentController extends Controller
         $request->validate([
             'id_user' => 'required|integer',
             'waktu_treatment' => 'required|date',
+            'id_dokter' => 'nullable|integer',     // Tambahkan ini
+            'id_beautician' => 'required|integer', // Tambahkan ini
             'status_booking_treatment' => 'required|string',
             'details' => 'required|array',
         ]);
@@ -57,6 +59,8 @@ class DetailBookingTreatmentController extends Controller
         $bookingData = [
             'id_user' => $request->id_user,
             'waktu_treatment' => $request->waktu_treatment,
+            'id_dokter' => $request->id_dokter,         // Tambahkan ini
+            'id_beautician' => $request->id_beautician, // Tambahkan ini
             'status_booking_treatment' => $request->status_booking_treatment,
             'id_promo' => $request->id_promo,
             'details' => $request->details

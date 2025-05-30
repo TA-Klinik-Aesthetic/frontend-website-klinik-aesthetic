@@ -11,6 +11,18 @@
             <div class="card-body">
                 <p><strong>Nama Pelanggan:</strong> {{ $bookingDetail['booking_treatment']['user']['nama_user'] }}</p>
                 <p><strong>Waktu Treatment:</strong> {{ $bookingDetail['booking_treatment']['waktu_treatment'] }}</p>
+                <p><strong>Dokter:</strong>
+                    @php
+                        $dokter = collect($dokters)->firstWhere('id_dokter', $bookingDetail['booking_treatment']['id_dokter']);
+                    @endphp
+                    {{ $dokter ? $dokter['nama_dokter'] : 'Tidak ada Dokter' }}
+                </p>
+                <p><strong>Beautician:</strong>
+                    @php
+                        $beautician = collect($beauticians)->firstWhere('id_beautician', $bookingDetail['booking_treatment']['id_beautician']);
+                    @endphp
+                    {{ $beautician ? $beautician['nama_beautician'] : 'Tidak ada Beautician' }}
+                </p>
                 <p><strong>Status Booking:</strong> {{ $bookingDetail['booking_treatment']['status_booking_treatment'] }}
                 </p>
                 <p><strong>Harga Total:</strong> {{ $bookingDetail['booking_treatment']['harga_total'] }}</p>
@@ -23,9 +35,6 @@
                         <tr>
                             <th>Treatment</th>
                             <th>Biaya Treatment</th>
-                            <th>Dokter</th>
-                            <th>Beautician</th>
-                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -41,29 +50,6 @@
                                     {{ $treatment ? $treatment['nama_treatment'] : 'Treatment tidak ditemukan' }}
                                 </td>
                                 <td>{{ $detail['biaya_treatment'] }}</td>
-                                <td>
-                                    @php
-                                        $dokter = collect($dokters)->firstWhere('id_dokter', $detail['id_dokter']);
-                                    @endphp
-                                    {{ $dokter ? $dokter['nama_dokter'] : 'Tidak ada Dokter' }}
-                                </td>
-                                <td>
-                                    @php
-                                        $beautician = collect($beauticians)->firstWhere(
-                                            'id_beautician',
-                                            $detail['id_beautician'],
-                                        );
-                                    @endphp
-                                    {{ $beautician ? $beautician['nama_beautician'] : 'Tidak ada Beautician' }}
-                                </td>
-                                <td>
-                                    <!-- Tombol untuk membuka modal -->
-                                    <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
-                                    data-target="#editModal{{ $detail['id_detail_booking_treatment'] }}">
-                                    Edit
-                                </button>
-                                
-                                </td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -72,7 +58,7 @@
         </div>
     </div>
 
-    @foreach ($bookingDetail['booking_treatment']['detail_booking'] as $detail)
+    {{-- @foreach ($bookingDetail['booking_treatment']['detail_booking'] as $detail)
     <div class="modal fade" id="editModal{{ $detail['id_detail_booking_treatment'] }}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel{{ $detail['id_detail_booking_treatment'] }}" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -135,5 +121,5 @@
             console.log('Modal ditemukan:', modal);
             console.log('Modal ID:', modal.id);
         });
-    </script>
+    </script> --}}
 @endsection

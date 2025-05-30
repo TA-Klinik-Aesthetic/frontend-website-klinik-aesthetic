@@ -33,11 +33,71 @@
                             <td>
                                 <a href="{{ route('booking.detail', $booking['id_booking_treatment']) }}"
                                     class="btn btn-info">Detail</a>
+                                <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
+                                    data-target="#editModal{{ $booking['id_booking_treatment'] }}">
+                                    Edit
+                                </button>
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
+
+            @foreach ($bookingTreatments as $booking)
+                <div class="modal fade" id="editModal{{ $booking['id_booking_treatment'] }}" tabindex="-1" role="dialog"
+                    aria-labelledby="editModalLabel{{ $booking['id_booking_treatment'] }}" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <form action="{{ route('detailBooking.update', $booking['id_booking_treatment']) }}"
+                                method="POST">
+                                @csrf
+                                @method('PUT')
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editModalLabel{{ $booking['id_booking_treatment'] }}">Edit
+                                        Booking Treatment</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <!-- Dropdown untuk Dokter -->
+                                    <div class="form-group">
+                                        <label for="id_dokter">Nama Dokter</label>
+                                        <select name="id_dokter" id="id_dokter" class="form-control">
+                                            <option value="">Pilih Dokter</option>
+                                            @foreach ($dokters as $dokter)
+                                                <option value="{{ $dokter['id_dokter'] }}"
+                                                    @if ($dokter['id_dokter'] == $booking['id_dokter']) selected @endif>
+                                                    {{ $dokter['nama_dokter'] }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <!-- Dropdown untuk Beautician -->
+                                    <div class="form-group">
+                                        <label for="id_beautician">Nama Beautician</label>
+                                        <select name="id_beautician" id="id_beautician" class="form-control" required>
+                                            <option value="">Pilih Beautician</option>
+                                            @foreach ($beauticians as $beautician)
+                                                <option value="{{ $beautician['id_beautician'] }}"
+                                                    @if ($beautician['id_beautician'] == $booking['id_beautician']) selected @endif>
+                                                    {{ $beautician['nama_beautician'] }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+
             <!-- Modal Tambah Booking -->
             <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel"
                 aria-hidden="true">
@@ -69,6 +129,28 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <label for="dokter">Dokter</label>
+                                    <select name="id_dokter" class="form-control">
+                                        <option value="">Pilih Dokter</option>
+                                        @foreach ($dokters as $dokter)
+                                            <option value="{{ $dokter['id_dokter'] }}">{{ $dokter['nama_dokter'] }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="beautician">Beautician</label>
+                                    <select name="id_beautician" class="form-control" required>
+                                        <option value="">Pilih Beautician</option>
+                                        @foreach ($beauticians as $beautician)
+                                            <option value="{{ $beautician['id_beautician'] }}">
+                                                {{ $beautician['nama_beautician'] }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
                                     <label for="status_booking_treatment">Status</label>
                                     <select name="status_booking_treatment" id="status_booking_treatment"
                                         class="form-control" required>
@@ -94,33 +176,12 @@
                                     <div class="treatment-group">
                                         <div class="form-group">
                                             <label for="treatment">Treatment</label>
-                                            <select name="details[0][id_treatment]" class="form-control treatment" required>
+                                            <select name="details[0][id_treatment]" class="form-control treatment"
+                                                required>
                                                 <option value="">Pilih Treatment</option>
                                                 @foreach ($treatments as $treatment)
                                                     <option value="{{ $treatment['id_treatment'] }}">
                                                         {{ $treatment['nama_treatment'] }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="dokter">Dokter</label>
-                                            <select name="details[0][id_dokter]" class="form-control dokter">
-                                                <option value="">Pilih Dokter</option>
-                                                @foreach ($dokters as $dokter)
-                                                    <option value="{{ $dokter['id_dokter'] }}">
-                                                        {{ $dokter['nama_dokter'] }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="beautician">Beautician</label>
-                                            <select name="details[0][id_beautician]" class="form-control beautician">
-                                                <option value="">Pilih Beautician</option>
-                                                @foreach ($beauticians as $beautician)
-                                                    <option value="{{ $beautician['id_beautician'] }}">
-                                                        {{ $beautician['nama_beautician'] }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -208,26 +269,6 @@
                 <option value="">Pilih Treatment</option>
                 @foreach ($treatments as $treatment)
                     <option value="{{ $treatment['id_treatment'] }}">{{ $treatment['nama_treatment'] }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Dokter</label>
-            <select name="details[${treatmentIndex}][id_dokter]" class="form-control dokter">
-                <option value="">Pilih Dokter</option>
-                @foreach ($dokters as $dokter)
-                    <option value="{{ $dokter['id_dokter'] }}">{{ $dokter['nama_dokter'] }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Beautician</label>
-            <select name="details[${treatmentIndex}][id_beautician]" class="form-control beautician">
-                <option value="">Pilih Beautician</option>
-                @foreach ($beauticians as $beautician)
-                    <option value="{{ $beautician['id_beautician'] }}">{{ $beautician['nama_beautician'] }}</option>
                 @endforeach
             </select>
         </div>
@@ -334,7 +375,8 @@
                 const promoVal = $('#promo').val();
                 if (allTreatmentUseKompensasi && promoVal) {
                     alert(
-                    'Promo tidak bisa digunakan jika seluruh treatment sudah menggunakan kompensasi.');
+                        'Promo tidak bisa digunakan jika seluruh treatment sudah menggunakan kompensasi.'
+                    );
                     isValid = false;
                 }
 
