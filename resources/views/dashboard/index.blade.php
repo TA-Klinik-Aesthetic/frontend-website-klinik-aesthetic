@@ -51,7 +51,6 @@
                 <div class="container-fluid">
                     <!-- Begin Page Content -->
                     @yield('content')
-                    @stack('scripts')
                     <!-- End Page Content -->
                 </div>
             </div>
@@ -117,7 +116,8 @@
     <!-- Page level custom scripts -->
     <script src="{{ asset('backend/js/demo/chart-area-demo.js') }}"></script>
     <script src="{{ asset('backend/js/demo/chart-pie-demo.js') }}"></script>
-
+    <script src="{{ asset('backend/js/demo/chart-bar-demo.js') }}"></script>
+    @stack('scripts')
 </body>
 
 </html>

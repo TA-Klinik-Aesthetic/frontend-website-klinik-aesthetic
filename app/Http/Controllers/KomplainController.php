@@ -10,6 +10,8 @@ class KomplainController extends Controller
     protected $komplainApiUrl = 'http://127.0.0.1:8080/api/komplain';
     protected $bookingTreatmentApiUrl = 'http://127.0.0.1:8080/api/detailBookingTreatments'; // API untuk mendapatkan data booking treatment
     protected $kompensasiApiUrl = 'http://127.0.0.1:8080/api/kompensasi'; // API untuk mengambil daftar kompensasi
+    protected $detailBookingApiUrl = 'http://127.0.0.1:8080/api/detail-booking-treatment';
+
 
     public function index()
     {
@@ -26,6 +28,11 @@ class KomplainController extends Controller
         $bookingResponse = Http::get($this->bookingTreatmentApiUrl);
         $bookingTreatments = $bookingResponse->json();
 
+        // Ambil data detail booking treatment
+        $detailBookingResponse = Http::get($this->detailBookingApiUrl);
+        $detailBookings = $detailBookingResponse->json();
+
+
         // Ambil data komplain treatment
         $komplainTreatmentResponse = Http::get('http://127.0.0.1:8080/api/komplain-treatment');
         $komplainTreatments = $komplainTreatmentResponse->json();
@@ -39,7 +46,7 @@ class KomplainController extends Controller
             $komplain['waktu_treatment'] = $this->getWaktuTreatment($komplain['id_booking_treatment'], $bookingTreatments);
 
             // Menambahkan informasi treatment untuk setiap komplain
-            $komplain['treatments'] = $this->getTreatmentsForKomplain($komplain['id_komplain'], $komplainTreatments);
+            $komplain['treatment'] = $this->getTreatmentNameForKomplain($komplain['id_detail_booking_treatment'], $detailBookings);
 
             // Menambahkan kompensasi yang diberikan ke komplain
             $komplain['kompensasi_diberikan'] = $this->getKompensasiDiberikan($komplain['id_komplain'], $kompensasiDiberikan);
@@ -61,19 +68,17 @@ class KomplainController extends Controller
     }
 
     // Fungsi untuk mendapatkan treatment berdasarkan id_komplain
-    private function getTreatmentsForKomplain($idKomplain, $komplainTreatments)
+    private function getTreatmentNameForKomplain($idDetailBookingTreatment, $detailBookings)
     {
-        $treatmentNames = [];
-
-        foreach ($komplainTreatments as $komplainTreatment) {
-            if ($komplainTreatment['id_komplain'] == $idKomplain) {
-                // Ambil nama treatment dari komplain_treatment yang ada
-                $treatmentNames[] = $komplainTreatment['detail_booking_treatment']['treatment']['nama_treatment'];
+        foreach ($detailBookings['detail_booking_treatments'] as $detail) {
+            if ($detail['id_detail_booking_treatment'] == $idDetailBookingTreatment) {
+                return $detail['treatment']['nama_treatment'];
             }
         }
-
-        return $treatmentNames;
+    
+        return '-';
     }
+    
 
     public function getKompensasiDiberikan($idKomplain, $kompensasiDiberikan)
     {

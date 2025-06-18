@@ -62,9 +62,7 @@
                         <!-- Treatment -->
                         <div class="form-group">
                             <label for="edit_treatment">Treatment</label>
-                            <ul id="edit_treatment_list" class="list-group">
-                                <!-- List treatment akan dimasukkan di sini -->
-                            </ul>
+                            <input type="text" class="form-control" id="edit_treatment" disabled>
                         </div>
 
                         <!-- Teks Komplain -->
@@ -88,7 +86,7 @@
                         <!-- Input Kompensasi -->
                         <div class="form-group">
                             <label for="edit_id_kompensasi">ID Kompensasi</label>
-                            <select class="form-control" id="edit_id_kompensasi" name="id_kompensasi" required>
+                            <select class="form-control" id="edit_id_kompensasi" name="id_kompensasi">
                                 <option value="">Pilih Kompensasi</option>
                                 @foreach ($kompensasiList as $kompensasi)
                                     <option value="{{ $kompensasi['id_kompensasi'] }}">
@@ -100,12 +98,12 @@
 
                         <div class="form-group">
                             <label for="edit_kode_kompensasi">Kode Kompensasi</label>
-                            <input type="text" class="form-control" id="edit_kode_kompensasi" name="kode_kompensasi" required>
+                            <input type="text" class="form-control" id="edit_kode_kompensasi" name="kode_kompensasi">
                         </div>
 
                         <div class="form-group">
                             <label for="edit_tanggal_berakhir_kompensasi">Tanggal Berakhir Kompensasi</label>
-                            <input type="date" class="form-control" id="edit_tanggal_berakhir_kompensasi" name="tanggal_berakhir_kompensasi" required>
+                            <input type="date" class="form-control" id="edit_tanggal_berakhir_kompensasi" name="tanggal_berakhir_kompensasi">
                         </div>
 
                     </div>
@@ -134,15 +132,18 @@
             document.getElementById('edit_waktu_treatment').value = komplain.waktu_treatment;
 
             // Set Treatment List
-            const treatmentListContainer = document.getElementById('edit_treatment_list');
-            treatmentListContainer.innerHTML = ''; // Clear previous treatment list
+            // const treatmentListContainer = document.getElementById('edit_treatment_list');
+            // treatmentListContainer.innerHTML = ''; // Clear previous treatment list
 
-            komplain.treatments.forEach(function(treatment, index) {
-                const treatmentItem = document.createElement('li');
-                treatmentItem.classList.add('list-group-item');
-                treatmentItem.innerHTML = treatment; // Menampilkan nama treatment
-                treatmentListContainer.appendChild(treatmentItem);
-            });
+            // komplain.treatments.forEach(function(treatment, index) {
+            //     const treatmentItem = document.createElement('li');
+            //     treatmentItem.classList.add('list-group-item');
+            //     treatmentItem.innerHTML = treatment; // Menampilkan nama treatment
+            //     treatmentListContainer.appendChild(treatmentItem);
+            // });
+
+            document.getElementById('edit_treatment').value = komplain.treatment;
+
 
             // Jika ada kompensasi, set input kompensasi
             if (komplain.kompensasi_diberikan) {

@@ -27,15 +27,50 @@
                             <td>{{ $booking['user_name'] }}</td>
                             <td>{{ $booking['waktu_treatment'] }}</td>
                             <td>{{ $booking['status_booking_treatment'] }}</td>
-                            <td>{{ $booking['harga_total'] }}</td>
-                            <td>{{ $booking['potongan_harga'] }}</td>
-                            <td>{{ $booking['harga_akhir_treatment'] }}</td>
+                            <td>
+                                {{-- Format Harga Total sebagai Rupiah --}}
+                                @php
+                                    $hargaTotal = $booking['harga_total'];
+                                @endphp
+                                Rp{{ number_format($hargaTotal, 0, ',', '.') }}
+                            </td>
+                            <td>
+                                {{-- Cari promo yang digunakan --}}
+                                @php
+                                    $promo = collect($promos)->firstWhere('id_promo', $booking['id_promo']);
+                                @endphp
+
+                                @if ($promo)
+                                    @if ($promo['tipe_potongan'] === 'Diskon')
+                                        {{-- Potongan dalam persen --}}
+                                        {{ number_format($promo['potongan_harga']) }}%
+                                    @else
+                                        {{-- Potongan dalam rupiah --}}
+                                        Rp{{ number_format($booking['potongan_harga'], 0, ',', '.') }}
+                                    @endif
+                                @else
+                                    {{-- Jika tidak ada promo --}}
+                                    -
+                                @endif
+                            </td>
+                            <td>
+                                {{-- Format Harga Akhir sebagai Rupiah --}}
+                                @php
+                                    $hargaAkhir = $booking['harga_akhir_treatment'];
+                                @endphp
+                                Rp{{ number_format($hargaAkhir, 0, ',', '.') }}
+                            </td>
                             <td>
                                 <a href="{{ route('booking.detail', $booking['id_booking_treatment']) }}"
                                     class="btn btn-info">Detail</a>
                                 <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
                                     data-target="#editModal{{ $booking['id_booking_treatment'] }}">
                                     Edit
+                                </button>
+                                <!-- Tombol Ubah Status -->
+                                <button class="btn btn-primary btn-sm" data-toggle="modal"
+                                    data-target="#statusModal-{{ $booking['id_booking_treatment'] }}">
+                                    Ubah Status
                                 </button>
                             </td>
                         </tr>
@@ -98,6 +133,54 @@
                 </div>
             @endforeach
 
+            {{-- Modal Ubah Status Booking Treatment --}}
+            @foreach ($bookingTreatments as $booking)
+                <div class="modal fade" id="statusModal-{{ $booking['id_booking_treatment'] }}" tabindex="-1"
+                    role="dialog" aria-labelledby="statusModalLabel-{{ $booking['id_booking_treatment'] }}"
+                    aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <form class="status-update-form" action="{{ route('bookingTreatment.updateStatus', $booking['id_booking_treatment']) }}"
+                            method="POST">
+                            @csrf
+                            @method('PUT')
+
+                            {{-- simpan status saat ini --}}
+                            <input type="hidden" name="current_status" value="{{ $booking['status_booking_treatment'] }}">
+
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="statusModalLabel-{{ $booking['id_booking_treatment'] }}">
+                                        Ubah Status Booking Treatment
+                                    </h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>
+                                        <strong>Pelanggan:</strong> {{ $booking['user_name'] }}<br>
+                                        <strong>Waktu:</strong> {{ $booking['waktu_treatment'] }}
+                                    </p>
+                                    <div class="form-group">
+                                        <label for="status-{{ $booking['id_booking_treatment'] }}">Status Baru</label>
+                                        <select id="status-{{ $booking['id_booking_treatment'] }}"
+                                            name="status_booking_treatment" class="form-control" required>
+                                            <option value="">-- Pilih Status --</option>
+                                            <option value="Selesai">Selesai</option>
+                                            <option value="Dibatalkan">Dibatalkan</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            @endforeach
+
             <!-- Modal Tambah Booking -->
             <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel"
                 aria-hidden="true">
@@ -150,7 +233,7 @@
                                     </select>
                                 </div>
 
-                                <div class="form-group">
+                                {{-- <div class="form-group">
                                     <label for="status_booking_treatment">Status</label>
                                     <select name="status_booking_treatment" id="status_booking_treatment"
                                         class="form-control" required>
@@ -159,17 +242,35 @@
                                         <option value="Dibatalkan">Dibatalkan</option>
                                         <option value="Selesai">Selesai</option>
                                     </select>
-                                </div>
+                                </div> --}}
 
                                 <div class="form-group">
                                     <label for="promo">Promo (Opsional)</label>
                                     <select name="id_promo" id="promo" class="form-control">
                                         <option value="">Pilih Promo</option>
                                         @foreach ($promos as $promo)
-                                            <option value="{{ $promo['id_promo'] }}">{{ $promo['nama_promo'] }}</option>
+                                            <option value="{{ $promo['id_promo'] }}">
+                                                {{ $promo['nama_promo'] }}
+                                                @if ($promo['tipe_potongan'] === 'Diskon')
+                                                    - Potongan:
+                                                    {{ rtrim(rtrim(number_format($promo['potongan_harga'], 2, ',', ''), '0'), ',') }}%
+                                                    @if ($promo['minimal_belanja'])
+                                                        - Min Belanja:
+                                                        Rp{{ number_format($promo['minimal_belanja'], 0, ',', '.') }}
+                                                    @endif
+                                                @else
+                                                    - Potongan:
+                                                    Rp{{ number_format($promo['potongan_harga'], 0, ',', '.') }}
+                                                    @if ($promo['minimal_belanja'])
+                                                        - Min Belanja:
+                                                        Rp{{ number_format($promo['minimal_belanja'], 0, ',', '.') }}
+                                                    @endif
+                                                @endif
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
+
 
                                 <div id="treatmentDetails">
                                     <!-- Kolom treatment pertama -->
@@ -181,7 +282,9 @@
                                                 <option value="">Pilih Treatment</option>
                                                 @foreach ($treatments as $treatment)
                                                     <option value="{{ $treatment['id_treatment'] }}">
-                                                        {{ $treatment['nama_treatment'] }}</option>
+                                                        {{ $treatment['nama_treatment'] }} -
+                                                        Rp{{ number_format($treatment['biaya_treatment'], 0, ',', '.') }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -268,7 +371,10 @@
             <select name="details[${treatmentIndex}][id_treatment]" class="form-control treatment" required>
                 <option value="">Pilih Treatment</option>
                 @foreach ($treatments as $treatment)
-                    <option value="{{ $treatment['id_treatment'] }}">{{ $treatment['nama_treatment'] }}</option>
+                <option value="{{ $treatment['id_treatment'] }}">
+                    {{ $treatment['nama_treatment'] }} -
+                    Rp{{ number_format($treatment['biaya_treatment'], 0, ',', '.') }}
+                </option>
                 @endforeach
             </select>
         </div>
@@ -345,6 +451,7 @@
                 let isValid = true;
                 const userId = $('#user').val();
 
+                // Validasi kompensasi user & treatment
                 $('.treatment-group').each(function() {
                     const treatment = $(this).find('.treatment').val();
                     const kompensasiSelect = $(this).find('.select2');
@@ -357,6 +464,7 @@
                         if (kompensasiUser != userId || kompensasiTreatment != treatment) {
                             alert('Kode kompensasi tidak valid untuk user atau treatment.');
                             isValid = false;
+                            e.preventDefault();
                             return false;
                         }
                     }
@@ -373,15 +481,80 @@
                 });
 
                 const promoVal = $('#promo').val();
+
+                // ❗ Validasi kombinasi kompensasi semua + promo
                 if (allTreatmentUseKompensasi && promoVal) {
                     alert(
                         'Promo tidak bisa digunakan jika seluruh treatment sudah menggunakan kompensasi.'
                     );
                     isValid = false;
+                    e.preventDefault();
+                    return false;
                 }
 
-                if (!isValid) e.preventDefault();
+                // ❗ Validasi promo dan minimal belanja
+                if (promoVal && !allTreatmentUseKompensasi) {
+                    const selectedPromo = @json($promos).find(p => p.id_promo == promoVal);
+
+                    if (selectedPromo && selectedPromo.minimal_belanja > 0) {
+                        let totalWithoutKompensasi = 0;
+
+                        $('.treatment-group').each(function() {
+                            const kompensasiVal = $(this).find('.kompensasi-select').val();
+                            const treatmentId = $(this).find('.treatment').val();
+
+                            if (!kompensasiVal && treatmentId) {
+                                const selectedTreatment = @json($treatments).find(t => t
+                                    .id_treatment == treatmentId);
+                                if (selectedTreatment) {
+                                    totalWithoutKompensasi += parseFloat(selectedTreatment
+                                        .biaya_treatment);
+                                }
+                            }
+                        });
+
+                        if (totalWithoutKompensasi < selectedPromo.minimal_belanja) {
+                            const formatter = new Intl.NumberFormat('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR'
+                            });
+
+                            alert(
+                                `Promo "${selectedPromo.nama_promo}" tidak bisa digunakan.\n\n` +
+                                `Total belanja tanpa kompensasi: ${formatter.format(totalWithoutKompensasi)}\n` +
+                                `Minimal belanja yang dibutuhkan: ${formatter.format(selectedPromo.minimal_belanja)}`
+                            );
+
+                            isValid = false;
+                            e.preventDefault();
+                            return false;
+                        }
+
+                    }
+                }
+
+                // ❗ Prevent jika ada yang tidak valid
+                if (!isValid) {
+                    e.preventDefault();
+                    return false;
+                }
             });
         });
     </script>
+    <script>
+        // Tangkap event submit untuk semua form dengan class .status-update-form
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.status-update-form').forEach(function(form) {
+                form.addEventListener('submit', function(e) {
+                    // baca status saat ini
+                    const current = form.querySelector('input[name="current_status"]').value;
+                    if (current.trim() !== 'Berhasil dibooking') {
+                        alert('Hanya booking dengan status "Berhasil Dibooking" yang boleh diubah statusnya.');
+                        e.preventDefault();  // batalkan submit
+                    }
+                });
+            });
+        });
+    </script>
+    
 @endpush

@@ -11,8 +11,8 @@
         @endif
 
         <!-- Tombol untuk Menambah Pembayaran -->
-        <button class="btn btn-success mb-3" data-toggle="modal" data-target="#tambahPembayaranModal"
-            onclick="clearForm()">Tambah Pembayaran</button>
+        {{-- <button class="btn btn-success mb-3" data-toggle="modal" data-target="#tambahPembayaranModal"
+            onclick="clearForm()">Tambah Pembayaran</button> --}}
 
         <table class="table table-bordered">
             <thead>
@@ -23,6 +23,7 @@
                     <th>Uang</th>
                     <th>Kembalian</th>
                     <th>Status Pembayaran</th>
+                    <th>Waktu Pembayaran</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -30,28 +31,33 @@
                 @foreach ($pembayaranProdukList as $pembayaran)
                     <tr>
                         <td>{{ $pembayaran['user_name'] }}</td>
-                        <td>{{ $pembayaran['harga_akhir'] }}</td>
+                        <td>Rp{{ number_format($pembayaran['harga_akhir'], 0, ',', '.') }}</td>
                         <td>{{ $pembayaran['metode_pembayaran'] }}</td>
                         <td>{{ $pembayaran['uang'] }}</td>
                         <td>{{ $pembayaran['kembalian'] }}</td>
-                        <td>{{ $pembayaran['penjualan_produk']['status_pembayaran'] }}</td>
+                        <td>{{ $pembayaran['status_pembayaran'] }}</td>
+                        <td>{{ $pembayaran['waktu_pembayaran'] }}</td>
+                        {{-- <td>{{ $pembayaran['penjualan_produk']['status_pembayaran'] }}</td> --}}
                         <td>
                             <!-- Tombol Edit -->
-                            <button class="btn btn-primary" data-toggle="modal" data-target="#editPembayaranModal"
-                                data-id="{{ $pembayaran['id_pembayaran_produk'] }}"
-                                data-id_penjualan_produk="{{ $pembayaran['id_penjualan_produk'] }}"
-                                data-total_bayar="{{ $pembayaran['uang'] }}"
-                                data-metode_pembayaran="{{ $pembayaran['metode_pembayaran'] }}"
-                                onclick="populateEditModal(this)">
+                            <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editPembayaranModal"
+                                data-id="{{ $pembayaran['id_pembayaran'] }}"
+                                data-metode="{{ $pembayaran['metode_pembayaran'] }}" data-uang="{{ $pembayaran['uang'] }}">
                                 Edit
                             </button>
+
+                            <a href="{{ route('invoice.pembayaran-produk', $pembayaran['id_pembayaran']) }}"
+                                class="btn btn-info btn-sm">
+                                Buat Invoice
+                            </a>
+
                         </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
 
-        <!-- Modal Tambah Pembayaran Produk -->
+        {{-- <!-- Modal Tambah Pembayaran Produk -->
         <div class="modal fade" id="tambahPembayaranModal" tabindex="-1" role="dialog"
             aria-labelledby="tambahPembayaranModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -94,7 +100,7 @@
                     </form>
                 </div>
             </div>
-        </div>
+        </div> --}}
 
         <!-- Modal Edit Pembayaran Produk -->
         <div class="modal fade" id="editPembayaranModal" tabindex="-1" role="dialog"
@@ -112,7 +118,7 @@
                         </div>
                         <div class="modal-body">
                             <!-- ID Penjualan Produk -->
-                            <div class="form-group">
+                            {{-- <div class="form-group">
                                 <label for="edit_id_penjualan_produk">Penjualan Produk</label>
                                 <select class="form-control" id="edit_id_penjualan_produk" name="id_penjualan_produk"
                                     disabled>
@@ -124,13 +130,12 @@
                                         </option>
                                     @endforeach
                                 </select>
-                            </div>
+                            </div> --}}
 
                             <!-- Metode Pembayaran -->
                             <div class="form-group">
                                 <label for="edit_metode_pembayaran">Metode Pembayaran</label>
-                                <select class="form-control" id="edit_metode_pembayaran" name="metode_pembayaran" required
-                                    disabled>
+                                <select name="metode_pembayaran" id="edit_metode_pembayaran" class="form-control" required>
                                     <option value="Tunai">Tunai</option>
                                     <option value="Non Tunai">Non Tunai</option>
                                 </select>
@@ -153,19 +158,23 @@
 
     </div>
 
-    <script>
-        function populateEditModal(button) {
-            const pembayaran = button.dataset;
+    @push('scripts')
+        <script>
+            function populateEditModal(button) {
+                const id = button.getAttribute('data-id');
+                const metode = button.getAttribute('data-metode');
+                const uang = button.getAttribute('data-uang');
 
-            document.getElementById('editPembayaranForm').action = `/pembayaran-produk/${pembayaran.id}`;
-            document.getElementById('edit_id_penjualan_produk').value = pembayaran.id_penjualan_produk;
-            document.getElementById('edit_metode_pembayaran').value = pembayaran.metode_pembayaran;
-            document.getElementById('edit_uang').value = pembayaran.uang;
-        }
+                const form = document.getElementById('editPembayaranForm');
+                form.action = `/pembayaran-produk/${id}`; // sesuaikan route-mu
+                document.getElementById('edit_metode_pembayaran').value = metode;
+                document.getElementById('edit_uang').value = uang;
+            }
 
-        function clearForm() {
-            document.getElementById('tambahPembayaranForm').reset();
-            document.getElementById('editPembayaranForm').action = '/pembayaran-produk';
-        }
-    </script>
+            // Pasang event listener ke tombol Edit
+            document.querySelectorAll('button[data-target="#editPembayaranModal"]').forEach(btn => {
+                btn.addEventListener('click', () => populateEditModal(btn));
+            });
+        </script>
+    @endpush
 @endsection

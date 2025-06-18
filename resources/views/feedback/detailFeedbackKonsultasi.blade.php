@@ -1,4 +1,4 @@
-@extends('dashboard.index')
+{{-- @extends('dashboard.index')
 
 @section('content')
     <h1>Detail Feedback Konsultasi</h1>
@@ -28,4 +28,4 @@
     </form>
     
     
-@endsection
+@endsection --}}

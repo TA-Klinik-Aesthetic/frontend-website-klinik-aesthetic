@@ -28,8 +28,8 @@ function number_format(number, decimals, dec_point, thousands_sep) {
 }
 
 // Bar Chart Example
-var ctx = document.getElementById("myBarChart");
-var myBarChart = new Chart(ctx, {
+document.querySelectorAll('.chart-bar canvas').forEach(function(canvas){
+  new Chart(canvas.getContext('2d'), {
   type: 'bar',
   data: {
     labels: ["January", "February", "March", "April", "May", "June"],
@@ -68,8 +68,8 @@ var myBarChart = new Chart(ctx, {
       yAxes: [{
         ticks: {
           min: 0,
-          max: 15000,
-          maxTicksLimit: 5,
+          // max: 100,
+          maxTicksLimit: 11,
           padding: 10,
           // Include a dollar sign in the ticks
           callback: function(value, index, values) {
@@ -108,4 +108,5 @@ var myBarChart = new Chart(ctx, {
       }
     },
   }
+})
 });

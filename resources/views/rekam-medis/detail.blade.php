@@ -50,6 +50,7 @@
                     <table class="table table-bordered mb-3">
                         <thead>
                             <tr>
+                                <th>Diagnosis</th>
                                 <th>Saran Tindakan</th>
                                 <th>Nama Treatment</th>
                             </tr>
@@ -57,6 +58,7 @@
                         <tbody>
                             @foreach ($konsultasi['detail_konsultasi'] as $detail)
                                 <tr>
+                                    <td>{{ $detail['diagnosis'] }}</td>
                                     <td>{{ $detail['saran_tindakan'] }}</td>
                                     <td>{{ $detail['treatment']['nama_treatment'] ?? 'Tidak ada treatment' }}</td>
                                 </tr>
@@ -73,7 +75,6 @@
                     <p><strong>Waktu Treatment:</strong> {{ $booking['waktu_treatment'] }}</p>
                     <p><strong>Dokter:</strong> {{ $booking['dokter']['nama_dokter'] ?? 'Tidak ada dokter' }}</p>
                     <p><strong>Beautician:</strong> {{ $booking['beautician']['nama_beautician'] ?? 'Tidak ada beautician' }}</p>
-                    <p><strong>Status Pembayaran:</strong> {{ $booking['status_pembayaran'] }}</p>
                     <p><strong>Harga Total:</strong> {{ $booking['harga_total'] }}</p>
                     <p><strong>Potongan Harga:</strong> {{ $booking['potongan_harga'] }}</p>
                     <p><strong>Harga Akhir Treatment:</strong> {{ $booking['harga_akhir_treatment'] }}</p>

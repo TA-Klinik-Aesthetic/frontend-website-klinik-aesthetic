@@ -23,6 +23,7 @@ use App\Http\Controllers\PembayaranTreatmentController;
 use App\Http\Controllers\PembayaranProdukController;
 use App\Http\Controllers\RekamMedisController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventarisStokController;
 
 
@@ -54,18 +55,21 @@ Route::get('/user/home', function () {
     return view('users-pages.home');
 })->name('user.home');
 
-Route::get('/dashboard', function () {
-    if (!session()->has('user')) {
-        return redirect()->route('login.form');
-    }
+// Route::get('/dashboard', function () {
+//     if (!session()->has('user')) {
+//         return redirect()->route('login.form');
+//     }
 
-    $role = session('user.role');
-    if (!in_array($role, ['dokter', 'beautician', 'front office'])) {
-        return redirect()->route('login.form');
-    }
+//     $role = session('user.role');
+//     if (!in_array($role, ['dokter', 'beautician', 'front office'])) {
+//         return redirect()->route('login.form');
+//     }
 
-    return view('dashboard.dashboard');
-})->name('dashboard');
+//     return view('dashboard.dashboard');
+// })->name('dashboard');
+
+Route::get('/dashboard', [DashboardController::class, 'index'])
+     ->name('dashboard');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -93,6 +97,11 @@ Route::get('/konsultasi/{id}/tambah-detail', [KonsultasiController::class, 'tamb
 
 // Route untuk proses simpan detail konsultasi
 Route::post('/konsultasi/{id}/tambah-detail', [KonsultasiController::class, 'simpanDetail'])->name('konsultasi.simpanDetail');
+
+// Jika untuk AJAX dari frontend, bisa di web.php:
+Route::post('konsultasi/{id}/update-status', [KonsultasiController::class, 'updateStatus'])
+    ->name('konsultasi.updateStatus');
+
 
 
 
@@ -142,6 +151,7 @@ Route::prefix('detailBooking')->name('detailBooking.')->group(function () {
     Route::delete('/{id}', [DetailBookingTreatmentController::class, 'destroy'])->name('destroy');
 });
 // Route::get('/autocomplete-kompensasi', [DetailBookingTreatmentController::class, 'autocompleteKompensasi']);
+Route::put('/detailBooking/{id}/update-status', [DetailBookingTreatmentController::class, 'updateStatus'])->name('bookingTreatment.updateStatus');
 
 
 Route::get('/booking/create', [DetailBookingTreatmentController::class, 'create'])->name('booking.create');
@@ -154,11 +164,12 @@ Route::put('/detailBooking/update/{id}', [DetailBookingTreatmentController::clas
 
 // Route untuk halaman pembelian produk
 Route::get('/pembelian-produk', [PembelianProdukController::class, 'index'])->name('pembelianProduk.index');
-Route::get('pembelian-produk/create', [PembelianProdukController::class, 'create'])->name('pembelian-produk.create'); // Menampilkan form tambah pembelian
+// Route::get('pembelian-produk/create', [PembelianProdukController::class, 'create'])->name('pembelian-produk.create'); // Menampilkan form tambah pembelian
 Route::post('pembelian-produk/store', [PembelianProdukController::class, 'store'])->name('pembelian-produk.store'); // Menyimpan data pembelian
 Route::get('/pembelian-produk/{id}', [PembelianProdukController::class, 'show'])->name('pembelian-produk.show'); // Rute untuk menampilkan detail pembelian produk
 Route::get('/pembelian-produk/{id}/edit', [PembelianProdukController::class, 'edit'])->name('pembelian-produk.edit');
 Route::put('/pembelian-produk/{id}', [PembelianProdukController::class, 'update'])->name('pembelian-produk.update');
+Route::delete('/pembelian-produk/{id}/destroy',[PembelianProdukController::class, 'destroy'])->name('pembelian-produk.destroy');
 
 
 // Kategorizes
@@ -200,6 +211,7 @@ Route::prefix('promo')->group(function () {
     Route::get('/', [PromoController::class, 'index'])->name('promo.index');
     Route::get('/{id}', [PromoController::class, 'show'])->name('promo.show');
     Route::post('/store', [PromoController::class, 'store'])->name('promo.store');
+    Route::put('/{id}', [PromoController::class, 'update'])->name('promo.update');
 });
 
 Route::prefix('kompensasi')->group(function () {
@@ -221,13 +233,17 @@ Route::get('/pembayaran-treatment', [PembayaranTreatmentController::class, 'inde
 Route::post('/pembayaran-treatment', [PembayaranTreatmentController::class, 'store'])->name('pembayaran-treatment.store');
 Route::put('/pembayaran-treatment/{id}', [PembayaranTreatmentController::class, 'update'])->name('pembayaran-treatment.update');
 
+
+
 Route::prefix('pembayaran-produk')->group(function () {
     Route::get('/', [PembayaranProdukController::class, 'index'])->name('pembayaran-produk.index'); // Tampilkan data pembayaran produk
     Route::post('/', [PembayaranProdukController::class, 'store'])->name('pembayaran-produk.store'); // Tambah pembayaran produk
     Route::put('/{id}', [PembayaranProdukController::class, 'update'])->name('pembayaran-produk.update'); // Update pembayaran produk
+    Route::get('/invoice/{id}', [PembayaranProdukController::class, 'generateInvoice'])->name('invoice.pembayaran-produk');
 });
 
 Route::get('pembayaran-treatment/invoice/{id}', [PembayaranTreatmentController::class, 'generateInvoice'])->name('invoice.pembayaran-treatment');
+
 
 Route::get('/rekam-medis', [RekamMedisController::class, 'rekamMedis'])->name('rekam-medis.index');
 Route::get('/rekam-medis/{id}', [RekamMedisController::class, 'rekamMedisDetail'])->name('rekam-medis.detail');

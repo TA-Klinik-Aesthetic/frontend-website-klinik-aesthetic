@@ -19,114 +19,119 @@ class PembayaranTreatmentController extends Controller
     // Menampilkan semua pembayaran treatment
     public function index()
     {
-        // Ambil data pembayaran treatment
         $response = Http::get($this->apiUrlPembayaran);
-        $pembayaranTreatmentList = $response->json();
-
-        // Ambil data booking treatment untuk mendapatkan informasi lebih lanjut
+        $list = $response->json();
+    
+        // Ambil booking treatments
         $bookingResponse = Http::get($this->apiUrlBooking);
-        $bookingTreatments = $bookingResponse->json()['booking_treatments'];
-
-        // Menambahkan nama user dan waktu treatment pada setiap pembayaran treatment
-        foreach ($pembayaranTreatmentList as &$pembayaran) {
-            foreach ($bookingTreatments as $booking) {
-                if ($booking['id_booking_treatment'] == $pembayaran['id_booking_treatment']) {
-                    $pembayaran['user_name'] = $booking['user']['nama_user'];
-                    $pembayaran['waktu_treatment'] = $booking['waktu_treatment'];
-                }
+        $bookings = collect($bookingResponse->json()['booking_treatments']);
+    
+        // Flatten: tambahkan user_name & harga_akhir langsung ke setiap pembayaran
+        $flattened = collect($list)->map(function($p) use ($bookings) {
+            if (isset($p['booking_treatment'])) {
+                $bt = $p['booking_treatment'];
+                $p['user_name'] = data_get($bt, 'user.nama_user', '-');
+                $p['harga_akhir'] = data_get($bt, 'harga_akhir_treatment', 0);
+            } else {
+                $p['user_name'] = '-';
+                $p['harga_akhir'] = 0;
             }
-        }
-
-        // Filter booking treatment yang status_pembayarannya "Belum Dibayar"
-        $bookingTreatments = array_filter($bookingTreatments, function ($booking) {
-            return $booking['status_pembayaran'] === 'Belum Dibayar';
+            return $p;
         });
-
-        return view('pembayaran.pembayaranTreatment', compact('pembayaranTreatmentList', 'bookingTreatments'));
+    
+        return view('pembayaran.pembayaranTreatment', [
+            'pembayaranTreatmentList' => $flattened,
+        ]);
     }
 
     // Menyimpan pembayaran treatment baru
-    public function store(Request $request)
-    {
-        $validatedData = $request->validate([
-            'id_booking_treatment' => 'required',
-            'metode_pembayaran' => 'required',
-            'pajak' => 'required',
-        ]);
+    // public function store(Request $request)
+    // {
+    //     $validatedData = $request->validate([
+    //         'id_booking_treatment' => 'required',
+    //         'metode_pembayaran' => 'required',
+    //         'pajak' => 'required',
+    //     ]);
 
-        try {
-            // Simpan data pembayaran
-            $pembayaranTreatmentResponse = Http::post($this->apiUrlPembayaran, [
-                'id_booking_treatment' => $validatedData['id_booking_treatment'],
-                'metode_pembayaran' => $validatedData['metode_pembayaran'],
-                'pajak' => $validatedData['pajak'],
-            ]);
+    //     try {
+    //         // Simpan data pembayaran
+    //         $pembayaranTreatmentResponse = Http::post($this->apiUrlPembayaran, [
+    //             'id_booking_treatment' => $validatedData['id_booking_treatment'],
+    //             'metode_pembayaran' => $validatedData['metode_pembayaran'],
+    //             'pajak' => $validatedData['pajak'],
+    //         ]);
 
-            // Redirect kembali ke halaman index dengan pesan sukses
-            return redirect()->route('pembayaran-treatment.index')->with('success', 'Pembayaran treatment berhasil disimpan');
-        } catch (\Exception $e) {
-            // Menampilkan pesan error jika terjadi kegagalan
-            return redirect()->route('pembayaran-treatment.index')->with('error', 'Error while creating pembayaran treatment');
-        }
-    }
+    //         // Redirect kembali ke halaman index dengan pesan sukses
+    //         return redirect()->route('pembayaran-treatment.index')->with('success', 'Pembayaran treatment berhasil disimpan');
+    //     } catch (\Exception $e) {
+    //         // Menampilkan pesan error jika terjadi kegagalan
+    //         return redirect()->route('pembayaran-treatment.index')->with('error', 'Error while creating pembayaran treatment');
+    //     }
+    // }
 
     // Memperbarui pembayaran treatment yang sudah ada
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'uang' => 'required|numeric|min:0',
+        $validated = $request->validate([
+            'metode_pembayaran' => 'required|in:Tunai,Non Tunai',
+            'uang'              => 'required|numeric|min:0',
         ]);
-
+    
         try {
-            // Update data pembayaran dengan total_bayar yang baru
-            $pembayaranUpdateResponse = Http::put("{$this->apiUrlPembayaran}/{$id}", [
-                'uang' => $request->uang,
+            // Kirim data lengkap ke API
+            $response = Http::put("{$this->apiUrlPembayaran}/{$id}", [
+                'metode_pembayaran' => $validated['metode_pembayaran'],
+                'uang'              => $validated['uang'],
             ]);
-
-            // Redirect kembali ke halaman index dengan pesan sukses
-            return redirect()->route('pembayaran-treatment.index')->with('success', 'Pembayaran treatment berhasil diperbarui');
+    
+            if ($response->successful()) {
+                return redirect()
+                    ->route('pembayaran-treatment.index')
+                    ->with('success', 'Pembayaran treatment berhasil diperbarui');
+            }
+    
+            // jika API merespon error
+            return redirect()
+                ->route('pembayaran-treatment.index')
+                ->with('error', 'Gagal memperbarui pembayaran treatment');
         } catch (\Exception $e) {
-            // Menampilkan pesan error jika terjadi kegagalan
-            return redirect()->route('pembayaran-treatment.index')->with('error', 'Error while updating pembayaran treatment');
+            return redirect()
+                ->route('pembayaran-treatment.index')
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
     public function generateInvoice($id)
     {
-        // Mengambil data pembayaran treatment berdasarkan ID
-        $pembayaranTreatmentResponse = Http::get("{$this->apiUrlPembayaran}/{$id}");
-        $pembayaranTreatment = $pembayaranTreatmentResponse->json()['data'];
-
-        // Mengambil data booking treatment berdasarkan id_booking_treatment
-        $bookingResponse = Http::get("{$this->apiUrlBooking}/{$pembayaranTreatment['id_booking_treatment']}");
-        $bookingData = $bookingResponse->json()['booking_treatment'];
-
-        // Mengambil data user
-        $userName = isset($bookingData['user']['nama_user']) ? $bookingData['user']['nama_user'] : 'Nama Tidak Tersedia';
-        $userTelp = isset($bookingData['user']['no_telp']) ? $bookingData['user']['no_telp'] : 'No. Telp Tidak Tersedia';
-        $userEmail = isset($bookingData['user']['email']) ? $bookingData['user']['email'] : 'Email Tidak Tersedia';
-        $potonganHarga = isset($bookingData['potongan_harga']) ? $bookingData['potongan_harga'] : 0;
-
-        // Membuat data untuk invoice
+        // Ambil data pembayaran
+        $respPay = Http::get("{$this->apiUrlPembayaran}/{$id}");
+        $dataPay = $respPay->json()['data'] ?? abort(404, 'Pembayaran tidak ditemukan');
+    
+        // Ambil data booking treatment
+        $respBook = Http::get("{$this->apiUrlBooking}/{$dataPay['id_booking_treatment']}");
+        $dataBook = $respBook->json()['booking_treatment'] ?? abort(404, 'Booking tidak ditemukan');
+    
+        // Siapkan data untuk view
         $invoiceData = [
-            'user_name' => $userName,
-            'no_telp' => $userTelp,
-            'email' => $userEmail,
-            'waktu_treatment' => $bookingData['waktu_treatment'],
-            'metode_pembayaran' => $pembayaranTreatment['metode_pembayaran'],
-            'subtotal' => $pembayaranTreatment['harga_akhir_treatment'],
-            'potongan_harga' => $potonganHarga,
-            'pajak' => $pembayaranTreatment['pajak'],
-            'total' => $pembayaranTreatment['total'],
-            'uang' => $pembayaranTreatment['uang'],
-            'kembalian' => $pembayaranTreatment['kembalian'],
-            'detail_booking' => $bookingData['detail_booking'],
+            'user_name'           => $dataBook['user']['nama_user'] ?? '-',
+            'no_telp'             => $dataBook['user']['no_telp'] ?? '-',
+            'email'               => $dataBook['user']['email'] ?? '-',
+            'waktu_treatment'     => $dataBook['waktu_treatment'],
+            'metode_pembayaran'   => $dataPay['metode_pembayaran'],
+            // Subtotal sebelum potongan = harga_total
+            'subtotal'            => $dataBook['harga_total'],
+            'potongan_harga'      => $dataBook['potongan_harga'],
+            // besaran_pajak adalah nominal pajak (misal 67500)
+            'pajak'               => $dataBook['besaran_pajak'],
+            // total setelah diskon + pajak
+            'total'               => $dataBook['harga_akhir_treatment'],
+            'uang'                => $dataPay['uang'],
+            'kembalian'           => $dataPay['kembalian'],
+            'detail_booking'      => $dataBook['detail_booking'],
+            'waktu_pembayaran'    => $dataPay['waktu_pembayaran'],
         ];
-
-        // Membuat PDF menggunakan DomPDF
+    
         $pdf = PDF::loadView('invoice.pembayaranTreatment', $invoiceData);
-
-        // Menghasilkan file PDF dan mengunduhnya
-        return $pdf->download('invoice_pembayaran_' . $pembayaranTreatment['id_pembayaran_treatment'] . '.pdf');
+        return $pdf->download("invoice_pembayaran_{$dataPay['id_pembayaran']}.pdf");
     }
 }

@@ -22,6 +22,22 @@ class KonsultasiController extends Controller
             return isset($item['dokter']); // Data memiliki dokter
         });
 
+        $usersResponse = Http::get('http://127.0.0.1:8080/api/users');
+        $doktersResponse = Http::get('http://127.0.0.1:8080/api/dokters');
+        $treatmentsResponse = Http::get('http://127.0.0.1:8080/api/treatments');
+        
+
+        $users = $usersResponse->json()['data'];
+        $dokters = $doktersResponse->json()['data'];
+        $treatments = $treatmentsResponse->json()['data'];
+
+        return view('konsultasi.tambahBooking', [
+            'data' => $dataWithDoctor,
+            'users' => $users,
+            'dokters' => $dokters,
+            'treatments' => $treatments,
+        ]);
+
         // Mengirim data ke tampilan
         return view('konsultasi.tambahBooking', ['data' => $dataWithDoctor]);
     }
@@ -82,11 +98,11 @@ class KonsultasiController extends Controller
         ]);
 
         if ($response->successful()) {
-            session()->flash('success', 'Data konsultasi berhasil ditambahkan!');
-            return redirect()->route('konsultasi.create');
+            // session()->flash('success', 'Data konsultasi berhasil ditambahkan!');
+            return redirect()->route('konsultasi.with-doctor');
         }
 
-        session()->flash('error', 'Terjadi kesalahan saat menambahkan data!');
+        // session()->flash('error', 'Terjadi kesalahan saat menambahkan data!');
         return redirect()->back();
     }
 
@@ -244,6 +260,25 @@ class KonsultasiController extends Controller
 
         if ($response->successful()) {
             return redirect()->route('konsultasi.with-doctor')->with('success', 'Detail konsultasi berhasil ditambahkan.');
+        }
+
+        return back()->with('error', 'Gagal menambahkan detail konsultasi. ' . $response->body());
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        // 1) Validasi input status
+        $validated = $request->validate([
+            'status_booking_konsultasi' => 'required|string|in:Berhasil Dibooking,Dibatalkan',
+        ]);
+
+        // 2) Panggil endpoint internal untuk update status
+        $response = Http::put("http://127.0.0.1:8080/api/konsultasi/{$id}", [
+            'status_booking_konsultasi' => $validated['status_booking_konsultasi'],
+        ]);
+
+        if ($response->successful()) {
+            return redirect()->route('konsultasi.with-doctor')->with('success', 'Status konsultasi berhasil diperbarui.');
         }
 
         return back()->with('error', 'Gagal menambahkan detail konsultasi. ' . $response->body());

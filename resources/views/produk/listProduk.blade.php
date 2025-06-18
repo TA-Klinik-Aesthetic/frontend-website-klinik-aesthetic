@@ -2,7 +2,10 @@
 
 @section('content')
     <h1 class="h3 mb-2 text-gray-800">List Produk</h1>
-    <a href="{{ route('produk.create') }}" class="btn btn-success mb-4">Tambah Produk</a>
+    <!-- Tombol Tambah Produk (trigger modal) -->
+    <button class="btn btn-success mb-4" data-toggle="modal" data-target="#addProdukModal">
+        <i class="fas fa-plus"></i> Tambah Produk
+    </button>
 
     <div class="card shadow mb-4">
         <div class="card-body">
@@ -25,12 +28,22 @@
                                 <td>{{ $produk['status_produk'] }}</td>
                                 <td>{{ $produk['kategori']['nama_kategori'] }}</td>
                                 <td>
-                                    <a href="{{ route('produk.show', $produk['id_produk']) }}" class="btn btn-info btn-sm">Detail</a>
-                                    <a href="{{ route('produk.edit', $produk['id_produk']) }}" class="btn btn-warning btn-sm">Edit</a>
-                                    <form action="{{ route('produk.destroy', $produk['id_produk']) }}" method="POST" style="display:inline-block;">
+                                    <a href="{{ route('produk.show', $produk['id_produk']) }}"
+                                        class="btn btn-info btn-sm">Detail</a>
+
+                                    <!-- Tombol Edit (trigger modal) -->
+                                    <button class="btn btn-warning btn-sm" data-toggle="modal"
+                                        data-target="#editProdukModal-{{ $produk['id_produk'] }}"
+                                        onclick="populateEditModal({{ json_encode($produk) }})">
+                                        Edit
+                                    </button>
+
+                                    <form action="{{ route('produk.destroy', $produk['id_produk']) }}" method="POST"
+                                        style="display:inline-block;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus?')">Hapus</button>
+                                        <button type="submit" class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Yakin ingin menghapus?')">Hapus</button>
                                     </form>
                                 </td>
                             </tr>
@@ -44,4 +57,184 @@
             </div>
         </div>
     </div>
+    <!-- Modal Tambah Produk -->
+    <div class="modal fade" id="addProdukModal" tabindex="-1" role="dialog" aria-labelledby="addProdukModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <form action="{{ route('produk.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addProdukModalLabel">Tambah Produk</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Nama Produk -->
+                        <div class="form-group">
+                            <label for="nama_produk">Nama Produk</label>
+                            <input type="text" name="nama_produk" id="nama_produk" class="form-control" required>
+                        </div>
+
+                        <!-- Deskripsi -->
+                        <div class="form-group">
+                            <label for="deskripsi_produk">Deskripsi Produk</label>
+                            <textarea name="deskripsi_produk" id="deskripsi_produk" class="form-control" rows="3" required></textarea>
+                        </div>
+
+                        <!-- Harga -->
+                        <div class="form-group">
+                            <label for="harga_produk">Harga Produk</label>
+                            <input type="number" name="harga_produk" id="harga_produk" class="form-control" required>
+                        </div>
+
+                        <!-- Stok -->
+                        <div class="form-group">
+                            <label for="stok_produk">Stok Produk</label>
+                            <input type="number" name="stok_produk" id="stok_produk" class="form-control" required>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="form-group">
+                            <label for="status_produk">Status Produk</label>
+                            <select name="status_produk" id="status_produk" class="form-control" required>
+                                <option value="Tersedia">Tersedia</option>
+                                <option value="Habis">Habis</option>
+                            </select>
+                        </div>
+
+                        <!-- Kategori -->
+                        <div class="form-group">
+                            <label for="id_kategori">Kategori Produk</label>
+                            <select name="id_kategori" id="id_kategori" class="form-control" required>
+                                <option value="">-- Pilih Kategori --</option>
+                                @foreach ($kategoriList as $kat)
+                                    <option value="{{ $kat['id_kategori'] }}">{{ $kat['nama_kategori'] }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Gambar Produk -->
+                        <div class="form-group">
+                            <label for="gambar_produk">Upload Gambar Produk</label>
+                            <input type="file" name="gambar_produk" id="gambar_produk" class="form-control-file"
+                                required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Produk</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- ============================
+         MODAL Edit Produk
+       ============================ --}}
+    @foreach ($produkList as $produk)
+        <div class="modal fade" id="editProdukModal-{{ $produk['id_produk'] }}" tabindex="-1" role="dialog"
+            aria-labelledby="editProdukModalLabel-{{ $produk['id_produk'] }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <form id="editProdukForm-{{ $produk['id_produk'] }}"
+                    action="{{ route('produk.update', $produk['id_produk']) }}" method="POST"
+                    enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editProdukModalLabel-{{ $produk['id_produk'] }}">
+                                Edit Produk
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Hidden ID -->
+                            <input type="hidden" name="id_produk" value="{{ $produk['id_produk'] }}">
+
+                            <!-- Nama Produk -->
+                            <div class="form-group">
+                                <label for="edit_nama_produk_{{ $produk['id_produk'] }}">Nama Produk</label>
+                                <input type="text" name="nama_produk"
+                                    id="edit_nama_produk_{{ $produk['id_produk'] }}" class="form-control" required>
+                            </div>
+                            <!-- Deskripsi -->
+                            <div class="form-group">
+                                <label for="edit_deskripsi_produk_{{ $produk['id_produk'] }}">Deskripsi Produk</label>
+                                <textarea name="deskripsi_produk" id="edit_deskripsi_produk_{{ $produk['id_produk'] }}" class="form-control"
+                                    rows="3" required></textarea>
+                            </div>
+                            <!-- Harga -->
+                            <div class="form-group">
+                                <label for="edit_harga_produk_{{ $produk['id_produk'] }}">Harga Produk</label>
+                                <input type="number" name="harga_produk"
+                                    id="edit_harga_produk_{{ $produk['id_produk'] }}" class="form-control" required>
+                            </div>
+                            <!-- Stok -->
+                            <div class="form-group">
+                                <label for="edit_stok_produk_{{ $produk['id_produk'] }}">Stok Produk</label>
+                                <input type="number" name="stok_produk"
+                                    id="edit_stok_produk_{{ $produk['id_produk'] }}" class="form-control" required>
+                            </div>
+                            <!-- Status -->
+                            <div class="form-group">
+                                <label for="edit_status_produk_{{ $produk['id_produk'] }}">Status Produk</label>
+                                <select name="status_produk" id="edit_status_produk_{{ $produk['id_produk'] }}"
+                                    class="form-control" required>
+                                    <option value="Tersedia">Tersedia</option>
+                                    <option value="Habis">Habis</option>
+                                </select>
+                            </div>
+                            <!-- Kategori -->
+                            <div class="form-group">
+                                <label for="edit_id_kategori_{{ $produk['id_produk'] }}">Kategori Produk</label>
+                                <select name="id_kategori" id="edit_id_kategori_{{ $produk['id_produk'] }}"
+                                    class="form-control" required>
+                                    @foreach ($kategoriList as $kat)
+                                        <option value="{{ $kat['id_kategori'] }}">{{ $kat['nama_kategori'] }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <!-- Gambar Produk -->
+                            <div class="form-group">
+                                {{-- <label>Gambar Produk Saat Ini</label><br>
+                                @if (!empty($produk['gambar_produk']))
+                                    <img src="{{ 'http://127.0.0.1:8080/storage/' . $produk['gambar_produk'] }}"
+                                        alt="" style="max-width:100px; display:block; margin-bottom:10px;">
+                                @endif --}}
+                                <label for="edit_gambar_produk_{{ $produk['id_produk'] }}">
+                                    Ubah Gambar Produk
+                                </label>
+                                <input type="file" name="gambar_produk"
+                                    id="edit_gambar_produk_{{ $produk['id_produk'] }}" class="form-control-file">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endforeach
 @endsection
+
+@push('scripts')
+<script>
+    function populateEditModal(data) {
+        const id = data.id_produk;
+        document.getElementById(`edit_nama_produk_${id}`).value       = data.nama_produk;
+        document.getElementById(`edit_deskripsi_produk_${id}`).value  = data.deskripsi_produk;
+        document.getElementById(`edit_harga_produk_${id}`).value      = data.harga_produk;
+        document.getElementById(`edit_stok_produk_${id}`).value       = data.stok_produk;
+        document.getElementById(`edit_status_produk_${id}`).value     = data.status_produk;
+        document.getElementById(`edit_id_kategori_${id}`).value       = data.id_kategori;
+        // file input tidak diisi lewat JS
+    }
+</script>
+@endpush

@@ -17,32 +17,45 @@ class PembelianProdukController extends Controller
         $userResponse = Http::get('http://127.0.0.1:8080/api/users');
         $users = collect($userResponse->json()['data']); // Adjust to access the 'data' key
 
+        // Fetch products
+        $productResponse = Http::get('http://127.0.0.1:8080/api/produk');
+        $products = $productResponse->json('data');
+
+        // Fetch promos
+        $promosResponse = Http::get('http://127.0.0.1:8080/api/promo');
+        $promos = collect($promosResponse->json()['data'])
+            ->where('jenis_promo', 'Produk')
+            ->values();
+
         // Map id_user to user name
         foreach ($pembelianProduk as &$pembelian) {
             $user = $users->firstWhere('id_user', $pembelian['id_user']); // Match id_user
             $pembelian['nama_user'] = $user ? $user['nama_user'] : 'Tidak Diketahui';
+
+            // Inject produk untuk keperluan modal edit
+            $pembelian['produk'] = collect($pembelian['detail_pembelian'])->map(function ($detail) {
+                return [
+                    'id_produk' => $detail['id_produk'],
+                    'jumlah_produk' => $detail['jumlah_produk']
+                ];
+            })->toArray();
+
+            $pembelian['promo_dipakai'] = $promos
+            ->firstWhere('id_promo', $pembelian['id_promo']);
         }
 
-        return view('pembelian-produk.pembelian', compact('pembelianProduk'));
+        return view('pembelian-produk.pembelian', compact('pembelianProduk', 'users', 'products', 'promos'));
     }
 
-    public function create()
-    {
-        // Fetch users
-        $userResponse = Http::get('http://127.0.0.1:8080/api/users');
-        $users = $userResponse->json()['data'];
-    
-        // Fetch products
-        $productResponse = Http::get('http://127.0.0.1:8080/api/produk');
-        $products = $productResponse->json('data');
-    
-        // Fetch promos
-        $promoResponse = Http::get('http://127.0.0.1:8080/api/promos');
-        $promos = $promoResponse->json('data');
-    
-        return view('pembelian-produk.createPembelian', compact('users', 'products', 'promos'));
-    }
-    
+    // public function create()
+    // {
+    //     // Fetch users
+    //     $userResponse = Http::get('http://127.0.0.1:8080/api/users');
+    //     $users = $userResponse->json()['data'];
+
+    //     return view('pembelian-produk.createPembelian', compact('users', 'products', 'promos'));
+    // }
+
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -52,32 +65,32 @@ class PembelianProdukController extends Controller
             'produk.*.jumlah_produk' => 'required|integer',
             'id_promo' => 'nullable|integer',
         ]);
-    
+
         // Kirim data ke API
         $response = Http::post('http://127.0.0.1:8080/api/penjualan-produk', $data);
-    
+
         if ($response->ok()) {
             return redirect()->route('pembelianProduk.index')->with('success', 'Data berhasil ditambahkan!');
         } else {
             return back()->withErrors('Gagal menambahkan data. Silakan coba lagi.');
         }
     }
-    
+
 
     public function show($id)
     {
         // Fetch the detail of the purchase
         $purchaseResponse = Http::get("http://127.0.0.1:8080/api/penjualan-produk/$id");
         $pembelian = $purchaseResponse->json();
-    
+
         // Fetch users
         $userResponse = Http::get('http://127.0.0.1:8080/api/users');
         $users = $userResponse->json()['data'];
-    
+
         // Fetch products
         $productResponse = Http::get('http://127.0.0.1:8080/api/produk');
         $products = $productResponse->json('data');
-    
+
         // Check if the API responses are successful
         if ($purchaseResponse->successful() && $userResponse->successful() && $productResponse->successful()) {
             return view('pembelian-produk.detailPembelian', [
@@ -86,7 +99,7 @@ class PembelianProdukController extends Controller
                 'products' => $products
             ]);
         }
-    
+
         // Redirect back with error if any API fails
         return redirect()->back()->with('error', 'Gagal mengambil data pembelian, pengguna, atau produk.');
     }
@@ -95,7 +108,7 @@ class PembelianProdukController extends Controller
     {
         $purchaseResponse = Http::get("http://127.0.0.1:8080/api/penjualan-produk/$id");
         $pembelian = $purchaseResponse->json();
-    
+
         // Map detail_pembelian ke produk
         $pembelian['produk'] = collect($pembelian['detail_pembelian'])->map(function ($detail) {
             return [
@@ -103,13 +116,13 @@ class PembelianProdukController extends Controller
                 'jumlah_produk' => $detail['jumlah_produk']
             ];
         })->toArray();
-    
+
         $productResponse = Http::get('http://127.0.0.1:8080/api/produk');
         $products = $productResponse->json('data');
 
         $promoResponse = Http::get('http://127.0.0.1:8080/api/promos');
         $promos = $promoResponse->json('data');
-    
+
         if ($purchaseResponse->successful() && $productResponse->successful()) {
             return view('pembelian-produk.editPembelianProduk', [
                 'pembelian' => $pembelian,
@@ -117,7 +130,7 @@ class PembelianProdukController extends Controller
                 'promos' => $promos
             ]);
         }
-    
+
         return redirect()->back()->with('error', 'Gagal mengambil data pembelian, pengguna, atau produk.');
     }
 
@@ -139,5 +152,19 @@ class PembelianProdukController extends Controller
             return back()->withErrors('Gagal memperbarui data. Silakan coba lagi.');
         }
     }
-    
+
+    public function destroy($id)
+    {
+        // Panggil endpoint API DELETE
+        $response = Http::delete("http://127.0.0.1:8080/api/penjualan-produk/{$id}");
+
+        if ($response->successful()) {
+            return redirect()
+                ->route('pembelianProduk.index')  // sesuaikan nama route index-mu
+                ->with('success', 'Penjualan produk berhasil dihapus.');
+        }
+
+        return back()
+            ->with('error', 'Gagal menghapus penjualan produk: ' . $response->body());
+    }
 }

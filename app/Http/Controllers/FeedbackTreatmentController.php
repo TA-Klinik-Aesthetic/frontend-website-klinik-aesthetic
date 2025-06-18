@@ -31,21 +31,14 @@ class FeedbackTreatmentController extends Controller
             
             if (isset($detailBookingMap[$idDetail])) {
                 $detail = $detailBookingMap[$idDetail];
-    
-                // Ambil nama dokter atau beautician
-                $dokter = $detail['dokter'] ? $detail['dokter']['nama_dokter'] : '-';
-                $beautician = $detail['beautician'] ? $detail['beautician']['nama_beautician'] : '-';
-        
+
                 // Ambil nama treatment
                 $treatment = $detail['treatment'] ? $detail['treatment']['nama_treatment'] : '-';
         
-                $feedback['nama_dokter'] = $dokter;
-                $feedback['nama_beautician'] = $beautician;
                 $feedback['nama_treatment'] = $treatment;  // Menambahkan nama treatment
+                
             } else {
                 // Jika tidak ditemukan, set default '-'
-                $feedback['nama_dokter'] = '-';
-                $feedback['nama_beautician'] = '-';
                 $feedback['nama_treatment'] = '-';
             }
         }

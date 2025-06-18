@@ -79,16 +79,50 @@ class TreatmentController extends Controller
     
     public function update(Request $request, $id)
     {
-        $data = $request->all();
-
-        $response = Http::put("{$this->baseApiUrl}/{$id}", $data);
-
-        if ($response->successful()) {
-            return redirect()->route('treatment.index')->with('success', 'Treatment berhasil diperbarui');
+        // 1) Validasi input
+        $validated = $request->validate([
+            'id_jenis_treatment'  => 'required',
+            'nama_treatment'      => 'required|string|max:255',
+            'deskripsi_treatment' => 'nullable|string',
+            'biaya_treatment'     => 'required|numeric',
+            'estimasi_treatment'  => 'required',
+            'gambar_treatment'    => 'nullable|image|mimes:jpeg,png,jpg,gif',
+        ]);
+    
+        // 2) Siapkan payload (termasuk _method untuk override PUT)
+        $payload = [
+            'id_jenis_treatment'  => $validated['id_jenis_treatment'],
+            'nama_treatment'      => $validated['nama_treatment'],
+            'deskripsi_treatment' => $validated['deskripsi_treatment'] ?? '',
+            'biaya_treatment'     => $validated['biaya_treatment'],
+            'estimasi_treatment'  => $validated['estimasi_treatment'],
+            '_method'             => 'PUT',
+        ];
+    
+        $url = "{$this->baseApiUrl}/{$id}";
+    
+        // 3) Kalau ada file, attach; kalau tidak, langsung post
+        if ($request->hasFile('gambar_treatment')) {
+            $file     = $request->file('gambar_treatment');
+            $response = Http::attach(
+                'gambar_treatment',
+                file_get_contents($file->getRealPath()),
+                $file->getClientOriginalName()
+            )->post($url, $payload);
+        } else {
+            $response = Http::post($url, $payload);
         }
-
+    
+        // 4) Cek hasil
+        if ($response->successful()) {
+            return redirect()->route('treatment.index')
+                             ->with('success', 'Treatment berhasil diperbarui');
+        }
+    
         return back()->with('error', 'Gagal memperbarui treatment');
     }
+    
+    
 
     public function destroy($id)
     {

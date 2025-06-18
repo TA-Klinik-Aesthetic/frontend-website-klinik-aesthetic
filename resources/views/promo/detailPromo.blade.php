@@ -9,12 +9,30 @@
             <td>{{ $promo['nama_promo'] }}</td>
         </tr>
         <tr>
+            <th>Jenis Promo</th>
+            <td>{{ $promo['jenis_promo'] }}</td>
+        </tr>
+        <tr>
             <th>Deskripsi</th>
             <td>{{ $promo['deskripsi_promo'] }}</td>
         </tr>
         <tr>
+            <th>Tipe Potongan</th>
+            <td>{{ $promo['tipe_potongan'] }}</td>
+        </tr>
+        <tr>
             <th>Potongan Harga</th>
-            <td>Rp {{ number_format($promo['potongan_harga']) }}</td>
+            <td>
+                @if ($promo['tipe_potongan'] === 'Diskon')
+                    {{ number_format($promo['potongan_harga']) }}%
+                @else
+                    Rp {{ number_format($promo['potongan_harga']) }}
+                @endif
+            </td>
+        </tr>
+        <tr>
+            <th>Minimal Belanja</th>
+            <td>Rp {{ number_format($promo['minimal_belanja']) }}</td>
         </tr>
         <tr>
             <th>Tanggal Mulai</th>

@@ -16,7 +16,13 @@ class DetailBookingTreatmentController extends Controller
         $bookingTreatments = $bookingResponse->json()['booking_treatments'] ?? [];
 
         $users = Http::get('http://127.0.0.1:8080/api/users')->json()['data'];
-        $promos = Http::get('http://127.0.0.1:8080/api/promos')->json()['data'];
+
+        // Hanya ambil promo yang jenis_promo-nya Treatment
+        $promosResponse = Http::get('http://127.0.0.1:8080/api/promo');
+        $promos = collect($promosResponse->json()['data'])
+            ->where('jenis_promo', 'Treatment')
+            ->values();
+            
         $treatments = Http::get('http://127.0.0.1:8080/api/treatments')->json()['data'];
         $dokters = Http::get('http://127.0.0.1:8080/api/dokters')->json()['data'];
         $beauticians = Http::get('http://127.0.0.1:8080/api/beauticians')->json()['data'];
@@ -51,7 +57,6 @@ class DetailBookingTreatmentController extends Controller
             'waktu_treatment' => 'required|date',
             'id_dokter' => 'nullable|integer',     // Tambahkan ini
             'id_beautician' => 'required|integer', // Tambahkan ini
-            'status_booking_treatment' => 'required|string',
             'details' => 'required|array',
         ]);
 
@@ -61,7 +66,6 @@ class DetailBookingTreatmentController extends Controller
             'waktu_treatment' => $request->waktu_treatment,
             'id_dokter' => $request->id_dokter,         // Tambahkan ini
             'id_beautician' => $request->id_beautician, // Tambahkan ini
-            'status_booking_treatment' => $request->status_booking_treatment,
             'id_promo' => $request->id_promo,
             'details' => $request->details
         ];
@@ -86,13 +90,18 @@ class DetailBookingTreatmentController extends Controller
         $dokters = Http::get('http://127.0.0.1:8080/api/dokters')->json('data');
         $beauticians = Http::get('http://127.0.0.1:8080/api/beauticians')->json('data');
         $treatments = Http::get('http://127.0.0.1:8080/api/treatments')->json('data');
+        $promosResponse = Http::get('http://127.0.0.1:8080/api/promo');
+        $promos = collect($promosResponse->json()['data'])
+        ->where('jenis_promo', 'Treatment')
+        ->values();
 
         // Mengirim data ke view
         return view('treatment.detailBooking', [
             'bookingDetail' => $bookingDetail,
             'dokters' => $dokters,
             'beauticians' => $beauticians,
-            'treatments' => $treatments
+            'treatments' => $treatments,
+            'promos' => $promos
         ]);
     }
 
@@ -109,6 +118,30 @@ class DetailBookingTreatmentController extends Controller
         }
 
         return redirect()->back()->with('error', 'Gagal memperbarui detail booking.');
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        // 1) Validasi input hanya boleh Selesai atau Dibatalkan
+        $validated = $request->validate([
+            'status_booking_treatment' => 'required|string|in:Selesai,Dibatalkan',
+        ]);
+
+        // 2) Panggil endpoint internal untuk update status
+        $response = Http::put(
+            "http://127.0.0.1:8080/api/statusBookingTreatments/{$id}",
+            ['status_booking_treatment' => $validated['status_booking_treatment']]
+        );
+
+        // 3) Jika sukses, redirect dengan pesan sukses
+        if ($response->successful()) {
+            return redirect()
+                ->route('detailBooking.index')  // sesuaikan dengan nama route index-mu
+                ->with('success', 'Status booking treatment berhasil diperbarui.');
+        }
+
+        // 4) Jika gagal, kembalikan error
+        return back()->with('error', 'Gagal mengubah status booking treatment. ' . $response->body());
     }
 
     // public function autocompleteKompensasi(Request $request)

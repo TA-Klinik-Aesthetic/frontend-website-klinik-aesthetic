@@ -10,15 +10,15 @@ class ProdukController extends Controller
     // Menampilkan daftar produk
     public function index()
     {
-        $response = Http::get('http://127.0.0.1:8080/api/produk'); // Ganti URL ini sesuai API Anda
+        // Ambil daftar produk
+        $response       = Http::get('http://127.0.0.1:8080/api/produk');
+        $produkList     = $response->successful() ? $response->json('data', []) : [];
 
-        if ($response->successful()) {
-            $produkList = $response->json('data'); // Hanya ambil bagian 'data'
-        } else {
-            $produkList = []; // Jika gagal, gunakan array kosong
-        }
+        // Ambil daftar kategori untuk modal tambah
+        $katResponse    = Http::get('http://127.0.0.1:8080/api/kategori');
+        $kategoriList   = $katResponse->successful() ? $katResponse->json() : [];
 
-        return view('produk.listProduk', compact('produkList'));
+        return view('produk.listProduk', compact('produkList', 'kategoriList'));
     }
 
     // Menampilkan form untuk membuat produk baru
@@ -67,16 +67,16 @@ class ProdukController extends Controller
     {
         $response = Http::get("http://127.0.0.1:8080/api/produk/{$id}");
         $produk = $response->json()['data'] ?? null;
-    
+
         if ($produk) {
             // Jika gambar tersimpan di storage server backend, pastikan URL gambar sesuai
             if (!empty($produk['gambar_produk'])) {
                 $produk['gambar_produk'] = "http://127.0.0.1:8080/storage/" . ltrim($produk['gambar_produk'], '/');
             }
-    
+
             return view('produk.detailProduk', compact('produk'));
         }
-    
+
         return redirect()->route('produk.index')->with('error', 'Produk tidak ditemukan.');
     }
 
@@ -108,14 +108,52 @@ class ProdukController extends Controller
     // Memperbarui data produk
     public function update(Request $request, $id)
     {
-        $response = Http::put("http://127.0.0.1:8080/api/produk/$id", $request->all());
-
-        if ($response->successful()) {
-            return redirect()->route('produk.index')->with('success', 'Produk berhasil diperbarui.');
+        // validasi semua field termasuk gambar
+        $validated = $request->validate([
+            'nama_produk'      => 'required|string|max:255',
+            'deskripsi_produk' => 'nullable|string',
+            'harga_produk'     => 'required|numeric',
+            'stok_produk'      => 'required|integer',
+            'status_produk'    => 'required|string',
+            'id_kategori'      => 'required',
+            'gambar_produk'    => 'nullable|image|mimes:jpeg,png,jpg,gif',
+        ]);
+    
+        // siapkan request ke API
+        $http = Http::withHeaders([
+            'Accept' => 'application/json'
+        ]);
+    
+        // kalau ada gambar baru, attach file
+        if ($request->hasFile('gambar_produk')) {
+            $file = $request->file('gambar_produk');
+            $http = $http->attach(
+                'gambar_produk',
+                file_get_contents($file->getRealPath()),
+                $file->getClientOriginalName()
+            );
         }
-
+    
+        // sisipkan method spoofing untuk PUT
+        $http = $http->asMultipart()->post("http://127.0.0.1:8080/api/produk/{$id}", [
+            '_method'         => 'PUT',
+            'nama_produk'     => $validated['nama_produk'],
+            'deskripsi_produk'=> $validated['deskripsi_produk'],
+            'harga_produk'    => $validated['harga_produk'],
+            'stok_produk'     => $validated['stok_produk'],
+            'status_produk'   => $validated['status_produk'],
+            'id_kategori'     => $validated['id_kategori'],
+            // jika tidak ada gambar, server akan mempertahankan gambar lama
+        ]);
+    
+        if ($http->successful()) {
+            return redirect()->route('produk.index')
+                             ->with('success', 'Produk berhasil diperbarui.');
+        }
+    
         return back()->with('error', 'Gagal memperbarui produk.');
     }
+    
 
     // Menghapus produk
     public function destroy($id)

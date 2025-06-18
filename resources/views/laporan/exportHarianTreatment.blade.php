@@ -66,15 +66,20 @@
                     <tr>
                         <td>{{ $promoName }}</td>
                         <td>{{ $promoDetails['count'] }}</td>
-                        <td>{{ $promoDetails['potongan_harga'] }}</td>
+                        <td>
+                            @if(isset($promoDetails['tipe_potongan']) && $promoDetails['tipe_potongan'] === 'Diskon')
+                                {{ rtrim(rtrim(number_format($promoDetails['potongan_harga'], 2, '.', ''), '0'), '.') }}%
+                            @else
+                                Rp {{ number_format($promoDetails['potongan_harga'], 0, ',', '.') }}
+                            @endif
+                        </td>
+                        
                     </tr>
                 @endforeach
             </tbody>
         </table>
     </div>
 
-    <h3>Total Penjualan Treatment: {{ $data['subtotal'] }}</h3>
-    <h3>Pajak : 10% </h3>
     <h3>Total Pendapatan: {{ $data['total_pendapatan'] }}</h3>
 </body>
 

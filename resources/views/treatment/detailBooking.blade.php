@@ -13,21 +13,59 @@
                 <p><strong>Waktu Treatment:</strong> {{ $bookingDetail['booking_treatment']['waktu_treatment'] }}</p>
                 <p><strong>Dokter:</strong>
                     @php
-                        $dokter = collect($dokters)->firstWhere('id_dokter', $bookingDetail['booking_treatment']['id_dokter']);
+                        $dokter = collect($dokters)->firstWhere(
+                            'id_dokter',
+                            $bookingDetail['booking_treatment']['id_dokter'],
+                        );
                     @endphp
                     {{ $dokter ? $dokter['nama_dokter'] : 'Tidak ada Dokter' }}
                 </p>
                 <p><strong>Beautician:</strong>
                     @php
-                        $beautician = collect($beauticians)->firstWhere('id_beautician', $bookingDetail['booking_treatment']['id_beautician']);
+                        $beautician = collect($beauticians)->firstWhere(
+                            'id_beautician',
+                            $bookingDetail['booking_treatment']['id_beautician'],
+                        );
                     @endphp
                     {{ $beautician ? $beautician['nama_beautician'] : 'Tidak ada Beautician' }}
                 </p>
                 <p><strong>Status Booking:</strong> {{ $bookingDetail['booking_treatment']['status_booking_treatment'] }}
                 </p>
-                <p><strong>Harga Total:</strong> {{ $bookingDetail['booking_treatment']['harga_total'] }}</p>
-                <p><strong>Potongan Harga:</strong> {{ $bookingDetail['booking_treatment']['potongan_harga'] }}</p>
-                <p><strong>Harga Akhir:</strong> {{ $bookingDetail['booking_treatment']['harga_akhir_treatment'] }}</p>
+                {{-- Cari promo yang dipakai --}}
+                @php
+                    $promoDipakai = collect($promos)->firstWhere(
+                        'id_promo',
+                        $bookingDetail['booking_treatment']['id_promo'],
+                    );
+                @endphp
+
+                <p><strong>Harga Total:</strong>
+                    @php
+                        $hargaTotal = $bookingDetail['booking_treatment']['harga_total'];
+                    @endphp
+                    Rp{{ number_format($hargaTotal, 0, ',', '.') }}
+                </p>
+
+                <p><strong>Potongan Harga:</strong>
+                    @if ($promoDipakai)
+                        @if ($promoDipakai['tipe_potongan'] === 'Diskon')
+                            {{-- Tampilkan persentase --}}
+                            {{ (int) $bookingDetail['booking_treatment']['potongan_harga'] }}%
+                        @else
+                            {{-- Tampilkan rupiah --}}
+                            Rp{{ number_format($bookingDetail['booking_treatment']['potongan_harga'], 0, ',', '.') }}
+                        @endif
+                    @else
+                        -
+                    @endif
+                </p>
+
+                <p><strong>Harga Akhir:</strong>
+                    @php
+                        $hargaAkhir = $bookingDetail['booking_treatment']['harga_akhir_treatment'];
+                    @endphp
+                    Rp{{ number_format($hargaAkhir, 0, ',', '.') }}
+                </p>
 
                 <h5>Detail Treatment:</h5>
                 <table class="table table-bordered">

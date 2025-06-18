@@ -9,8 +9,6 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Dokter</th>
-                    <th>Beautician</th>
                     <th>Treatment</th>
                     <th>Rating</th>
                     <th>Teks Feedback</th>
@@ -21,8 +19,6 @@
             <tbody>
                 @foreach ($feedbacks as $feedback)
                     <tr>
-                        <td>{{ $feedback['nama_dokter'] ?? '-' }}</td>
-                        <td>{{ $feedback['nama_beautician'] ?? '-' }}</td>
                         <td>{{ $feedback['nama_treatment'] }}</td>  <!-- Menampilkan nama treatment -->
                         <td>{{ $feedback['rating'] }}</td>
                         <td>{{ $feedback['teks_feedback'] }}</td>

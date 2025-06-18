@@ -16,7 +16,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($treatments as $treatment)
+            @foreach ($treatments as $treatment)
                 <tr>
                     <td>{{ $treatment['nama_treatment'] }}</td>
                     <td>{{ $treatment['jenis_treatment']['nama_jenis_treatment'] }}</td>
@@ -26,17 +26,17 @@
                         </a>
 
                         <!-- Tombol Edit -->
-                        <button type="button" class="btn btn-warning btn-sm" 
-                                data-toggle="modal" 
-                                data-target="#editTreatmentModal" 
-                                onclick="populateEditModal({{ json_encode($treatment) }})">
+                        <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
+                            data-target="#editTreatmentModal" onclick="populateEditModal({{ json_encode($treatment) }})">
                             <i class="fas fa-edit"></i>
                         </button>
 
-                        <form action="{{ route('treatment.destroy', $treatment['id_treatment']) }}" method="POST" style="display: inline;">
+                        <form action="{{ route('treatment.destroy', $treatment['id_treatment']) }}" method="POST"
+                            style="display: inline;">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus treatment ini?')">
+                            <button type="submit" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Apakah Anda yakin ingin menghapus treatment ini?')">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </form>
@@ -47,7 +47,8 @@
     </table>
 
     <!-- Modal Tambah Treatment -->
-    <div class="modal fade" id="tambahTreatmentModal" tabindex="-1" role="dialog" aria-labelledby="tambahTreatmentModalLabel" aria-hidden="true">
+    <div class="modal fade" id="tambahTreatmentModal" tabindex="-1" role="dialog"
+        aria-labelledby="tambahTreatmentModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <form action="{{ route('treatment.store') }}" method="POST" enctype="multipart/form-data">
@@ -84,7 +85,8 @@
                         </div>
                         <div class="form-group">
                             <label for="estimasi_treatment">Estimasi Treatment (HH:MM)</label>
-                            <input type="time" name="estimasi_treatment" class="form-control" id="estimasi_treatment" required>
+                            <input type="time" name="estimasi_treatment" class="form-control" id="estimasi_treatment"
+                                required>
                         </div>
                         <div>
                             <label for="gambar_treatment">Upload Gambar:</label>
@@ -101,48 +103,94 @@
     </div>
 
     <!-- Modal Edit Treatment -->
-    <div class="modal fade" id="editTreatmentModal" tabindex="-1" role="dialog" aria-labelledby="editTreatmentModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editTreatmentModal" tabindex="-1" role="dialog" aria-labelledby="editTreatmentModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form id="editTreatmentForm" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
+            <form id="editTreatmentForm" method="POST" enctype="multipart/form-data" style="display: contents;">
+                @csrf
+                <input type="hidden" name="_method" value="PUT">
+
+                <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="editTreatmentModalLabel">Edit Treatment</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
+                        {{-- Jenis Treatment --}}
+                        <div class="form-group">
+                            <label for="edit_id_jenis_treatment">Jenis Treatment</label>
+                            <select name="id_jenis_treatment" id="edit_id_jenis_treatment" class="form-control" required>
+                                <option value="">— Pilih Jenis —</option>
+                                @foreach ($jenisTreatments as $jt)
+                                    <option value="{{ $jt['id_jenis_treatment'] }}">
+                                        {{ $jt['nama_jenis_treatment'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Nama --}}
                         <div class="form-group">
                             <label for="edit_nama_treatment">Nama Treatment</label>
-                            <input type="text" name="nama_treatment" class="form-control" id="edit_nama_treatment" required>
+                            <input type="text" name="nama_treatment" class="form-control" id="edit_nama_treatment"
+                                required>
                         </div>
+
+                        {{-- Deskripsi --}}
                         <div class="form-group">
-                            <label for="edit_deskripsi_treatment">Deskripsi Treatment</label>
-                            <textarea name="deskripsi_treatment" class="form-control" id="edit_deskripsi_treatment" rows="3" required></textarea>
+                            <label for="edit_deskripsi_treatment">Deskripsi</label>
+                            <textarea name="deskripsi_treatment" class="form-control" id="edit_deskripsi_treatment" rows="3"></textarea>
                         </div>
+
+                        {{-- Biaya --}}
                         <div class="form-group">
                             <label for="edit_biaya_treatment">Biaya Treatment</label>
-                            <input type="number" name="biaya_treatment" class="form-control" id="edit_biaya_treatment" required>
+                            <input type="number" name="biaya_treatment" class="form-control" id="edit_biaya_treatment"
+                                required>
+                        </div>
+
+                        {{-- Estimasi --}}
+                        <div class="form-group">
+                            <label for="edit_estimasi_treatment">Estimasi Treatment</label>
+                            <input type="time" name="estimasi_treatment" class="form-control"
+                                id="edit_estimasi_treatment" required>
+                        </div>
+
+                        {{-- Gambar (opsional) --}}
+                        <div class="form-group">
+                            <label for="edit_gambar_treatment">Ganti Gambar Treatment</label>
+                            <input type="file" name="gambar_treatment" id="edit_gambar_treatment"
+                                class="form-control-file">
+                            <small class="form-text text-muted">
+                                Kosongkan jika tidak ingin mengubah gambar.
+                            </small>
                         </div>
                     </div>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        <button type="submit" class="btn btn-primary">
+                            Simpan Perubahan
+                        </button>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 
     <script>
         function populateEditModal(treatment) {
-            const form = document.getElementById('editTreatmentForm');
-            form.action = `/treatment/${treatment.id_treatment}`;
-            document.getElementById('edit_nama_treatment').value = treatment.nama_treatment;
-            document.getElementById('edit_deskripsi_treatment').value = treatment.deskripsi_treatment;
-            document.getElementById('edit_biaya_treatment').value = treatment.biaya_treatment;
+          const form = document.getElementById('editTreatmentForm');
+          form.action = `/treatment/${treatment.id_treatment}`;
+      
+          document.getElementById('edit_id_jenis_treatment').value     = treatment.id_jenis_treatment;
+          document.getElementById('edit_nama_treatment').value         = treatment.nama_treatment;
+          document.getElementById('edit_deskripsi_treatment').value    = treatment.deskripsi_treatment || '';
+          document.getElementById('edit_biaya_treatment').value        = treatment.biaya_treatment;
+          document.getElementById('edit_estimasi_treatment').value     = treatment.estimasi_treatment;
+          // file input tidak bisa di‐prefill, tapi keterangan sudah cukup
         }
-    </script>
+      </script>
 @endsection

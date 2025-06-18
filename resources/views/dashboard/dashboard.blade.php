@@ -1,7 +1,7 @@
 @extends('dashboard.index')
 
 @section('content')
-<!-- Begin Page Content -->
+    <!-- Begin Page Content -->
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -11,15 +11,18 @@
     <!-- Content Row -->
     <div class="row">
 
-        <!-- Earnings (Monthly) Card Example -->
+        <!-- Booking Konsultasi -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Booking Konsultasi</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                                Booking Konsultasi
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ $consultCount }}
+                            </div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-calendar fa-2x text-gray-300"></i>
@@ -29,62 +32,37 @@
             </div>
         </div>
 
-        <!-- Earnings (Monthly) Card Example -->
+        <!-- Booking Treatment -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-success shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Booking Treatment</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                                Booking Treatment
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ $treatCount }}
+                            </div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                            <i class="fas fa-procedures fa-2x text-gray-300"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Penjualan Produk
-                            </div>
-                            <div class="row no-gutters align-items-center">
-                                <div class="col-auto">
-                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
-                                </div>
-                                <div class="col">
-                                    <div class="progress progress-sm mr-2">
-                                        <div class="progress-bar bg-info" role="progressbar"
-                                            style="width: 50%" aria-valuenow="50" aria-valuemin="0"
-                                            aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pending Requests Card Example -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-warning shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Komplain</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                                Komplain (Belum Dibalas)
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ $pendingCount }}
+                            </div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-comments fa-2x text-gray-300"></i>
@@ -95,5 +73,119 @@
         </div>
     </div>
 
-<!-- /.container-fluid -->
+    <!-- Filter Tahun -->
+    <form method="GET" class="form-inline mb-4">
+        <label class="mr-2 font-weight-bold">Pilih Tahun:</label>
+        <select name="year" class="form-control" onchange="this.form.submit()">
+            @for ($y = date('Y') - 5; $y <= date('Y') + 1; $y++)
+                <option value="{{ $y }}" {{ $y == $year ? 'selected' : '' }}>
+                    {{ $y }}
+                </option>
+            @endfor
+        </select>
+    </form>
+
+    <!-- Chart Pembayaran Treatment per Bulan -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        Pembayaran Treatment / Bulan ({{ $year }})
+                    </h6>
+                </div>
+                <div class="card-body" style="height: 300px;">
+                    <canvas id="monthlyTreatmentChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Pembayaran Produk per Bulan -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">
+                        Pembayaran Produk / Bulan ({{ $year }})
+                    </h6>
+                </div>
+                <div class="card-body" style="height: 300px;">
+                    <canvas id="monthlyProductChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
+
+@push('scripts')
+    <script>
+        // Data dari controller
+        const treatLabels = {!! json_encode($treatmentLabels) !!};
+        const treatData = {!! json_encode($treatmentData) !!};
+        const prodLabels = {!! json_encode($productLabels) !!};
+        const prodData = {!! json_encode($productData) !!};
+
+        // Hitung max dinamis kelipatan 10
+        const maxTreat = treatData.length ?
+            Math.ceil(Math.max(...treatData) / 10) * 10 :
+            10;
+        const maxProd = prodData.length ?
+            Math.ceil(Math.max(...prodData) / 10) * 10 :
+            10;
+
+        // Chart Pembayaran Treatment
+        new Chart(
+            document.getElementById('monthlyTreatmentChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: treatLabels,
+                    datasets: [{
+                        label: 'Jumlah Pembayaran',
+                        backgroundColor: '#4e73df',
+                        data: treatData
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                stepSize: 10,
+                                max: maxTreat
+                            }
+                        }]
+                    }
+                }
+            }
+        );
+
+        // Chart Pembayaran Produk
+        new Chart(
+            document.getElementById('monthlyProductChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: prodLabels,
+                    datasets: [{
+                        label: 'Jumlah Pembayaran',
+                        backgroundColor: '#1cc88a',
+                        data: prodData
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                stepSize: 10,
+                                max: maxProd
+                            }
+                        }]
+                    }
+                }
+            }
+        );
+    </script>
+@endpush

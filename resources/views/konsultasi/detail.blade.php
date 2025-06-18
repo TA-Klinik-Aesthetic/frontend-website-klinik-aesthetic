@@ -33,6 +33,7 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
+                            <th>Diagnosis</th>
                             <th>Saran Tindakan</th>
                             <th>Treatment</th>
                             <th>Aksi</th>
@@ -40,7 +41,8 @@
                     </thead>
                     <tbody>
                         @foreach ($konsultasi['detail_konsultasi'] as $detail)
-                            <tr>                               
+                            <tr>        
+                                <td>{{ $detail['diagnosis'] ?? 'Tidak ada saran' }}</td>                    
                                 <td>{{ $detail['saran_tindakan'] ?? 'Tidak ada saran' }}</td>
                                 <td>
                                     {{ $detail['treatment']['nama_treatment'] ?? 'Tidak ada treatment' }}
