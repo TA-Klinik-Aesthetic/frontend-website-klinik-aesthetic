@@ -1,11 +1,10 @@
 @extends('dashboard.index')
 
 @section('content')
-    <h1>Feedback Konsultasi</h1>
+    <h1 class="h3 mb-2 text-gray-800">Feedback Konsultasi</h1>
 
     <!-- Feedback List -->
     <div class="mb-4">
-        <h3>Daftar Feedback</h3>
         <table class="table table-bordered">
             <thead>
                 <tr>

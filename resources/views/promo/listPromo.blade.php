@@ -1,47 +1,103 @@
 @extends('dashboard.index')
 
 @section('content')
-    <h1>List Promo</h1>
+    <!-- Custom CSS untuk DataTables filter -->
+    <style>
+        /* pastikan kontainer filter benar-benar rata-kanan */
+        .dataTables_filter {
+            text-align: right !important;
+        }
 
-    <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#tambahPromoModal">
+        /* label cukup inline-flex, tidak full-width */
+        .dataTables_filter label {
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        /* jarak antara teks “Search:” dan input */
+        .dataTables_filter label input {
+            margin-left: 0.5rem;
+        }
+
+        /* Contoh: semua paginate button jadi merah solid */
+        .dataTables_wrapper .dataTables_paginate .btn {
+            background-color: #F3A14B !important;
+            /* merah */
+            border-color: #F3A14B !important;
+            color: #fff !important;
+        }
+
+        /* Hover */
+        .dataTables_wrapper .dataTables_paginate .btn:hover {
+            background-color: #F3A14B !important;
+            border-color: #F3A14B !important;
+        }
+    </style>
+
+    <style>
+        /* custom pale-orange button */
+        .btn-pale {
+            background-color: #F3A14B !important;
+            border-color: #F3A14B !important;
+            color: #fff !important;
+        }
+
+        .btn-pale:hover,
+        .btn-pale:focus {
+            background-color: #d18d3f !important;
+            /* varian gelap */
+            border-color: #d18d3f !important;
+            color: #fff !important;
+        }
+    </style>
+
+
+    <h1 class="h3 mb-2 text-gray-800">List Promo</h1>
+
+    <button type="button" class="btn btn-pale mb-3" data-toggle="modal" data-target="#tambahPromoModal">
         <i class="fas fa-plus"></i> Tambah Promo
     </button>
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Nama Promo</th>
-                <th>Potongan Harga</th>
-                <th>Status</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($promos as $promo)
-                <tr>
-                    <td>{{ $promo['nama_promo'] }}</td>
-                    <td>
-                        @if ($promo['tipe_potongan'] === 'Diskon')
-                            {{ number_format($promo['potongan_harga']) }}%
-                        @else
-                            Rp {{ number_format($promo['potongan_harga']) }}
-                        @endif
-                    </td>
-                    <td>{{ ucfirst($promo['status_promo']) }}</td>
-                    <td>
-                        <a href="{{ route('promo.show', $promo['id_promo']) }}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        <!-- Tombol Edit -->
-                        <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editPromoModal"
-                            onclick="populateEditPromo({{ json_encode($promo) }})">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <table id="laporanPromoTable" class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Nama Promo</th>
+                        <th>Potongan Harga</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($promos as $promo)
+                        <tr>
+                            <td>{{ $promo['nama_promo'] }}</td>
+                            <td>
+                                @if ($promo['tipe_potongan'] === 'Diskon')
+                                    {{ number_format($promo['potongan_harga']) }}%
+                                @else
+                                    Rp {{ number_format($promo['potongan_harga']) }}
+                                @endif
+                            </td>
+                            <td>{{ ucfirst($promo['status_promo']) }}</td>
+                            <td>
+                                <a href="{{ route('promo.show', $promo['id_promo']) }}" class="btn btn-pale mb-3">
+                                    Detail
+                                </a>
+                                <!-- Tombol Edit -->
+                                <button class="btn btn-pale mb-3" data-toggle="modal" data-target="#editPromoModal"
+                                    onclick="populateEditPromo({{ json_encode($promo) }})">
+                                    Edit
+                                </button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     <!-- Modal Tambah Promo -->
     <div class="modal fade" id="tambahPromoModal" tabindex="-1" role="dialog" aria-labelledby="tambahPromoModalLabel"
@@ -124,7 +180,7 @@
     <!-- Modal Edit Promo -->
     <div class="modal fade" id="editPromoModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
-            <form id="editPromoForm" method="POST" enctype="multipart/form-data" class="modal-content">
+            <form id="editPromoForm" method="POST" action="" enctype="multipart/form-data" class="modal-content">
                 @csrf
                 <input type="hidden" name="_method" value="PUT">
 
@@ -243,5 +299,32 @@
             form.querySelector('input[name="tanggal_berakhir"]').value = p.tanggal_berakhir;
             form.querySelector('select[name="status_promo"]').value = p.status_promo;
         }
+    </script>
+@endpush
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#laporanPromoTable').DataTable({
+                responsive: true,
+                pageLength: 25,
+                lengthMenu: [
+                    [10, 25, 50, 100],
+                    [10, 25, 50, 100]
+                ],
+                pagingType: 'simple_numbers',
+                dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 text-right'f>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 text-right'p>>",
+                drawCallback: function(settings) {
+                    // styling ulang pagination setiap draw
+                    $('.dataTables_wrapper .dataTables_paginate a').each(function() {
+                        $(this)
+                            .removeClass('paginate_button')
+                            .addClass('btn btn-sm btn-outline-primary mx-1');
+                    });
+                }
+            });
+        });
     </script>
 @endpush

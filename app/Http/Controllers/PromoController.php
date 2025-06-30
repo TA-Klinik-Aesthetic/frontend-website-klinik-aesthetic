@@ -24,7 +24,7 @@ class PromoController extends Controller
 
         if ($promo) {
             if (!empty($promo['gambar_promo'])) {
-                $promo['gambar_promo'] = "http://127.0.0.1:8080/storage/" . ltrim($promo['gambar_promo'], '/');
+                $promo['gambar_promo'] = "http://127.0.0.1:8080/" . ltrim($promo['gambar_promo'], '/');
             }
             return view('promo.detailPromo', compact('promo'));
         }

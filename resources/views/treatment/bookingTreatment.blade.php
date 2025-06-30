@@ -1,15 +1,66 @@
 @extends('dashboard.index')
 
 @section('content')
-    <div class="container">
-        <h1 class="my-4">Booking Treatment List</h1>
-        <!-- Tombol trigger modal -->
-        <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#bookingModal">
-            <i class="fas fa-plus"></i> Tambah Booking
-        </button>
+    <style>
+        /* pastikan kontainer filter benar-benar rata-kanan */
+        .dataTables_filter {
+            text-align: right !important;
+        }
 
-        <div class="table-responsive">
-            <table class="table table-bordered">
+        /* label cukup inline-flex, tidak full-width */
+        .dataTables_filter label {
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        /* jarak antara teks “Search:” dan input */
+        .dataTables_filter label input {
+            margin-left: 0.5rem;
+        }
+
+        /* Contoh: semua paginate button jadi merah solid */
+        .dataTables_wrapper .dataTables_paginate .btn {
+            background-color: #F3A14B !important;
+            /* merah */
+            border-color: #F3A14B !important;
+            color: #fff !important;
+        }
+
+        /* Hover */
+        .dataTables_wrapper .dataTables_paginate .btn:hover {
+            background-color: #F3A14B !important;
+            border-color: #F3A14B !important;
+        }
+    </style>
+
+    <style>
+        /* custom pale-orange button */
+        .btn-pale {
+            background-color: #F3A14B !important;
+            border-color: #F3A14B !important;
+            color: #fff !important;
+        }
+
+        .btn-pale:hover,
+        .btn-pale:focus {
+            background-color: #d18d3f !important;
+            /* varian gelap */
+            border-color: #d18d3f !important;
+            color: #fff !important;
+        }
+    </style>
+
+    <h1 class="h3 mb-2 text-gray-800">Booking Treatment List</h1>
+
+    <button type="button" class="btn btn-pale mb-3" data-toggle="modal" data-target="#bookingModal">
+        <i class="fas fa-plus"></i> Tambah Booking
+    </button>
+
+    <!-- Card putih dengan shadow -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <table id="laporanBookingTreatmentTable" class="table table-bordered" width="100%" cellspacing="0">
                 <thead>
                     <tr>
                         <th>Nama User</th>
@@ -27,48 +78,31 @@
                             <td>{{ $booking['user_name'] }}</td>
                             <td>{{ $booking['waktu_treatment'] }}</td>
                             <td>{{ $booking['status_booking_treatment'] }}</td>
+                            <td>Rp{{ number_format($booking['harga_total'], 0, ',', '.') }}</td>
                             <td>
-                                {{-- Format Harga Total sebagai Rupiah --}}
-                                @php
-                                    $hargaTotal = $booking['harga_total'];
-                                @endphp
-                                Rp{{ number_format($hargaTotal, 0, ',', '.') }}
-                            </td>
-                            <td>
-                                {{-- Cari promo yang digunakan --}}
                                 @php
                                     $promo = collect($promos)->firstWhere('id_promo', $booking['id_promo']);
                                 @endphp
 
                                 @if ($promo)
                                     @if ($promo['tipe_potongan'] === 'Diskon')
-                                        {{-- Potongan dalam persen --}}
                                         {{ number_format($promo['potongan_harga']) }}%
                                     @else
-                                        {{-- Potongan dalam rupiah --}}
                                         Rp{{ number_format($booking['potongan_harga'], 0, ',', '.') }}
                                     @endif
                                 @else
-                                    {{-- Jika tidak ada promo --}}
                                     -
                                 @endif
                             </td>
-                            <td>
-                                {{-- Format Harga Akhir sebagai Rupiah --}}
-                                @php
-                                    $hargaAkhir = $booking['harga_akhir_treatment'];
-                                @endphp
-                                Rp{{ number_format($hargaAkhir, 0, ',', '.') }}
-                            </td>
+                            <td>Rp{{ number_format($booking['harga_akhir_treatment'], 0, ',', '.') }}</td>
                             <td>
                                 <a href="{{ route('booking.detail', $booking['id_booking_treatment']) }}"
-                                    class="btn btn-info">Detail</a>
-                                <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
+                                    class="btn btn-pale mb-3">Detail</a>
+                                <button type="button" class="btn btn-pale mb-3" data-toggle="modal"
                                     data-target="#editModal{{ $booking['id_booking_treatment'] }}">
                                     Edit
                                 </button>
-                                <!-- Tombol Ubah Status -->
-                                <button class="btn btn-primary btn-sm" data-toggle="modal"
+                                <button class="btn btn-pale mb-3" data-toggle="modal"
                                     data-target="#statusModal-{{ $booking['id_booking_treatment'] }}">
                                     Ubah Status
                                 </button>
@@ -77,163 +111,163 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+    </div>
 
-            @foreach ($bookingTreatments as $booking)
-                <div class="modal fade" id="editModal{{ $booking['id_booking_treatment'] }}" tabindex="-1" role="dialog"
-                    aria-labelledby="editModalLabel{{ $booking['id_booking_treatment'] }}" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <form action="{{ route('detailBooking.update', $booking['id_booking_treatment']) }}"
-                                method="POST">
-                                @csrf
-                                @method('PUT')
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="editModalLabel{{ $booking['id_booking_treatment'] }}">Edit
-                                        Booking Treatment</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <!-- Dropdown untuk Dokter -->
-                                    <div class="form-group">
-                                        <label for="id_dokter">Nama Dokter</label>
-                                        <select name="id_dokter" id="id_dokter" class="form-control">
-                                            <option value="">Pilih Dokter</option>
-                                            @foreach ($dokters as $dokter)
-                                                <option value="{{ $dokter['id_dokter'] }}"
-                                                    @if ($dokter['id_dokter'] == $booking['id_dokter']) selected @endif>
-                                                    {{ $dokter['nama_dokter'] }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+    @foreach ($bookingTreatments as $booking)
+        <div class="modal fade" id="editModal{{ $booking['id_booking_treatment'] }}" tabindex="-1" role="dialog"
+            aria-labelledby="editModalLabel{{ $booking['id_booking_treatment'] }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form action="{{ route('detailBooking.update', $booking['id_booking_treatment']) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editModalLabel{{ $booking['id_booking_treatment'] }}">Edit
+                                Booking Treatment</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Dropdown untuk Dokter -->
+                            <div class="form-group">
+                                <label for="id_dokter">Nama Dokter</label>
+                                <select name="id_dokter" id="id_dokter" class="form-control">
+                                    <option value="">Pilih Dokter</option>
+                                    @foreach ($dokters as $dokter)
+                                        <option value="{{ $dokter['id_dokter'] }}"
+                                            @if ($dokter['id_dokter'] == $booking['id_dokter']) selected @endif>
+                                            {{ $dokter['nama_dokter'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                                    <!-- Dropdown untuk Beautician -->
-                                    <div class="form-group">
-                                        <label for="id_beautician">Nama Beautician</label>
-                                        <select name="id_beautician" id="id_beautician" class="form-control" required>
-                                            <option value="">Pilih Beautician</option>
-                                            @foreach ($beauticians as $beautician)
-                                                <option value="{{ $beautician['id_beautician'] }}"
-                                                    @if ($beautician['id_beautician'] == $booking['id_beautician']) selected @endif>
-                                                    {{ $beautician['nama_beautician'] }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                                </div>
-                            </form>
+                            <!-- Dropdown untuk Beautician -->
+                            <div class="form-group">
+                                <label for="id_beautician">Nama Beautician</label>
+                                <select name="id_beautician" id="id_beautician" class="form-control" required>
+                                    <option value="">Pilih Beautician</option>
+                                    @foreach ($beauticians as $beautician)
+                                        <option value="{{ $beautician['id_beautician'] }}"
+                                            @if ($beautician['id_beautician'] == $booking['id_beautician']) selected @endif>
+                                            {{ $beautician['nama_beautician'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
+    {{-- Modal Ubah Status Booking Treatment --}}
+    @foreach ($bookingTreatments as $booking)
+        <div class="modal fade" id="statusModal-{{ $booking['id_booking_treatment'] }}" tabindex="-1" role="dialog"
+            aria-labelledby="statusModalLabel-{{ $booking['id_booking_treatment'] }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <form class="status-update-form"
+                    action="{{ route('bookingTreatment.updateStatus', $booking['id_booking_treatment']) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+
+                    {{-- simpan status saat ini --}}
+                    <input type="hidden" name="current_status" value="{{ $booking['status_booking_treatment'] }}">
+
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="statusModalLabel-{{ $booking['id_booking_treatment'] }}">
+                                Ubah Status Booking Treatment
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                <strong>Pelanggan:</strong> {{ $booking['user_name'] }}<br>
+                                <strong>Waktu:</strong> {{ $booking['waktu_treatment'] }}
+                            </p>
+                            <div class="form-group">
+                                <label for="status-{{ $booking['id_booking_treatment'] }}">Status Baru</label>
+                                <select id="status-{{ $booking['id_booking_treatment'] }}" name="status_booking_treatment"
+                                    class="form-control" required>
+                                    <option value="">-- Pilih Status --</option>
+                                    <option value="Selesai">Selesai</option>
+                                    <option value="Dibatalkan">Dibatalkan</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Simpan</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                         </div>
                     </div>
-                </div>
-            @endforeach
+                </form>
+            </div>
+        </div>
+    @endforeach
 
-            {{-- Modal Ubah Status Booking Treatment --}}
-            @foreach ($bookingTreatments as $booking)
-                <div class="modal fade" id="statusModal-{{ $booking['id_booking_treatment'] }}" tabindex="-1"
-                    role="dialog" aria-labelledby="statusModalLabel-{{ $booking['id_booking_treatment'] }}"
-                    aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <form class="status-update-form" action="{{ route('bookingTreatment.updateStatus', $booking['id_booking_treatment']) }}"
-                            method="POST">
-                            @csrf
-                            @method('PUT')
-
-                            {{-- simpan status saat ini --}}
-                            <input type="hidden" name="current_status" value="{{ $booking['status_booking_treatment'] }}">
-
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="statusModalLabel-{{ $booking['id_booking_treatment'] }}">
-                                        Ubah Status Booking Treatment
-                                    </h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <p>
-                                        <strong>Pelanggan:</strong> {{ $booking['user_name'] }}<br>
-                                        <strong>Waktu:</strong> {{ $booking['waktu_treatment'] }}
-                                    </p>
-                                    <div class="form-group">
-                                        <label for="status-{{ $booking['id_booking_treatment'] }}">Status Baru</label>
-                                        <select id="status-{{ $booking['id_booking_treatment'] }}"
-                                            name="status_booking_treatment" class="form-control" required>
-                                            <option value="">-- Pilih Status --</option>
-                                            <option value="Selesai">Selesai</option>
-                                            <option value="Dibatalkan">Dibatalkan</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn-primary">Simpan</button>
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                </div>
-                            </div>
-                        </form>
+    <!-- Modal Tambah Booking -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <form action="{{ route('booking.store') }}" method="POST">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="bookingModalLabel">Tambah Booking Treatment</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                </div>
-            @endforeach
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="user">User</label>
+                            <select name="id_user" id="user" class="form-control" required>
+                                <option value="">Pilih User</option>
+                                @foreach ($users as $user)
+                                    <option value="{{ $user['id_user'] }}">{{ $user['nama_user'] }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-            <!-- Modal Tambah Booking -->
-            <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog modal-lg" role="document">
-                    <div class="modal-content">
-                        <form action="{{ route('booking.store') }}" method="POST">
-                            @csrf
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="bookingModalLabel">Tambah Booking Treatment</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="form-group">
-                                    <label for="user">User</label>
-                                    <select name="id_user" id="user" class="form-control" required>
-                                        <option value="">Pilih User</option>
-                                        @foreach ($users as $user)
-                                            <option value="{{ $user['id_user'] }}">{{ $user['nama_user'] }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                        <div class="form-group">
+                            <label for="waktu_treatment">Waktu Treatment</label>
+                            <input type="datetime-local" name="waktu_treatment" id="waktu_treatment"
+                                class="form-control" required>
+                        </div>
 
-                                <div class="form-group">
-                                    <label for="waktu_treatment">Waktu Treatment</label>
-                                    <input type="datetime-local" name="waktu_treatment" id="waktu_treatment"
-                                        class="form-control" required>
-                                </div>
+                        <div class="form-group">
+                            <label for="dokter">Dokter</label>
+                            <select name="id_dokter" class="form-control">
+                                <option value="">Pilih Dokter</option>
+                                @foreach ($dokters as $dokter)
+                                    <option value="{{ $dokter['id_dokter'] }}">{{ $dokter['nama_dokter'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                                <div class="form-group">
-                                    <label for="dokter">Dokter</label>
-                                    <select name="id_dokter" class="form-control">
-                                        <option value="">Pilih Dokter</option>
-                                        @foreach ($dokters as $dokter)
-                                            <option value="{{ $dokter['id_dokter'] }}">{{ $dokter['nama_dokter'] }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                        <div class="form-group">
+                            <label for="beautician">Beautician</label>
+                            <select name="id_beautician" class="form-control" required>
+                                <option value="">Pilih Beautician</option>
+                                @foreach ($beauticians as $beautician)
+                                    <option value="{{ $beautician['id_beautician'] }}">
+                                        {{ $beautician['nama_beautician'] }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                                <div class="form-group">
-                                    <label for="beautician">Beautician</label>
-                                    <select name="id_beautician" class="form-control" required>
-                                        <option value="">Pilih Beautician</option>
-                                        @foreach ($beauticians as $beautician)
-                                            <option value="{{ $beautician['id_beautician'] }}">
-                                                {{ $beautician['nama_beautician'] }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                {{-- <div class="form-group">
+                        {{-- <div class="form-group">
                                     <label for="status_booking_treatment">Status</label>
                                     <select name="status_booking_treatment" id="status_booking_treatment"
                                         class="form-control" required>
@@ -244,83 +278,82 @@
                                     </select>
                                 </div> --}}
 
+                        <div class="form-group">
+                            <label for="promo">Promo (Opsional)</label>
+                            <select name="id_promo" id="promo" class="form-control">
+                                <option value="">Pilih Promo</option>
+                                @foreach ($promos as $promo)
+                                    <option value="{{ $promo['id_promo'] }}">
+                                        {{ $promo['nama_promo'] }}
+                                        @if ($promo['tipe_potongan'] === 'Diskon')
+                                            - Potongan:
+                                            {{ rtrim(rtrim(number_format($promo['potongan_harga'], 2, ',', ''), '0'), ',') }}%
+                                            @if ($promo['minimal_belanja'])
+                                                - Min Belanja:
+                                                Rp{{ number_format($promo['minimal_belanja'], 0, ',', '.') }}
+                                            @endif
+                                        @else
+                                            - Potongan:
+                                            Rp{{ number_format($promo['potongan_harga'], 0, ',', '.') }}
+                                            @if ($promo['minimal_belanja'])
+                                                - Min Belanja:
+                                                Rp{{ number_format($promo['minimal_belanja'], 0, ',', '.') }}
+                                            @endif
+                                        @endif
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+
+                        <div id="treatmentDetails">
+                            <!-- Kolom treatment pertama -->
+                            <div class="treatment-group">
                                 <div class="form-group">
-                                    <label for="promo">Promo (Opsional)</label>
-                                    <select name="id_promo" id="promo" class="form-control">
-                                        <option value="">Pilih Promo</option>
-                                        @foreach ($promos as $promo)
-                                            <option value="{{ $promo['id_promo'] }}">
-                                                {{ $promo['nama_promo'] }}
-                                                @if ($promo['tipe_potongan'] === 'Diskon')
-                                                    - Potongan:
-                                                    {{ rtrim(rtrim(number_format($promo['potongan_harga'], 2, ',', ''), '0'), ',') }}%
-                                                    @if ($promo['minimal_belanja'])
-                                                        - Min Belanja:
-                                                        Rp{{ number_format($promo['minimal_belanja'], 0, ',', '.') }}
-                                                    @endif
-                                                @else
-                                                    - Potongan:
-                                                    Rp{{ number_format($promo['potongan_harga'], 0, ',', '.') }}
-                                                    @if ($promo['minimal_belanja'])
-                                                        - Min Belanja:
-                                                        Rp{{ number_format($promo['minimal_belanja'], 0, ',', '.') }}
-                                                    @endif
-                                                @endif
+                                    <label for="treatment">Treatment</label>
+                                    <select name="details[0][id_treatment]" class="form-control treatment" required>
+                                        <option value="">Pilih Treatment</option>
+                                        @foreach ($treatments as $treatment)
+                                            <option value="{{ $treatment['id_treatment'] }}">
+                                                {{ $treatment['nama_treatment'] }} -
+                                                Rp{{ number_format($treatment['biaya_treatment'], 0, ',', '.') }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
 
-
-                                <div id="treatmentDetails">
-                                    <!-- Kolom treatment pertama -->
-                                    <div class="treatment-group">
-                                        <div class="form-group">
-                                            <label for="treatment">Treatment</label>
-                                            <select name="details[0][id_treatment]" class="form-control treatment"
-                                                required>
-                                                <option value="">Pilih Treatment</option>
-                                                @foreach ($treatments as $treatment)
-                                                    <option value="{{ $treatment['id_treatment'] }}">
-                                                        {{ $treatment['nama_treatment'] }} -
-                                                        Rp{{ number_format($treatment['biaya_treatment'], 0, ',', '.') }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="id_kompensasi_diberikan">Kode Kompensasi</label>
-                                            <select name="details[0][id_kompensasi_diberikan]"
-                                                class="form-control select2 kompensasi-select" style="width: 100%;">
-                                                <option value="">Pilih Kode Kompensasi</option>
-                                                @foreach ($kompensasis as $kompensasi)
-                                                    @if ($kompensasi['status_kompensasi'] === 'Belum digunakan')
-                                                        <option value="{{ $kompensasi['id_kompensasi_diberikan'] }}"
-                                                            data-user="{{ $kompensasi['komplain']['id_user'] }}"
-                                                            data-treatment="{{ $kompensasi['kompensasi']['id_treatment'] }}">
-                                                            {{ $kompensasi['kode_kompensasi'] }}
-                                                        </option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <!-- Tombol tambah hanya di group terakhir -->
-                                        <button type="button" class="btn btn-success mt-2 addTreatmentGroup">+ Tambah
-                                            Treatment</button>
-                                    </div>
+                                <div class="form-group">
+                                    <label for="id_kompensasi_diberikan">Kode Kompensasi</label>
+                                    <select name="details[0][id_kompensasi_diberikan]"
+                                        class="form-control select2 kompensasi-select" style="width: 100%;">
+                                        <option value="">Pilih Kode Kompensasi</option>
+                                        @foreach ($kompensasis as $kompensasi)
+                                            @if ($kompensasi['status_kompensasi'] === 'Belum digunakan')
+                                                <option value="{{ $kompensasi['id_kompensasi_diberikan'] }}"
+                                                    data-user="{{ $kompensasi['komplain']['id_user'] }}"
+                                                    data-treatment="{{ $kompensasi['kompensasi']['id_treatment'] }}">
+                                                    {{ $kompensasi['kode_kompensasi'] }}
+                                                </option>
+                                            @endif
+                                        @endforeach
+                                    </select>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn-primary">Simpan</button>
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                </div>
+
+                                <!-- Tombol tambah hanya di group terakhir -->
+                                <button type="button" class="btn btn-success mt-2 addTreatmentGroup">+ Tambah
+                                    Treatment</button>
                             </div>
-                        </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Simpan</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
+    </div>
+    </div>
     </div>
 @endsection
 
@@ -549,12 +582,40 @@
                     // baca status saat ini
                     const current = form.querySelector('input[name="current_status"]').value;
                     if (current.trim() !== 'Berhasil dibooking') {
-                        alert('Hanya booking dengan status "Berhasil Dibooking" yang boleh diubah statusnya.');
-                        e.preventDefault();  // batalkan submit
+                        alert(
+                            'Hanya booking dengan status "Berhasil Dibooking" yang boleh diubah statusnya.'
+                        );
+                        e.preventDefault(); // batalkan submit
                     }
                 });
             });
         });
     </script>
-    
+@endpush
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#laporanBookingTreatmentTable').DataTable({
+                responsive: true,
+                pageLength: 25,
+                lengthMenu: [
+                    [10, 25, 50, 100],
+                    [10, 25, 50, 100]
+                ],
+                pagingType: 'simple_numbers',
+                dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 text-right'f>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 text-right'p>>",
+                drawCallback: function(settings) {
+                    // styling ulang pagination setiap draw
+                    $('.dataTables_wrapper .dataTables_paginate a').each(function() {
+                        $(this)
+                            .removeClass('paginate_button')
+                            .addClass('btn btn-sm btn-outline-primary mx-1');
+                    });
+                }
+            });
+        });
+    </script>
 @endpush

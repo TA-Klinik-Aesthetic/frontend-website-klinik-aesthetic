@@ -1,70 +1,118 @@
 @extends('dashboard.index')
 
 @section('content')
+    <style>
+        /* pastikan kontainer filter benar-benar rata-kanan */
+        .dataTables_filter {
+            text-align: right !important;
+        }
+
+        /* label cukup inline-flex, tidak full-width */
+        .dataTables_filter label {
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        /* jarak antara teks “Search:” dan input */
+        .dataTables_filter label input {
+            margin-left: 0.5rem;
+        }
+
+        /* Contoh: semua paginate button jadi merah solid */
+        .dataTables_wrapper .dataTables_paginate .btn {
+            background-color: #F3A14B !important;
+            /* merah */
+            border-color: #F3A14B !important;
+            color: #fff !important;
+        }
+
+        /* Hover */
+        .dataTables_wrapper .dataTables_paginate .btn:hover {
+            background-color: #F3A14B !important;
+            border-color: #F3A14B !important;
+        }
+    </style>
+
+    <style>
+        /* custom pale-orange button */
+        .btn-pale {
+            background-color: #F3A14B !important;
+            border-color: #F3A14B !important;
+            color: #fff !important;
+        }
+
+        .btn-pale:hover,
+        .btn-pale:focus {
+            background-color: #d18d3f !important;
+            /* varian gelap */
+            border-color: #d18d3f !important;
+            color: #fff !important;
+        }
+    </style>
+
     <h1 class="h3 mb-2 text-gray-800">Daftar Booking Konsultasi</h1>
-    <button type="button" class="btn btn-success mb-4" data-toggle="modal" data-target="#tambahKonsultasiModal">
+    <button type="button" class="btn btn-pale mb-3" data-toggle="modal" data-target="#tambahKonsultasiModal">
         <i class="fas fa-plus"></i> Tambah Booking
     </button>
 
     <div class="card shadow mb-4">
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered" width="100%" cellspacing="0">
-                    <thead>
+            <table id="laporanKonsultasiTable" class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Nama Pelanggan</th>
+                        <th>Waktu Konsultasi</th>
+                        <th>Dokter</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($data->reverse() as $item)
                         <tr>
-                            <th>Nama Pelanggan</th>
-                            <th>Waktu Konsultasi</th>
-                            <th>Dokter</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($data->reverse() as $item)
-                            <tr>
-                                <td>{{ $item['user']['nama_user'] ?? 'Tidak ada nama pelanggan' }}</td>
-                                <td>{{ $item['waktu_konsultasi'] }}</td>
-                                <td>{{ $item['dokter']['nama_dokter'] }}</td>
-                                <td>{{ $item['status_booking_konsultasi'] }}</td>
-                                <td>
-                                    <!-- Tombol Detail -->
-                                    <a href="{{ route('konsultasi.show', ['id' => $item['id_konsultasi']]) }}"
-                                        class="btn btn-primary">Detail</a>
+                            <td>{{ $item['user']['nama_user'] ?? 'Tidak ada nama pelanggan' }}</td>
+                            <td>{{ $item['waktu_konsultasi'] }}</td>
+                            <td>{{ $item['dokter']['nama_dokter'] }}</td>
+                            <td>{{ $item['status_booking_konsultasi'] }}</td>
+                            <td>
+                                <!-- Tombol Detail -->
+                                <a href="{{ route('konsultasi.show', ['id' => $item['id_konsultasi']]) }}"
+                                    class="btn btn-pale mb-3">Detail</a>
 
-                                    {{-- @if (!empty($item['detail_konsultasi']) && isset($item['detail_konsultasi']['id_detail_konsultasi']))
+                                {{-- @if (!empty($item['detail_konsultasi']) && isset($item['detail_konsultasi']['id_detail_konsultasi']))
                                         <a href="{{ route('konsultasi.editKeluhan', $item['detail_konsultasi']['id_detail_konsultasi']) }}"
                                             class="btn btn-warning">Edit</a>
                                     @else
                                         <button class="btn btn-secondary" disabled>Edit</button>
                                     @endif --}}
 
-                                    <!-- Tombol Tambah Detail -->
-                                    <button type="button" class="btn btn-success" data-toggle="modal"
-                                        data-target="#tambahDetailModal-{{ $item['id_konsultasi'] }}">
-                                        Tambah Detail
+                                <!-- Tombol Tambah Detail -->
+                                <button type="button" class="btn btn-pale mb-3" data-toggle="modal"
+                                    data-target="#tambahDetailModal-{{ $item['id_konsultasi'] }}">
+                                    Tambah Detail
 
-                                    </button>
+                                </button>
 
-                                    <!-- Tombol Ubah Status -->
-                                    <button class="btn btn-sm btn-warning" data-toggle="modal"
-                                        data-target="#statusModal-{{ $item['id_konsultasi'] }}">
-                                        Ubah Status
-                                    </button>
+                                <!-- Tombol Ubah Status -->
+                                <button class="btn btn-pale mb-3" data-toggle="modal"
+                                    data-target="#statusModal-{{ $item['id_konsultasi'] }}">
+                                    Ubah Status
+                                </button>
 
 
-                                    {{-- <form action="{{ route('konsultasi.destroy', $item['id_konsultasi']) }}" method="POST"
+                                {{-- <form action="{{ route('konsultasi.destroy', $item['id_konsultasi']) }}" method="POST"
                                         style="display:inline-block;">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger"
                                             onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">Delete</button>
                                     </form> --}}
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -126,7 +174,8 @@
 
     {{-- Modal-Modal Ubah Status --}}
     @foreach ($data->reverse() as $item)
-        <div class="modal fade" id="statusModal-{{ $item['id_konsultasi'] }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel-{{ $item['id_konsultasi'] }}" aria-hidden="true">
+        <div class="modal fade" id="statusModal-{{ $item['id_konsultasi'] }}" tabindex="-1" role="dialog"
+            aria-labelledby="statusModalLabel-{{ $item['id_konsultasi'] }}" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <form action="{{ route('konsultasi.updateStatus', $item['id_konsultasi']) }}" method="POST">
                     @csrf
@@ -146,11 +195,8 @@
                             </p>
                             <div class="form-group">
                                 <label for="status_booking_konsultasi-{{ $item['id_konsultasi'] }}">Status Baru</label>
-                                <select 
-                                    id="status_booking_konsultasi-{{ $item['id_konsultasi'] }}" 
-                                    name="status_booking_konsultasi" 
-                                    class="form-control" 
-                                    required>
+                                <select id="status_booking_konsultasi-{{ $item['id_konsultasi'] }}"
+                                    name="status_booking_konsultasi" class="form-control" required>
                                     <option value="">-- Pilih Status --</option>
                                     <option value="Berhasil Dibooking">Berhasil Dibooking</option>
                                     <option value="Dibatalkan">Dibatalkan</option>
@@ -196,8 +242,8 @@
                         <!-- Waktu Konsultasi -->
                         <div class="form-group">
                             <label for="waktu_konsultasi">Waktu Konsultasi</label>
-                            <input type="datetime-local" class="form-control" id="waktu_konsultasi" name="waktu_konsultasi"
-                                required>
+                            <input type="datetime-local" class="form-control" id="waktu_konsultasi"
+                                name="waktu_konsultasi" required>
                         </div>
 
                         <!-- Nama Dokter -->
@@ -257,5 +303,32 @@
         `;
             container.insertAdjacentHTML('beforeend', html);
         }
+    </script>
+@endpush
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#laporanKonsultasiTable').DataTable({
+                responsive: true,
+                pageLength: 25,
+                lengthMenu: [
+                    [10, 25, 50, 100],
+                    [10, 25, 50, 100]
+                ],
+                pagingType: 'simple_numbers',
+                dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 text-right'f>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 text-right'p>>",
+                drawCallback: function(settings) {
+                    // styling ulang pagination setiap draw
+                    $('.dataTables_wrapper .dataTables_paginate a').each(function() {
+                        $(this)
+                            .removeClass('paginate_button')
+                            .addClass('btn btn-sm btn-outline-primary mx-1');
+                    });
+                }
+            });
+        });
     </script>
 @endpush

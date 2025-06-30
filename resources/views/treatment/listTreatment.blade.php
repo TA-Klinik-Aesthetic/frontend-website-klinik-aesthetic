@@ -1,50 +1,106 @@
 @extends('dashboard.index')
 
 @section('content')
-    <h1>List Treatment</h1>
+    <style>
+        /* pastikan kontainer filter benar-benar rata-kanan */
+        .dataTables_filter {
+            text-align: right !important;
+        }
 
-    <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#tambahTreatmentModal">
+        /* label cukup inline-flex, tidak full-width */
+        .dataTables_filter label {
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        /* jarak antara teks “Search:” dan input */
+        .dataTables_filter label input {
+            margin-left: 0.5rem;
+        }
+
+        /* Contoh: semua paginate button jadi merah solid */
+        .dataTables_wrapper .dataTables_paginate .btn {
+            background-color: #F3A14B !important;
+            /* merah */
+            border-color: #F3A14B !important;
+            color: #fff !important;
+        }
+
+        /* Hover */
+        .dataTables_wrapper .dataTables_paginate .btn:hover {
+            background-color: #F3A14B !important;
+            border-color: #F3A14B !important;
+        }
+    </style>
+
+    <style>
+        /* custom pale-orange button */
+        .btn-pale {
+            background-color: #F3A14B !important;
+            border-color: #F3A14B !important;
+            color: #fff !important;
+        }
+
+        .btn-pale:hover,
+        .btn-pale:focus {
+            background-color: #d18d3f !important;
+            /* varian gelap */
+            border-color: #d18d3f !important;
+            color: #fff !important;
+        }
+    </style>
+
+    <h1 class="h3 mb-2 text-gray-800">List Treatment</h1>
+
+    <button type="button" class="btn btn-pale mb-3" data-toggle="modal" data-target="#tambahTreatmentModal">
         <i class="fas fa-plus"></i> Tambah Treatment
     </button>
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Nama Treatment</th>
-                <th>Jenis Treatment</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($treatments as $treatment)
-                <tr>
-                    <td>{{ $treatment['nama_treatment'] }}</td>
-                    <td>{{ $treatment['jenis_treatment']['nama_jenis_treatment'] }}</td>
-                    <td>
-                        <a href="{{ route('treatment.show', $treatment['id_treatment']) }}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-eye"></i>
-                        </a>
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <table id="listTreatmentTable" class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Nama Treatment</th>
+                        <th>Jenis Treatment</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($treatments as $treatment)
+                        <tr>
+                            <td>{{ $treatment['nama_treatment'] }}</td>
+                            <td>{{ $treatment['jenis_treatment']['nama_jenis_treatment'] }}</td>
+                            <td>
+                                <a href="{{ route('treatment.show', $treatment['id_treatment']) }}"
+                                    class="btn btn-pale mb-3">
+                                    Detail
+                                </a>
 
-                        <!-- Tombol Edit -->
-                        <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
-                            data-target="#editTreatmentModal" onclick="populateEditModal({{ json_encode($treatment) }})">
-                            <i class="fas fa-edit"></i>
-                        </button>
+                                <!-- Tombol Edit -->
+                                <button type="button" class="btn btn-pale mb-3" data-toggle="modal"
+                                    data-target="#editTreatmentModal"
+                                    onclick="populateEditModal({{ json_encode($treatment) }})">
+                                    Edit
+                                </button>
 
-                        <form action="{{ route('treatment.destroy', $treatment['id_treatment']) }}" method="POST"
-                            style="display: inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm"
-                                onclick="return confirm('Apakah Anda yakin ingin menghapus treatment ini?')">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+                                <form action="{{ route('treatment.destroy', $treatment['id_treatment']) }}" method="POST"
+                                    style="display: inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-pale mb-3"
+                                        onclick="return confirm('Apakah Anda yakin ingin menghapus treatment ini?')">
+                                        Hapus
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     <!-- Modal Tambah Treatment -->
     <div class="modal fade" id="tambahTreatmentModal" tabindex="-1" role="dialog"
@@ -180,17 +236,46 @@
         </div>
     </div>
 
-    <script>
-        function populateEditModal(treatment) {
-          const form = document.getElementById('editTreatmentForm');
-          form.action = `/treatment/${treatment.id_treatment}`;
-      
-          document.getElementById('edit_id_jenis_treatment').value     = treatment.id_jenis_treatment;
-          document.getElementById('edit_nama_treatment').value         = treatment.nama_treatment;
-          document.getElementById('edit_deskripsi_treatment').value    = treatment.deskripsi_treatment || '';
-          document.getElementById('edit_biaya_treatment').value        = treatment.biaya_treatment;
-          document.getElementById('edit_estimasi_treatment').value     = treatment.estimasi_treatment;
-          // file input tidak bisa di‐prefill, tapi keterangan sudah cukup
-        }
-      </script>
+    @push('scripts')
+        <script>
+            function populateEditModal(treatment) {
+                const form = document.getElementById('editTreatmentForm');
+                form.action = `/treatment/${treatment.id_treatment}`;
+
+                document.getElementById('edit_id_jenis_treatment').value = treatment.id_jenis_treatment;
+                document.getElementById('edit_nama_treatment').value = treatment.nama_treatment;
+                document.getElementById('edit_deskripsi_treatment').value = treatment.deskripsi_treatment || '';
+                document.getElementById('edit_biaya_treatment').value = treatment.biaya_treatment;
+                document.getElementById('edit_estimasi_treatment').value = treatment.estimasi_treatment;
+                // file input tidak bisa di‐prefill, tapi keterangan sudah cukup
+            }
+        </script>
+    @endpush
+
+    @push('scripts')
+        <script>
+            $(document).ready(function() {
+                $('#listTreatmentTable').DataTable({
+                    responsive: true,
+                    pageLength: 25,
+                    lengthMenu: [
+                        [10, 25, 50, 100],
+                        [10, 25, 50, 100]
+                    ],
+                    pagingType: 'simple_numbers',
+                    dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 text-right'f>>" +
+                        "<'row'<'col-sm-12'tr>>" +
+                        "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 text-right'p>>",
+                    drawCallback: function(settings) {
+                        // styling ulang pagination setiap draw
+                        $('.dataTables_wrapper .dataTables_paginate a').each(function() {
+                            $(this)
+                                .removeClass('paginate_button')
+                                .addClass('btn btn-sm btn-outline-primary mx-1');
+                        });
+                    }
+                });
+            });
+        </script>
+    @endpush
 @endsection

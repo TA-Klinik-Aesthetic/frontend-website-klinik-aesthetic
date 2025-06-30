@@ -66,7 +66,7 @@ class TreatmentController extends Controller
         if ($treatment) {
             if (!empty($treatment['gambar_treatment'])) {
                 // Gunakan URL backend langsung agar bisa diakses dari frontend
-                $treatment['gambar_treatment'] = "http://127.0.0.1:8080/storage/" . ltrim($treatment['gambar_treatment'], '/');
+                $treatment['gambar_treatment'] = "http://127.0.0.1:8080/" . ltrim($treatment['gambar_treatment'], '/');
             }
     
             return view('treatment.detailTreatment', compact('treatment'));

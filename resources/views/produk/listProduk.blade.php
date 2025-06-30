@@ -1,60 +1,108 @@
 @extends('dashboard.index')
 
 @section('content')
+    <style>
+        /* pastikan kontainer filter benar-benar rata-kanan */
+        .dataTables_filter {
+            text-align: right !important;
+        }
+
+        /* label cukup inline-flex, tidak full-width */
+        .dataTables_filter label {
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        /* jarak antara teks “Search:” dan input */
+        .dataTables_filter label input {
+            margin-left: 0.5rem;
+        }
+
+        /* Contoh: semua paginate button jadi merah solid */
+        .dataTables_wrapper .dataTables_paginate .btn {
+            background-color: #F3A14B !important;
+            /* merah */
+            border-color: #F3A14B !important;
+            color: #fff !important;
+        }
+
+        /* Hover */
+        .dataTables_wrapper .dataTables_paginate .btn:hover {
+            background-color: #F3A14B !important;
+            border-color: #F3A14B !important;
+        }
+    </style>
+
+    <style>
+        /* custom pale-orange button */
+        .btn-pale {
+            background-color: #F3A14B !important;
+            border-color: #F3A14B !important;
+            color: #fff !important;
+        }
+
+        .btn-pale:hover,
+        .btn-pale:focus {
+            background-color: #d18d3f !important;
+            /* varian gelap */
+            border-color: #d18d3f !important;
+            color: #fff !important;
+        }
+    </style>
+
     <h1 class="h3 mb-2 text-gray-800">List Produk</h1>
     <!-- Tombol Tambah Produk (trigger modal) -->
-    <button class="btn btn-success mb-4" data-toggle="modal" data-target="#addProdukModal">
+    <button class="btn btn-pale mb-3" data-toggle="modal" data-target="#addProdukModal">
         <i class="fas fa-plus"></i> Tambah Produk
     </button>
 
     <div class="card shadow mb-4">
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered" width="100%" cellspacing="0">
-                    <thead>
+            <table id="laporanProdukTable" class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Nama Produk</th>
+                        <th>Harga</th>
+                        <th>Status</th>
+                        <th>Kategori</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($produkList as $produk)
                         <tr>
-                            <th>Nama Produk</th>
-                            <th>Harga</th>
-                            <th>Status</th>
-                            <th>Kategori</th>
-                            <th>Aksi</th>
+                            <td>{{ $produk['nama_produk'] }}</td>
+                            <td>Rp{{ number_format($produk['harga_produk'], 2, ',', '.') }}</td>
+                            <td>{{ $produk['status_produk'] }}</td>
+                            <td>{{ $produk['kategori']['nama_kategori'] }}</td>
+                            <td>
+                                <a href="{{ route('produk.show', $produk['id_produk']) }}"
+                                    class="btn btn-pale mb-3">Detail</a>
+
+                                <!-- Tombol Edit (trigger modal) -->
+                                <button class="btn btn-pale mb-3" data-toggle="modal"
+                                    data-target="#editProdukModal-{{ $produk['id_produk'] }}"
+                                    onclick="populateEditModal({{ json_encode($produk) }})">
+                                    Edit
+                                </button>
+
+                                <form action="{{ route('produk.destroy', $produk['id_produk']) }}" method="POST"
+                                    style="display:inline-block;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-pale mb-3"
+                                        onclick="return confirm('Yakin ingin menghapus?')">Hapus</button>
+                                </form>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($produkList as $produk)
-                            <tr>
-                                <td>{{ $produk['nama_produk'] }}</td>
-                                <td>Rp{{ number_format($produk['harga_produk'], 2, ',', '.') }}</td>
-                                <td>{{ $produk['status_produk'] }}</td>
-                                <td>{{ $produk['kategori']['nama_kategori'] }}</td>
-                                <td>
-                                    <a href="{{ route('produk.show', $produk['id_produk']) }}"
-                                        class="btn btn-info btn-sm">Detail</a>
-
-                                    <!-- Tombol Edit (trigger modal) -->
-                                    <button class="btn btn-warning btn-sm" data-toggle="modal"
-                                        data-target="#editProdukModal-{{ $produk['id_produk'] }}"
-                                        onclick="populateEditModal({{ json_encode($produk) }})">
-                                        Edit
-                                    </button>
-
-                                    <form action="{{ route('produk.destroy', $produk['id_produk']) }}" method="POST"
-                                        style="display:inline-block;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm"
-                                            onclick="return confirm('Yakin ingin menghapus?')">Hapus</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="8" class="text-center">Tidak ada data produk tersedia.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="text-center">Tidak ada data produk tersedia.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
     <!-- Modal Tambah Produk -->
@@ -225,16 +273,43 @@
 @endsection
 
 @push('scripts')
-<script>
-    function populateEditModal(data) {
-        const id = data.id_produk;
-        document.getElementById(`edit_nama_produk_${id}`).value       = data.nama_produk;
-        document.getElementById(`edit_deskripsi_produk_${id}`).value  = data.deskripsi_produk;
-        document.getElementById(`edit_harga_produk_${id}`).value      = data.harga_produk;
-        document.getElementById(`edit_stok_produk_${id}`).value       = data.stok_produk;
-        document.getElementById(`edit_status_produk_${id}`).value     = data.status_produk;
-        document.getElementById(`edit_id_kategori_${id}`).value       = data.id_kategori;
-        // file input tidak diisi lewat JS
-    }
-</script>
+    <script>
+        function populateEditModal(data) {
+            const id = data.id_produk;
+            document.getElementById(`edit_nama_produk_${id}`).value = data.nama_produk;
+            document.getElementById(`edit_deskripsi_produk_${id}`).value = data.deskripsi_produk;
+            document.getElementById(`edit_harga_produk_${id}`).value = data.harga_produk;
+            document.getElementById(`edit_stok_produk_${id}`).value = data.stok_produk;
+            document.getElementById(`edit_status_produk_${id}`).value = data.status_produk;
+            document.getElementById(`edit_id_kategori_${id}`).value = data.id_kategori;
+            // file input tidak diisi lewat JS
+        }
+    </script>
+@endpush
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#laporanProdukTable').DataTable({
+                responsive: true,
+                pageLength: 25,
+                lengthMenu: [
+                    [10, 25, 50, 100],
+                    [10, 25, 50, 100]
+                ],
+                pagingType: 'simple_numbers',
+                dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 text-right'f>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 text-right'p>>",
+                drawCallback: function(settings) {
+                    // styling ulang pagination setiap draw
+                    $('.dataTables_wrapper .dataTables_paginate a').each(function() {
+                        $(this)
+                            .removeClass('paginate_button')
+                            .addClass('btn btn-sm btn-outline-primary mx-1');
+                    });
+                }
+            });
+        });
+    </script>
 @endpush

@@ -26,6 +26,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
+    @push('styles')
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+        <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
+    @endpush
 
 </head>
 
@@ -117,6 +121,15 @@
     <script src="{{ asset('backend/js/demo/chart-area-demo.js') }}"></script>
     <script src="{{ asset('backend/js/demo/chart-pie-demo.js') }}"></script>
     <script src="{{ asset('backend/js/demo/chart-bar-demo.js') }}"></script>
+
+    @push('scripts')
+        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    @endpush
+
     @stack('scripts')
 </body>
 

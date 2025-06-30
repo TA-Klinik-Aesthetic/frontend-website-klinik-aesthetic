@@ -4,48 +4,59 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PembelianProdukController extends Controller
 {
     public function index()
     {
-        // Fetch product purchases
-        $pembelianResponse = Http::get('http://127.0.0.1:8080/api/penjualan-produk');
-        $pembelianProduk = $pembelianResponse->json();
-
-        // Fetch user data
-        $userResponse = Http::get('http://127.0.0.1:8080/api/users');
-        $users = collect($userResponse->json()['data']); // Adjust to access the 'data' key
-
-        // Fetch products
-        $productResponse = Http::get('http://127.0.0.1:8080/api/produk');
-        $products = $productResponse->json('data');
-
-        // Fetch promos
-        $promosResponse = Http::get('http://127.0.0.1:8080/api/promo');
-        $promos = collect($promosResponse->json()['data'])
-            ->where('jenis_promo', 'Produk')
-            ->values();
-
-        // Map id_user to user name
-        foreach ($pembelianProduk as &$pembelian) {
-            $user = $users->firstWhere('id_user', $pembelian['id_user']); // Match id_user
-            $pembelian['nama_user'] = $user ? $user['nama_user'] : 'Tidak Diketahui';
-
-            // Inject produk untuk keperluan modal edit
-            $pembelian['produk'] = collect($pembelian['detail_pembelian'])->map(function ($detail) {
-                return [
-                    'id_produk' => $detail['id_produk'],
-                    'jumlah_produk' => $detail['jumlah_produk']
-                ];
-            })->toArray();
-
-            $pembelian['promo_dipakai'] = $promos
-            ->firstWhere('id_promo', $pembelian['id_promo']);
-        }
-
-        return view('pembelian-produk.pembelian', compact('pembelianProduk', 'users', 'products', 'promos'));
+        // 1) Ambil semua penjualan produk (API mereturn array)
+        $respSale    = Http::get('http://127.0.0.1:8080/api/penjualan-produk');
+        $rawSales    = $respSale->json();          // <-- gunakan ini saja
+        $pembelian   = collect($rawSales);
+    
+        // 2) Data pendukung
+        $users    = collect(Http::get('http://127.0.0.1:8080/api/users')->json('data') ?? []);
+        $products = Http::get('http://127.0.0.1:8080/api/produk')->json('data') ?? [];
+        $promos   = collect(Http::get('http://127.0.0.1:8080/api/promo')
+                       ->json('data') ?? [])
+                       ->where('jenis_promo','Produk')
+                       ->values();
+    
+        // 3) Semua pembayaran
+        $allPays = collect(Http::get('http://127.0.0.1:8080/api/pembayaran-produk')
+        ->json() ?? []);
+    
+        // 4) Map: tambahkan nama_user, daftar produk, promo dan id_pembayaran
+        $pembelianProduk = $pembelian->map(function($p) use($users,$products,$promos,$allPays){
+            // nama user
+            $u = $users->firstWhere('id_user',$p['id_user']);
+            $p['nama_user'] = $u['nama_user'] ?? 'Tidak Diketahui';
+    
+            // list produk (modal edit)
+            $p['produk'] = collect($p['detail_pembelian'] ?? [])
+                ->map(fn($d)=>[
+                    'id_produk'=>$d['id_produk'],
+                    'jumlah_produk'=>$d['jumlah_produk'],
+                ])->toArray();
+    
+            // promo
+            $p['promo_dipakai'] = $promos->firstWhere('id_promo',$p['id_promo']);
+    
+            // id_pembayaran yang cocok
+            $pay = $allPays->firstWhere('id_penjualan_produk',$p['id_penjualan_produk']);
+            $p['id_pembayaran'] = data_get($pay,'id_pembayaran');
+            $p['status_pembayaran'] = data_get($pay, 'status_pembayaran', 'Belum Dibayar');
+            return $p;
+        });
+    
+        return view('pembelian-produk.pembelian', 
+            compact('pembelianProduk','users','products','promos')
+        );
     }
+    
+
+
 
     // public function create()
     // {
@@ -64,16 +75,37 @@ class PembelianProdukController extends Controller
             'produk.*.id_produk' => 'required|integer',
             'produk.*.jumlah_produk' => 'required|integer',
             'id_promo' => 'nullable|integer',
+            'status_pengambilan_produk' => 'nullable',
+            // baru:
+            'metode_pembayaran'        => 'required|string|in:Tunai,Non Tunai',
+            'uang'                     => 'nullable|numeric|min:0',
         ]);
 
-        // Kirim data ke API
-        $response = Http::post('http://127.0.0.1:8080/api/penjualan-produk', $data);
+        // 1) Buat penjualan
+        $resp = Http::post('http://127.0.0.1:8080/api/penjualan-produk/kasir', $data);
 
-        if ($response->ok()) {
-            return redirect()->route('pembelianProduk.index')->with('success', 'Data berhasil ditambahkan!');
-        } else {
-            return back()->withErrors('Gagal menambahkan data. Silakan coba lagi.');
+        if (! $resp->successful()) {
+            return back()->withErrors('Gagal menyimpan penjualan.');
         }
+
+        // ambil ID penjualan yang baru
+        $penjId = $resp->json('data.id_penjualan_produk');
+
+        // 2) Buat pembayaran
+        $payResp = Http::post('http://127.0.0.1:8080/api/pembayaran-produk', [
+            'id_penjualan_produk' => $penjId,
+            'metode_pembayaran'   => $data['metode_pembayaran'],
+            'uang'                => $data['uang'],
+        ]);
+
+        if (! $payResp->successful()) {
+            // rollback di backend? minimal beri tahu user
+            return back()->withErrors('Penjualan tersimpan, tapi gagal membuat pembayaran.');
+        }
+
+        return redirect()
+            ->route('pembelianProduk.index')
+            ->with('success', 'Penjualan & Pembayaran berhasil disimpan!');
     }
 
 
@@ -91,18 +123,23 @@ class PembelianProdukController extends Controller
         $productResponse = Http::get('http://127.0.0.1:8080/api/produk');
         $products = $productResponse->json('data');
 
-        // Check if the API responses are successful
+        // **Tambah: Fetch semua pembayaran, lalu cari yang id_penjualan_produk == $id**
+        $paymentResponse = Http::get('http://127.0.0.1:8080/api/pembayaran-produk');
+        $allPayments     = collect($paymentResponse->json());
+        $payment         = $allPayments->firstWhere('id_penjualan_produk', $id);
+
         if ($purchaseResponse->successful() && $userResponse->successful() && $productResponse->successful()) {
             return view('pembelian-produk.detailPembelian', [
                 'pembelian' => $pembelian,
-                'users' => $users,
-                'products' => $products
+                'users'     => $users,
+                'products'  => $products,
+                'payment'   => $payment,   // passing payment data (null jika belum)
             ]);
         }
 
-        // Redirect back with error if any API fails
         return redirect()->back()->with('error', 'Gagal mengambil data pembelian, pengguna, atau produk.');
     }
+
 
     public function edit($id)
     {
@@ -166,5 +203,43 @@ class PembelianProdukController extends Controller
 
         return back()
             ->with('error', 'Gagal menghapus penjualan produk: ' . $response->body());
+    }
+
+    public function generateInvoice($paymentId)
+    {
+        // 1) Ambil data pembayaran
+        $respPay = Http::get("http://127.0.0.1:8080/api/pembayaran-produk/{$paymentId}");
+        // kalau API single return { data: {...} }:
+        $dataPay = $respPay->json('data')
+            ?? $respPay->json()
+            ?? abort(404, 'Pembayaran tidak ditemukan');
+
+        // 2) Ambil data penjualan yang terkait
+        $saleId   = $dataPay['id_penjualan_produk'];
+        $respSale = Http::get("http://127.0.0.1:8080/api/penjualan-produk/{$saleId}");
+        $dataSale = $respSale->json('data')
+            ?? $respSale->json()
+            ?? abort(404, 'Penjualan tidak ditemukan');
+
+        // 3) Siapkan data invoice
+        $invoiceData = [
+            'user_name'         => data_get($dataSale, 'user.nama_user', '-'),
+            'no_telp'           => data_get($dataSale, 'user.no_telp', '-'),
+            'email'             => data_get($dataSale, 'user.email', '-'),
+            'tanggal_pembelian' => $dataSale['tanggal_pembelian'],
+            'metode_pembayaran' => $dataPay['metode_pembayaran'],
+            'subtotal'          => $dataSale['harga_total'],
+            'potongan_harga'    => $dataSale['potongan_harga'],
+            'pajak'             => $dataSale['besaran_pajak'],
+            'total'             => $dataSale['harga_akhir'],
+            'uang'              => $dataPay['uang'],
+            'kembalian'         => $dataPay['kembalian'],
+            'detail_pembelian'  => $dataSale['detail_pembelian'],
+            'waktu_pembayaran'  => $dataPay['waktu_pembayaran'],
+        ];
+
+        // 4) Render & download PDF
+        $pdf = Pdf::loadView('invoice.pembayaranProduk', $invoiceData);
+        return $pdf->download("invoice_pembayaran_{$paymentId}.pdf");
     }
 }

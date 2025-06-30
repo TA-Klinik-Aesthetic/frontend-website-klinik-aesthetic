@@ -1,36 +1,108 @@
 @extends('dashboard.index')
 
 @section('content')
-    <h1>List Komplain</h1>
+    <!-- Custom CSS untuk DataTables filter -->
+    <style>
+        /* pastikan kontainer filter benar-benar rata-kanan */
+        .dataTables_filter {
+            text-align: right !important;
+        }
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Nama Pengguna</th>
-                <th>Teks Komplain</th>
-                <th>Balasan Komplain</th>
-                <th>Pemberian Kompensasi</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($komplainList as $komplain)
-                <tr>
-                    <td>{{ $komplain['user']['nama_user'] }}</td>
-                    <td>{{ $komplain['teks_komplain'] }}</td>
-                    <td>{{ $komplain['balasan_komplain'] }}</td>
-                    <td>{{ $komplain['pemberian_kompensasi'] ?? 'Menunggu pengiriman' }}</td>
-                    <td>
-                        <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
-                            data-target="#editKomplainModal" data-komplain='@json($komplain)'
-                            onclick="populateEditModalFromButton(this)">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+        /* label cukup inline-flex, tidak full-width */
+        .dataTables_filter label {
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        /* jarak antara teks “Search:” dan input */
+        .dataTables_filter label input {
+            margin-left: 0.5rem;
+        }
+
+        /* Contoh: semua paginate button jadi merah solid */
+        .dataTables_wrapper .dataTables_paginate .btn {
+            background-color: #F3A14B !important;
+            /* merah */
+            border-color: #F3A14B !important;
+            color: #fff !important;
+        }
+
+        /* Hover */
+        .dataTables_wrapper .dataTables_paginate .btn:hover {
+            background-color: #F3A14B !important;
+            border-color: #F3A14B !important;
+        }
+    </style>
+
+    <style>
+        /* custom pale-orange button */
+        .btn-pale {
+            background-color: #F3A14B !important;
+            border-color: #F3A14B !important;
+            color: #fff !important;
+        }
+
+        .btn-pale:hover,
+        .btn-pale:focus {
+            background-color: #d18d3f !important;
+            /* varian gelap */
+            border-color: #d18d3f !important;
+            color: #fff !important;
+        }
+    </style>
+
+    <style>
+        /* custom pale-orange button */
+        .btn-pale {
+            background-color: #F3A14B !important;
+            border-color: #F3A14B !important;
+            color: #fff !important;
+        }
+
+        .btn-pale:hover,
+        .btn-pale:focus {
+            background-color: #d18d3f !important;
+            /* varian gelap */
+            border-color: #d18d3f !important;
+            color: #fff !important;
+        }
+    </style>
+
+    <h1 class="h3 mb-2 text-gray-800">List Komplain</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <table id="laporanKomplainTable" class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Nama Pengguna</th>
+                        <th>Teks Komplain</th>
+                        <th>Balasan Komplain</th>
+                        <th>Pemberian Kompensasi</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($komplainList as $komplain)
+                        <tr>
+                            <td>{{ $komplain['user']['nama_user'] }}</td>
+                            <td>{{ $komplain['teks_komplain'] }}</td>
+                            <td>{{ $komplain['balasan_komplain'] }}</td>
+                            <td>{{ $komplain['pemberian_kompensasi'] ?? 'Menunggu pengiriman' }}</td>
+                            <td>
+                                <button type="button" class="btn btn-pale mb-3" data-toggle="modal"
+                                    data-target="#editKomplainModal" data-komplain='@json($komplain)'
+                                    onclick="populateEditModalFromButton(this)">
+                                    Balas
+                                </button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     <!-- Modal Edit Komplain -->
     <div class="modal fade" id="editKomplainModal" tabindex="-1" role="dialog" aria-labelledby="editKomplainModalLabel"
@@ -103,7 +175,8 @@
 
                         <div class="form-group">
                             <label for="edit_tanggal_berakhir_kompensasi">Tanggal Berakhir Kompensasi</label>
-                            <input type="date" class="form-control" id="edit_tanggal_berakhir_kompensasi" name="tanggal_berakhir_kompensasi">
+                            <input type="date" class="form-control" id="edit_tanggal_berakhir_kompensasi"
+                                name="tanggal_berakhir_kompensasi">
                         </div>
 
                     </div>
@@ -116,78 +189,108 @@
         </div>
     </div>
 
-    <script>
-        function populateEditModalFromButton(button) {
-            const komplain = JSON.parse(button.getAttribute('data-komplain'));
-            populateEditModal(komplain);
-        }
-
-        function populateEditModal(komplain) {
-            const form = document.getElementById('editKomplainForm');
-            form.action = `/komplain/${komplain.id_komplain}`;
-
-            document.getElementById('edit_nama_user').value = komplain.user.nama_user;
-            document.getElementById('edit_teks_komplain').value = komplain.teks_komplain;
-            document.getElementById('edit_balasan_komplain').value = komplain.balasan_komplain ?? '';
-            document.getElementById('edit_waktu_treatment').value = komplain.waktu_treatment;
-
-            // Set Treatment List
-            // const treatmentListContainer = document.getElementById('edit_treatment_list');
-            // treatmentListContainer.innerHTML = ''; // Clear previous treatment list
-
-            // komplain.treatments.forEach(function(treatment, index) {
-            //     const treatmentItem = document.createElement('li');
-            //     treatmentItem.classList.add('list-group-item');
-            //     treatmentItem.innerHTML = treatment; // Menampilkan nama treatment
-            //     treatmentListContainer.appendChild(treatmentItem);
-            // });
-
-            document.getElementById('edit_treatment').value = komplain.treatment;
-
-
-            // Jika ada kompensasi, set input kompensasi
-            if (komplain.kompensasi_diberikan) {
-                document.getElementById('edit_id_kompensasi').value = komplain.kompensasi_diberikan.id_kompensasi;
-                document.getElementById('edit_kode_kompensasi').value = komplain.kompensasi_diberikan.kode_kompensasi;
-                document.getElementById('edit_tanggal_berakhir_kompensasi').value = komplain.kompensasi_diberikan.tanggal_berakhir_kompensasi;
-            }
-            
-            const baseUrl = 'http://127.0.0.1:8080/storage/';
-
-            // Debugging gambar_komplain
-            console.log('gambar_komplain:', komplain.gambar_komplain);
-
-            // Pastikan gambar_komplain adalah array yang valid
-            let gambarKomplainArray = [];
-            try {
-                gambarKomplainArray = JSON.parse(komplain.gambar_komplain); // Mengonversi string menjadi array
-            } catch (e) {
-                console.error('Gagal parsing gambar_komplain:', e);
+    @push('scripts')
+        <script>
+            function populateEditModalFromButton(button) {
+                const komplain = JSON.parse(button.getAttribute('data-komplain'));
+                populateEditModal(komplain);
             }
 
-            // Kosongkan dulu link download sebelumnya
-            const gambarKomplainContainer = document.getElementById('gambar_komplain_links');
-            gambarKomplainContainer.innerHTML = '';
+            function populateEditModal(komplain) {
+                const form = document.getElementById('editKomplainForm');
+                form.action = `/komplain/${komplain.id_komplain}`;
 
-            if (Array.isArray(gambarKomplainArray) && gambarKomplainArray.length > 0) {
-                gambarKomplainArray.forEach(function(gambarPath, index) {
-                    // Menghapus tanda kutip ganda atau escape karakter dalam path gambar
-                    gambarPath = gambarPath.replace(/['"]+/g, '');
+                document.getElementById('edit_nama_user').value = komplain.user.nama_user;
+                document.getElementById('edit_teks_komplain').value = komplain.teks_komplain;
+                document.getElementById('edit_balasan_komplain').value = komplain.balasan_komplain ?? '';
+                document.getElementById('edit_waktu_treatment').value = komplain.waktu_treatment;
 
-                    const link = document.createElement('a');
-                    link.href = baseUrl + gambarPath;
-                    link.className = 'btn btn-outline-primary btn-sm m-1';
-                    link.target = '_blank';
-                    link.download = '';
-                    link.innerHTML = `<i class="fas fa-download"></i> Gambar Komplain ${index + 1}`;
-                    gambarKomplainContainer.appendChild(link);
+                // Set Treatment List
+                // const treatmentListContainer = document.getElementById('edit_treatment_list');
+                // treatmentListContainer.innerHTML = ''; // Clear previous treatment list
+
+                // komplain.treatments.forEach(function(treatment, index) {
+                //     const treatmentItem = document.createElement('li');
+                //     treatmentItem.classList.add('list-group-item');
+                //     treatmentItem.innerHTML = treatment; // Menampilkan nama treatment
+                //     treatmentListContainer.appendChild(treatmentItem);
+                // });
+
+                document.getElementById('edit_treatment').value = komplain.treatment;
+
+
+                // Jika ada kompensasi, set input kompensasi
+                if (komplain.kompensasi_diberikan) {
+                    document.getElementById('edit_id_kompensasi').value = komplain.kompensasi_diberikan.id_kompensasi;
+                    document.getElementById('edit_kode_kompensasi').value = komplain.kompensasi_diberikan.kode_kompensasi;
+                    document.getElementById('edit_tanggal_berakhir_kompensasi').value = komplain.kompensasi_diberikan
+                        .tanggal_berakhir_kompensasi;
+                }
+
+                const baseUrl = 'http://127.0.0.1:8080/';
+
+                // Debugging gambar_komplain
+                console.log('gambar_komplain:', komplain.gambar_komplain);
+
+                // Pastikan gambar_komplain adalah array yang valid
+                let gambarKomplainArray = [];
+                try {
+                    gambarKomplainArray = JSON.parse(komplain.gambar_komplain); // Mengonversi string menjadi array
+                } catch (e) {
+                    console.error('Gagal parsing gambar_komplain:', e);
+                }
+
+                // Kosongkan dulu link download sebelumnya
+                const gambarKomplainContainer = document.getElementById('gambar_komplain_links');
+                gambarKomplainContainer.innerHTML = '';
+
+                if (Array.isArray(gambarKomplainArray) && gambarKomplainArray.length > 0) {
+                    gambarKomplainArray.forEach(function(gambarPath, index) {
+                        // Menghapus tanda kutip ganda atau escape karakter dalam path gambar
+                        gambarPath = gambarPath.replace(/['"]+/g, '');
+
+                        const link = document.createElement('a');
+                        link.href = baseUrl + gambarPath;
+                        link.className = 'btn btn-outline-primary btn-sm m-1';
+                        link.target = '_blank';
+                        link.download = '';
+                        link.innerHTML = `<i class="fas fa-download"></i> Gambar Komplain ${index + 1}`;
+                        gambarKomplainContainer.appendChild(link);
+                    });
+                } else {
+                    gambarKomplainContainer.innerHTML = '<p class="text-muted">Tidak ada gambar komplain.</p>';
+                }
+
+                // document.getElementById('download_gambar_bukti_transaksi').href = komplain.gambar_bukti_transaksi ? (baseUrl +
+                //     komplain.gambar_bukti_transaksi) : '#';
+            }
+        </script>
+    @endpush
+
+    @push('scripts')
+        <script>
+            $(document).ready(function() {
+                $('#laporanKomplainTable').DataTable({
+                    responsive: true,
+                    pageLength: 25,
+                    lengthMenu: [
+                        [10, 25, 50, 100],
+                        [10, 25, 50, 100]
+                    ],
+                    pagingType: 'simple_numbers',
+                    dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 text-right'f>>" +
+                        "<'row'<'col-sm-12'tr>>" +
+                        "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 text-right'p>>",
+                    drawCallback: function(settings) {
+                        // styling ulang pagination setiap draw
+                        $('.dataTables_wrapper .dataTables_paginate a').each(function() {
+                            $(this)
+                                .removeClass('paginate_button')
+                                .addClass('btn btn-sm btn-outline-primary mx-1');
+                        });
+                    }
                 });
-            } else {
-                gambarKomplainContainer.innerHTML = '<p class="text-muted">Tidak ada gambar komplain.</p>';
-            }
-
-            // document.getElementById('download_gambar_bukti_transaksi').href = komplain.gambar_bukti_transaksi ? (baseUrl +
-            //     komplain.gambar_bukti_transaksi) : '#';
-        }
-    </script>
+            });
+        </script>
+    @endpush
 @endsection

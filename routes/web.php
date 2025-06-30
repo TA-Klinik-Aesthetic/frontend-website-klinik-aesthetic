@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AkunPelangganController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\KonsultasiController;
@@ -48,12 +49,13 @@ Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('regi
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
-Route::get('/user/home', function () {
-    if (!session()->has('user') || session('user.role') !== 'pelanggan') {
-        return redirect()->route('login.form');
-    }
-    return view('users-pages.home');
-})->name('user.home');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+// Route::get('/user/home', function () {
+//     if (!session()->has('user') || session('user.role') !== 'pelanggan') {
+//         return redirect()->route('login.form');
+//     }
+//     return view('users-pages.home');
+// })->name('user.home');
 
 // Route::get('/dashboard', function () {
 //     if (!session()->has('user')) {
@@ -69,7 +71,7 @@ Route::get('/user/home', function () {
 // })->name('dashboard');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
-     ->name('dashboard');
+    ->name('dashboard');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -81,6 +83,20 @@ Route::get('/home', function () {
 Route::get('/konsultasi', function () {
     return view('users-pages.konsultasi');
 })->name('users.konsultasi');
+
+
+// Form pendaftaran pelanggan
+Route::get('/register', [AkunPelangganController::class, 'index'])
+    ->name('register.form');
+
+// Kirim data pendaftaran
+Route::post('/register', [AkunPelangganController::class, 'register'])
+    ->name('akun.store');
+
+Route::put('akun-pelanggan/{id}/update-password', [AkunPelangganController::class, 'updatePassword'])
+    ->name('akun.updatePassword');
+
+
 
 Route::get('/konsultasi/with-doctor', [KonsultasiController::class, 'indexWithDoctor'])->name('konsultasi.with-doctor');
 // Route::get('/konsultasi/without-doctor', [KonsultasiController::class, 'indexWithoutDoctor'])->name('konsultasi.without-doctor');
@@ -161,7 +177,9 @@ Route::put('/detailBooking/update/{id}', [DetailBookingTreatmentController::clas
 
 
 
-
+Route::get('/pembelian-produk/{paymentId}/invoice', 
+    [PembelianProdukController::class, 'generateInvoice']
+)->name('pembelian-produk.invoice');
 // Route untuk halaman pembelian produk
 Route::get('/pembelian-produk', [PembelianProdukController::class, 'index'])->name('pembelianProduk.index');
 // Route::get('pembelian-produk/create', [PembelianProdukController::class, 'create'])->name('pembelian-produk.create'); // Menampilkan form tambah pembelian
@@ -169,7 +187,8 @@ Route::post('pembelian-produk/store', [PembelianProdukController::class, 'store'
 Route::get('/pembelian-produk/{id}', [PembelianProdukController::class, 'show'])->name('pembelian-produk.show'); // Rute untuk menampilkan detail pembelian produk
 Route::get('/pembelian-produk/{id}/edit', [PembelianProdukController::class, 'edit'])->name('pembelian-produk.edit');
 Route::put('/pembelian-produk/{id}', [PembelianProdukController::class, 'update'])->name('pembelian-produk.update');
-Route::delete('/pembelian-produk/{id}/destroy',[PembelianProdukController::class, 'destroy'])->name('pembelian-produk.destroy');
+Route::delete('/pembelian-produk/{id}/destroy', [PembelianProdukController::class, 'destroy'])->name('pembelian-produk.destroy');
+
 
 
 // Kategorizes

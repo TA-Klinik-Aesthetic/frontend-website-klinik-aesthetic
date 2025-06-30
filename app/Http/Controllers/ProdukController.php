@@ -71,7 +71,7 @@ class ProdukController extends Controller
         if ($produk) {
             // Jika gambar tersimpan di storage server backend, pastikan URL gambar sesuai
             if (!empty($produk['gambar_produk'])) {
-                $produk['gambar_produk'] = "http://127.0.0.1:8080/storage/" . ltrim($produk['gambar_produk'], '/');
+                $produk['gambar_produk'] = "http://127.0.0.1:8080/" . ltrim($produk['gambar_produk'], '/');
             }
 
             return view('produk.detailProduk', compact('produk'));

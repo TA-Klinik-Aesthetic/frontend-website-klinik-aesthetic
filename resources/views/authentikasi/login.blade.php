@@ -24,6 +24,23 @@
 
 <body class="bg-gradient-primary">
 
+    <style>
+        /* custom pale-orange button */
+        .btn-pale {
+            background-color: #F3A14B !important;
+            border-color: #F3A14B !important;
+            color: #fff !important;
+        }
+
+        .btn-pale:hover,
+        .btn-pale:focus {
+            background-color: #d18d3f !important;
+            /* varian gelap */
+            border-color: #d18d3f !important;
+            color: #fff !important;
+        }
+    </style>
+
     <div class="container">
 
         <!-- Outer Row -->
@@ -71,7 +88,7 @@
                                         <hr>
                                         <hr>
                                         <!-- Login Button -->
-                                        <button type="submit" class="btn btn-primary btn-user btn-block">
+                                        <button type="submit" class="btn btn-pale btn-user btn-block">
                                             Login
                                         </button>
                                     </form>

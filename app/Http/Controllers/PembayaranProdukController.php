@@ -78,7 +78,7 @@ class PembayaranProdukController extends Controller
     {
         $validated = $request->validate([
             'metode_pembayaran' => 'required|in:Tunai,Non Tunai',
-            'uang' => 'required|numeric|min:0',
+            'uang' => 'nullable|numeric|min:0',
         ]);
 
         try {
