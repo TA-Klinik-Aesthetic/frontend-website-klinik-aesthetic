@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 
 class RekamMedisController extends Controller
 {
-    protected $apiUrlRekamMedis = 'http://127.0.0.1:8080/api/rekam-medis'; // API Rekam Medis
+    protected $apiUrlRekamMedis = 'https://klinikneshnavya.com/api/rekam-medis'; // API Rekam Medis
 
     public function rekamMedis()
     {

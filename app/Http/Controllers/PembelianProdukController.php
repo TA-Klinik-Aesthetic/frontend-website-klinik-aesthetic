@@ -11,20 +11,21 @@ class PembelianProdukController extends Controller
     public function index()
     {
         // 1) Ambil semua penjualan produk (API mereturn array)
-        $respSale    = Http::get('http://127.0.0.1:8080/api/penjualan-produk');
+        $respSale    = Http::get('https://klinikneshnavya.com/api/penjualan-produk');
         $rawSales    = $respSale->json();          // <-- gunakan ini saja
         $pembelian   = collect($rawSales);
     
         // 2) Data pendukung
-        $users    = collect(Http::get('http://127.0.0.1:8080/api/users')->json('data') ?? []);
-        $products = Http::get('http://127.0.0.1:8080/api/produk')->json('data') ?? [];
-        $promos   = collect(Http::get('http://127.0.0.1:8080/api/promo')
+        $categories = Http::get('https://klinikneshnavya.com/api/kategori')->json();
+        $users    = collect(Http::get('https://klinikneshnavya.com/api/users')->json('data') ?? []);
+        $products = Http::get('https://klinikneshnavya.com/api/produk')->json('data') ?? [];
+        $promos   = collect(Http::get('https://klinikneshnavya.com/api/promo')
                        ->json('data') ?? [])
                        ->where('jenis_promo','Produk')
                        ->values();
     
         // 3) Semua pembayaran
-        $allPays = collect(Http::get('http://127.0.0.1:8080/api/pembayaran-produk')
+        $allPays = collect(Http::get('https://klinikneshnavya.com/api/pembayaran-produk')
         ->json() ?? []);
     
         // 4) Map: tambahkan nama_user, daftar produk, promo dan id_pembayaran
@@ -51,7 +52,7 @@ class PembelianProdukController extends Controller
         });
     
         return view('pembelian-produk.pembelian', 
-            compact('pembelianProduk','users','products','promos')
+            compact('pembelianProduk','users','products','promos', 'categories')
         );
     }
     
@@ -61,7 +62,7 @@ class PembelianProdukController extends Controller
     // public function create()
     // {
     //     // Fetch users
-    //     $userResponse = Http::get('http://127.0.0.1:8080/api/users');
+    //     $userResponse = Http::get('https://klinikneshnavya.com/api/users');
     //     $users = $userResponse->json()['data'];
 
     //     return view('pembelian-produk.createPembelian', compact('users', 'products', 'promos'));
@@ -82,7 +83,7 @@ class PembelianProdukController extends Controller
         ]);
 
         // 1) Buat penjualan
-        $resp = Http::post('http://127.0.0.1:8080/api/penjualan-produk/kasir', $data);
+        $resp = Http::post('https://klinikneshnavya.com/api/penjualan-produk/kasir', $data);
 
         if (! $resp->successful()) {
             return back()->withErrors('Gagal menyimpan penjualan.');
@@ -92,7 +93,7 @@ class PembelianProdukController extends Controller
         $penjId = $resp->json('data.id_penjualan_produk');
 
         // 2) Buat pembayaran
-        $payResp = Http::post('http://127.0.0.1:8080/api/pembayaran-produk', [
+        $payResp = Http::post('https://klinikneshnavya.com/api/pembayaran-produk', [
             'id_penjualan_produk' => $penjId,
             'metode_pembayaran'   => $data['metode_pembayaran'],
             'uang'                => $data['uang'],
@@ -112,19 +113,19 @@ class PembelianProdukController extends Controller
     public function show($id)
     {
         // Fetch the detail of the purchase
-        $purchaseResponse = Http::get("http://127.0.0.1:8080/api/penjualan-produk/$id");
+        $purchaseResponse = Http::get("https://klinikneshnavya.com/api/penjualan-produk/$id");
         $pembelian = $purchaseResponse->json();
 
         // Fetch users
-        $userResponse = Http::get('http://127.0.0.1:8080/api/users');
+        $userResponse = Http::get('https://klinikneshnavya.com/api/users');
         $users = $userResponse->json()['data'];
 
         // Fetch products
-        $productResponse = Http::get('http://127.0.0.1:8080/api/produk');
+        $productResponse = Http::get('https://klinikneshnavya.com/api/produk');
         $products = $productResponse->json('data');
 
         // **Tambah: Fetch semua pembayaran, lalu cari yang id_penjualan_produk == $id**
-        $paymentResponse = Http::get('http://127.0.0.1:8080/api/pembayaran-produk');
+        $paymentResponse = Http::get('https://klinikneshnavya.com/api/pembayaran-produk');
         $allPayments     = collect($paymentResponse->json());
         $payment         = $allPayments->firstWhere('id_penjualan_produk', $id);
 
@@ -143,7 +144,7 @@ class PembelianProdukController extends Controller
 
     public function edit($id)
     {
-        $purchaseResponse = Http::get("http://127.0.0.1:8080/api/penjualan-produk/$id");
+        $purchaseResponse = Http::get("https://klinikneshnavya.com/api/penjualan-produk/$id");
         $pembelian = $purchaseResponse->json();
 
         // Map detail_pembelian ke produk
@@ -154,10 +155,10 @@ class PembelianProdukController extends Controller
             ];
         })->toArray();
 
-        $productResponse = Http::get('http://127.0.0.1:8080/api/produk');
+        $productResponse = Http::get('https://klinikneshnavya.com/api/produk');
         $products = $productResponse->json('data');
 
-        $promoResponse = Http::get('http://127.0.0.1:8080/api/promos');
+        $promoResponse = Http::get('https://klinikneshnavya.com/api/promos');
         $promos = $promoResponse->json('data');
 
         if ($purchaseResponse->successful() && $productResponse->successful()) {
@@ -181,7 +182,7 @@ class PembelianProdukController extends Controller
         ]);
 
         // Kirim data ke API
-        $response = Http::put("http://127.0.0.1:8080/api/penjualan-produk/$id", $data);
+        $response = Http::put("https://klinikneshnavya.com/api/penjualan-produk/$id", $data);
 
         if ($response->ok()) {
             return redirect()->route('pembelianProduk.index')->with('success', 'Data berhasil diperbarui!');
@@ -190,10 +191,29 @@ class PembelianProdukController extends Controller
         }
     }
 
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status_pengambilan_produk' => 'required|in:Belum diambil,Sudah diambil',
+        ]);
+
+
+
+        $payload = ['status_pengambilan_produk' => $request->status_pengambilan_produk];
+
+        $res = Http::put("https://klinikneshnavya.com/api/penjualan-produk/{$id}/status-pengambilan", $payload);
+
+        if ($res->successful()) {
+            return back()->with('success', 'Status pengambilan berhasil diperbarui.');
+        }
+
+        return back()->with('error', 'Gagal memperbarui status pengambilan.');
+    }
+
     public function destroy($id)
     {
         // Panggil endpoint API DELETE
-        $response = Http::delete("http://127.0.0.1:8080/api/penjualan-produk/{$id}");
+        $response = Http::delete("https://klinikneshnavya.com/api/penjualan-produk/{$id}");
 
         if ($response->successful()) {
             return redirect()
@@ -208,7 +228,7 @@ class PembelianProdukController extends Controller
     public function generateInvoice($paymentId)
     {
         // 1) Ambil data pembayaran
-        $respPay = Http::get("http://127.0.0.1:8080/api/pembayaran-produk/{$paymentId}");
+        $respPay = Http::get("https://klinikneshnavya.com/api/pembayaran-produk/{$paymentId}");
         // kalau API single return { data: {...} }:
         $dataPay = $respPay->json('data')
             ?? $respPay->json()
@@ -216,7 +236,7 @@ class PembelianProdukController extends Controller
 
         // 2) Ambil data penjualan yang terkait
         $saleId   = $dataPay['id_penjualan_produk'];
-        $respSale = Http::get("http://127.0.0.1:8080/api/penjualan-produk/{$saleId}");
+        $respSale = Http::get("https://klinikneshnavya.com/api/penjualan-produk/{$saleId}");
         $dataSale = $respSale->json('data')
             ?? $respSale->json()
             ?? abort(404, 'Penjualan tidak ditemukan');
@@ -241,5 +261,17 @@ class PembelianProdukController extends Controller
         // 4) Render & download PDF
         $pdf = Pdf::loadView('invoice.pembayaranProduk', $invoiceData);
         return $pdf->download("invoice_pembayaran_{$paymentId}.pdf");
+    }
+
+    public function confirmPayment($id)
+    {
+        // panggil API konfirmasi
+        $response = Http::put("https://klinikneshnavya.com/api/pembayaran-produk/{$id}/konfirmasi");
+
+        if ($response->successful()) {
+            return redirect()->back()->with('success', 'Pembayaran berhasil dikonfirmasi.');
+        }
+
+        return redirect()->back()->with('error', 'Gagal konfirmasi: '.$response->body());
     }
 }

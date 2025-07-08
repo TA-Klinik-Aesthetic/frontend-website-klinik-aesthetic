@@ -332,3 +332,41 @@
         });
     </script>
 @endpush
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            // Validasi waktu konsultasi
+            $('#waktu_konsultasi').on('change', function() {
+                const val = $(this).val();
+                if (!val) return;
+
+                const sel = new Date(val);
+                const now = new Date();
+
+                // Normalisasi tanggal ke 00:00:00
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+                const selDateOnly = new Date(sel.getFullYear(), sel.getMonth(), sel.getDate()).getTime();
+
+                // 1) Tanggal sudah lewat
+                if (selDateOnly < today) {
+                    alert('Tidak bisa memilih tanggal yang sudah lewat.');
+                    return $(this).val('');
+                }
+
+                // 2) Jika tanggal sama dengan hari ini, jam tidak boleh kurang dari sekarang
+                if (selDateOnly === today && sel < now) {
+                    alert('Tidak bisa memilih jam yang sudah lewat hari ini.');
+                    return $(this).val('');
+                }
+
+                // 3) Jam harus antara 10:00–20:00
+                const jam = sel.getHours();
+                if (jam < 10 || jam >= 20) {
+                    alert('Waktu konsultasi harus antara jam 10:00 dan 20:00.');
+                    return $(this).val('');
+                }
+            });
+        });
+    </script>
+@endpush

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 
 class FeedbackTreatmentController extends Controller
 {
-    protected $baseApiUrl = 'http://127.0.0.1:8080/api/feedbackTreatments';
+    protected $baseApiUrl = 'https://klinikneshnavya.com/api/feedbackTreatments';
 
     public function index()
     {
@@ -16,7 +16,7 @@ class FeedbackTreatmentController extends Controller
         $feedbacks = $feedbackResponse->json()['data'] ?? [];
         
         // Ambil data detail booking treatment
-        $detailBookingResponse = Http::get('http://127.0.0.1:8080/api/detailBookingTreatments');
+        $detailBookingResponse = Http::get('https://klinikneshnavya.com/api/detailBookingTreatments');
         $detailBookingData = $detailBookingResponse->json()['booking_treatments'][0]['detail_booking'] ?? [];  // Sesuaikan dengan struktur JSON
     
         // Buat mapping id_detail_booking_treatment ke detail booking

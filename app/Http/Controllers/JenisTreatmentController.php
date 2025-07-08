@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 
 class JenisTreatmentController extends Controller
 {
-    protected $baseApiUrl = 'http://127.0.0.1:8080/api/jenisTreatments';
+    protected $baseApiUrl = 'https://klinikneshnavya.com/api/jenisTreatments';
 
 
     public function index()

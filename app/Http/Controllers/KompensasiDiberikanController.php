@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Http;
 
 class KompensasiDiberikanController extends Controller
 {
-    protected $kompensasiDiberikanApi = 'http://127.0.0.1:8080/api/kompensasi-diberikan';
-    protected $komplainApi = 'http://127.0.0.1:8080/api/komplain';
-    protected $kompensasiApi = 'http://127.0.0.1:8080/api/kompensasi';
+    protected $kompensasiDiberikanApi = 'https://klinikneshnavya.com/api/kompensasi-diberikan';
+    protected $komplainApi = 'https://klinikneshnavya.com/api/komplain';
+    protected $kompensasiApi = 'https://klinikneshnavya.com/api/kompensasi';
 
     public function index()
     {

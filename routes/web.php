@@ -174,12 +174,16 @@ Route::get('/booking/create', [DetailBookingTreatmentController::class, 'create'
 Route::post('/booking', [DetailBookingTreatmentController::class, 'store'])->name('booking.store');
 Route::get('/booking/detail/{id}', [DetailBookingTreatmentController::class, 'show'])->name('booking.detail');
 Route::put('/detailBooking/update/{id}', [DetailBookingTreatmentController::class, 'update'])->name('detailBooking.update');
+Route::get('booking-treatment/slots/{tanggal}', [DetailBookingTreatmentController::class, 'getSlots'])->name('booking.slots');
 
 
 
 Route::get('/pembelian-produk/{paymentId}/invoice', 
     [PembelianProdukController::class, 'generateInvoice']
 )->name('pembelian-produk.invoice');
+Route::put('pembayaran-produk/{id}/konfirmasi', 
+    [PembelianProdukController::class, 'confirmPayment'])
+    ->name('pembayaran-produk.confirm');
 // Route untuk halaman pembelian produk
 Route::get('/pembelian-produk', [PembelianProdukController::class, 'index'])->name('pembelianProduk.index');
 // Route::get('pembelian-produk/create', [PembelianProdukController::class, 'create'])->name('pembelian-produk.create'); // Menampilkan form tambah pembelian
@@ -188,6 +192,7 @@ Route::get('/pembelian-produk/{id}', [PembelianProdukController::class, 'show'])
 Route::get('/pembelian-produk/{id}/edit', [PembelianProdukController::class, 'edit'])->name('pembelian-produk.edit');
 Route::put('/pembelian-produk/{id}', [PembelianProdukController::class, 'update'])->name('pembelian-produk.update');
 Route::delete('/pembelian-produk/{id}/destroy', [PembelianProdukController::class, 'destroy'])->name('pembelian-produk.destroy');
+Route::put('/pembelian-produk/{id}/status', [PembelianProdukController::class, 'updateStatus'])->name('pembelian-produk.updateStatus');
 
 
 
@@ -251,6 +256,9 @@ Route::post('/kompensasi-diberikan', [KompensasiDiberikanController::class, 'sto
 Route::get('/pembayaran-treatment', [PembayaranTreatmentController::class, 'index'])->name('pembayaran-treatment.index');
 Route::post('/pembayaran-treatment', [PembayaranTreatmentController::class, 'store'])->name('pembayaran-treatment.store');
 Route::put('/pembayaran-treatment/{id}', [PembayaranTreatmentController::class, 'update'])->name('pembayaran-treatment.update');
+Route::get('pembayaran-treatment/invoice/{id}', [PembayaranTreatmentController::class, 'generateInvoice'])->name('invoice.pembayaran-treatment');
+Route::get('pembayaran-treatment/{id}/confirm', [PembayaranTreatmentController::class, 'confirmPaymentTreatment'])->name('pembayaran-treatment.confirm');
+
 
 
 
@@ -260,8 +268,13 @@ Route::prefix('pembayaran-produk')->group(function () {
     Route::put('/{id}', [PembayaranProdukController::class, 'update'])->name('pembayaran-produk.update'); // Update pembayaran produk
     Route::get('/invoice/{id}', [PembayaranProdukController::class, 'generateInvoice'])->name('invoice.pembayaran-produk');
 });
+// Route::put(
+//     'pembayaran-produk/{id}/konfirmasi',
+//     [PembayaranProdukController::class, 'confirmPayment']
+// )->name('pembayaran-produk.confirm');
 
-Route::get('pembayaran-treatment/invoice/{id}', [PembayaranTreatmentController::class, 'generateInvoice'])->name('invoice.pembayaran-treatment');
+
+
 
 
 Route::get('/rekam-medis', [RekamMedisController::class, 'rekamMedis'])->name('rekam-medis.index');

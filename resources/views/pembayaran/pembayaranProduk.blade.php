@@ -3,11 +3,11 @@
 @section('content')
     <h1 class="h3 mb-2 text-gray-800">Data Pembayaran Produk</h1>
 
-    @if (session('success'))
+    {{-- @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @elseif(session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
+    @endif --}}
 
     <!-- Tombol untuk Menambah Pembayaran -->
     {{-- <button class="btn btn-success mb-3" data-toggle="modal" data-target="#tambahPembayaranModal"
@@ -45,9 +45,22 @@
                                     <button class="btn btn-primary btn-sm" data-toggle="modal"
                                         data-target="#editPembayaranModal" data-id="{{ $pembayaran['id_pembayaran'] }}"
                                         data-metode="{{ $pembayaran['metode_pembayaran'] }}"
-                                        data-uang="{{ $pembayaran['uang'] }}">
-                                        Edit
+                                        data-uang="{{ $pembayaran['uang'] }}"
+                                        data-harga="{{ $pembayaran['harga_akhir'] }}">
+                                        Bayar
                                     </button>
+
+                                    {{-- @if ($pembayaran['metode_pembayaran'] === 'Non Tunai' && $pembayaran['status_pembayaran'] === 'Belum Dibayar')
+                                        <form
+                                            action="{{ route('pembayaran-produk.confirm', $pembayaran['id_pembayaran']) }}"
+                                            method="POST" class="d-inline-block">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                Konfirmasi
+                                            </button>
+                                        </form>
+                                    @endif --}}
 
                                     <a href="{{ route('invoice.pembayaran-produk', $pembayaran['id_pembayaran']) }}"
                                         class="btn btn-info btn-sm">
@@ -140,16 +153,20 @@
                         <!-- Metode Pembayaran -->
                         <div class="form-group">
                             <label for="edit_metode_pembayaran">Metode Pembayaran</label>
-                            <select name="metode_pembayaran" id="edit_metode_pembayaran" class="form-control" required>
+                            <select name="metode_pembayaran" id="edit_metode_pembayaran" class="form-control" disabled>
                                 <option value="Tunai">Tunai</option>
                                 <option value="Non Tunai">Non Tunai</option>
                             </select>
+                            <input type="hidden" name="metode_pembayaran" id="hidden_metode_pembayaran">
                         </div>
+
+                        <!-- Total bayar (untuk validasi) -->
+                        <input type="hidden" id="hidden_harga_akhir">
 
                         <!-- Total Bayar -->
                         <div class="form-group">
                             <label for="edit_uang">Uang</label>
-                            <input type="number" class="form-control" id="edit_uang" name="uang" required>
+                            <input type="number" class="form-control" id="edit_uang" name="uang">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -177,6 +194,50 @@
             // Pasang event listener ke tombol Edit
             document.querySelectorAll('button[data-target="#editPembayaranModal"]').forEach(btn => {
                 btn.addEventListener('click', () => populateEditModal(btn));
+            });
+        </script>
+        <script>
+            // populate ketika klik Edit
+            function populateEditModal(btn) {
+                const id = btn.dataset.id;
+                const metode = btn.dataset.metode;
+                const uang = btn.dataset.uang;
+                const harga = btn.dataset.harga;
+
+                const form = document.getElementById('editPembayaranForm');
+                form.action = `/pembayaran-produk/${id}`; // sesuaikan route-mu
+                form.dataset.hargaAkhir = harga; // simpan untuk validasi
+
+                // set tampilan select & hidden
+                document.getElementById('edit_metode_pembayaran').value = metode;
+                document.getElementById('hidden_metode_pembayaran').value = metode;
+                document.getElementById('hidden_harga_akhir').value = harga;
+
+                document.getElementById('edit_uang').value = uang ?? '';
+            }
+
+            // attach event ke semua tombol Edit
+            document.querySelectorAll('button[data-target="#editPembayaranModal"]')
+                .forEach(btn => btn.addEventListener('click', () => populateEditModal(btn)));
+
+            // validasi sebelum submit
+            document.getElementById('editPembayaranForm').addEventListener('submit', function(e) {
+                const metode = document.getElementById('hidden_metode_pembayaran').value;
+                const uang = parseFloat(document.getElementById('edit_uang').value) || 0;
+                const harga = parseFloat(this.dataset.hargaAkhir);
+
+                if (metode === 'Tunai') {
+                    if (!uang) {
+                        alert('Masukkan jumlah uang untuk pembayaran Tunai.');
+                        e.preventDefault();
+                        return;
+                    }
+                    if (uang < harga) {
+                        alert(
+                            `Jumlah uang kurang: total tagihan Rp${harga.toLocaleString('id-ID')}.\n\nSilakan masukkan minimal Rp${harga.toLocaleString('id-ID')}.`);
+                        e.preventDefault();
+                    }
+                }
             });
         </script>
     @endpush

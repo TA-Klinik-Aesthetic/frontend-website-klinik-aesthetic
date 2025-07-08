@@ -1,4 +1,4 @@
-@extends('dashboard.index')
+{{-- @extends('dashboard.index')
 
 @section('content')
 <div class="container mt-5">
@@ -33,4 +33,4 @@
         <button type="submit" class="btn btn-success">{{ isset($jadwalDokter) ? 'Update' : 'Simpan' }}</button>
     </form>
 </div>
-@endsection
+@endsection --}}

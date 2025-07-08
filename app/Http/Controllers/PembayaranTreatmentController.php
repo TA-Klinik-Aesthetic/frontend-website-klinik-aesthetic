@@ -11,10 +11,10 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class PembayaranTreatmentController extends Controller
 {
     // URL API untuk pembayaran treatment
-    protected $apiUrlPembayaran = 'http://127.0.0.1:8080/api/pembayaran-treatment';
+    protected $apiUrlPembayaran = 'https://klinikneshnavya.com/api/pembayaran-treatment';
 
     // URL API untuk booking treatment
-    protected $apiUrlBooking = 'http://127.0.0.1:8080/api/detailBookingTreatments';
+    protected $apiUrlBooking = 'https://klinikneshnavya.com/api/detailBookingTreatments';
 
     // Menampilkan semua pembayaran treatment
     public function index()
@@ -133,5 +133,23 @@ class PembayaranTreatmentController extends Controller
     
         $pdf = PDF::loadView('invoice.pembayaranTreatment', $invoiceData);
         return $pdf->download("invoice_pembayaran_{$dataPay['id_pembayaran']}.pdf");
+    }
+
+    public function confirmPaymentTreatment($id)
+    {
+        // Panggil endpoint API eksternal
+        $response = Http::put("https://klinikneshnavya.com/api/pembayaran-treatment/{$id}/konfirmasi");
+
+        if ($response->successful()) {
+            return redirect()->back()
+                ->with('success', 'Pembayaran treatment berhasil dikonfirmasi.');
+        }
+
+        // Jika gagal, ambil pesan error dari body API
+        $body = $response->json();
+        $msg  = $body['message'] ?? $response->body();
+
+        return redirect()->back()
+            ->with('error', 'Gagal konfirmasi: '.$msg);
     }
 }

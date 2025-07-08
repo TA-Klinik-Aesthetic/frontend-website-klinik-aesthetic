@@ -9,10 +9,10 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class PembayaranProdukController extends Controller
 {
     // URL API untuk pembayaran produk
-    protected $apiUrlPembayaran = 'http://127.0.0.1:8080/api/pembayaran-produk';
+    protected $apiUrlPembayaran = 'https://klinikneshnavya.com/api/pembayaran-produk';
 
     // URL API untuk penjualan produk
-    protected $apiUrlPenjualan = 'http://127.0.0.1:8080/api/penjualan-produk';
+    protected $apiUrlPenjualan = 'https://klinikneshnavya.com/api/penjualan-produk';
 
     // Menampilkan semua pembayaran produk
     public function index()
@@ -26,7 +26,7 @@ class PembayaranProdukController extends Controller
         $penjualanProduk = collect($penjualanResponse->json());
 
         // Flatten: tambahkan user_name & harga_akhir langsung ke setiap pembayaran
-        $flattened = collect($pembayaranProdukList)->map(function($p) use ($penjualanProduk) {
+        $flattened = collect($pembayaranProdukList)->map(function ($p) use ($penjualanProduk) {
             if (isset($p['penjualan_produk'])) {
                 $bt = $p['penjualan_produk'];
                 $p['user_name'] = data_get($bt, 'user.nama_user', '-');
@@ -77,7 +77,7 @@ class PembayaranProdukController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'metode_pembayaran' => 'required|in:Tunai,Non Tunai',
+            'metode_pembayaran' => 'nullable|in:Tunai,Non Tunai',
             'uang' => 'nullable|numeric|min:0',
         ]);
 
@@ -87,7 +87,7 @@ class PembayaranProdukController extends Controller
                 'metode_pembayaran' => $validated['metode_pembayaran'],
                 'uang'              => $validated['uang'],
             ]);
-    
+
             if ($response->successful()) {
                 return redirect()
                     ->route('pembayaran-produk.index')
@@ -134,6 +134,20 @@ class PembayaranProdukController extends Controller
 
         // 5. Download
         return $pdf->download("invoice_pembayaran_{$dataPay['id_pembayaran']}.pdf");
-        }
+    }
 
+    // public function confirmPayment($id)
+    // {
+    //     // 1) Panggil API konfirmasi
+    //     $response = Http::put("https://klinikneshnavya.com/api/pembayaran-produk/{$id}/konfirmasi");
+
+    //     // 2) Jika sukses, redirect dengan pesan sukses
+    //     if ($response->successful()) {
+    //         return redirect()->back()->with('success', 'Pembayaran berhasil dikonfirmasi.');
+    //     }
+
+    //     // 3) Kalau gagal, redirect dengan pesan error
+    //     $errorMessage = $response->json('message') ?? $response->body();
+    //     return redirect()->back()->with('error', 'Gagal konfirmasi: ' . $errorMessage);
+    // }
 }

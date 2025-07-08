@@ -94,9 +94,17 @@
                                 <button class="btn btn-pale mb-3" data-toggle="modal" data-target="#editPembayaranModal"
                                     data-id="{{ $pembayaran['id_pembayaran'] }}"
                                     data-metode="{{ $pembayaran['metode_pembayaran'] }}"
-                                    data-uang="{{ $pembayaran['uang'] }}">
-                                    Edit
+                                    data-uang="{{ $pembayaran['uang'] }}"
+                                    data-harga="{{ $pembayaran['harga_akhir'] }}" >
+                                    Bayar
                                 </button>
+
+                                @if($pembayaran['metode_pembayaran'] === 'Non Tunai' && $pembayaran['status_pembayaran'] !== 'Sudah Dibayar')
+                                <a href="{{ route('pembayaran-treatment.confirm', $pembayaran['id_pembayaran']) }}"
+                                   class="btn btn-pale mb-3">
+                                   Konfirmasi
+                                </a>
+                            @endif
 
                                 <!-- Tombol Buat Invoice -->
                                 <a href="{{ route('invoice.pembayaran-treatment', $pembayaran['id_pembayaran']) }}"
@@ -204,20 +212,49 @@
 
 @push('scripts')
     <script>
-        function populateEditModal(button) {
-            const id = button.getAttribute('data-id');
-            const metode = button.getAttribute('data-metode');
-            const uang = button.getAttribute('data-uang');
-
+        document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('editPembayaranForm');
-            form.action = `/pembayaran-treatment/${id}`; // sesuaikan route-mu
-            document.getElementById('edit_metode_pembayaran').value = metode;
-            document.getElementById('edit_uang').value = uang;
-        }
+            const selMetode = document.getElementById('edit_metode_pembayaran');
+            const inpUang = document.getElementById('edit_uang');
+            let hargaAkhir = 0;
 
-        // Pasang event listener ke tombol Edit
-        document.querySelectorAll('button[data-target="#editPembayaranModal"]').forEach(btn => {
-            btn.addEventListener('click', () => populateEditModal(btn));
+            // Isi modal saat tombol Edit diklik
+            $('#editPembayaranModal').on('show.bs.modal', function(e) {
+                const btn = e.relatedTarget;
+                const id = btn.getAttribute('data-id');
+                const metode = btn.getAttribute('data-metode');
+                const uang = btn.getAttribute('data-uang');
+                hargaAkhir = parseFloat(btn.getAttribute('data-harga'));
+
+                form.action = `/pembayaran-treatment/${id}`; // route update-mu
+                selMetode.value = metode;
+                inpUang.value = uang;
+            });
+
+            // Validasi sebelum submit
+            form.addEventListener('submit', e => {
+                const metode = selMetode.value;
+                const uang = inpUang.value ? parseFloat(inpUang.value) : null;
+
+                if (metode === 'Tunai') {
+                    if (uang === null) {
+                        alert('Harap isi kolom Uang untuk metode Tunai.');
+                        e.preventDefault();
+                        return;
+                    }
+                    if (uang < hargaAkhir) {
+                        alert(
+                            `Jumlah uang tidak boleh kurang dari Total (${hargaAkhir.toLocaleString('id-ID',{style:'currency',currency:'IDR'})}).`);
+                        e.preventDefault();
+                    }
+                } else {
+                    // Non Tunai: uang harus kosong
+                    if (inpUang.value) {
+                        alert('Untuk metode Non Tunai, kolom Uang harus dikosongkan.');
+                        e.preventDefault();
+                    }
+                }
+            });
         });
     </script>
 @endpush

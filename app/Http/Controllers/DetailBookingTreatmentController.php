@@ -12,21 +12,22 @@ class DetailBookingTreatmentController extends Controller
 
     public function index()
     {
-        $bookingResponse = Http::get('http://127.0.0.1:8080/api/detailBookingTreatments');
+        $bookingResponse = Http::get('https://klinikneshnavya.com/api/detailBookingTreatments');
         $bookingTreatments = $bookingResponse->json()['booking_treatments'] ?? [];
 
-        $users = Http::get('http://127.0.0.1:8080/api/users')->json()['data'];
+        $users = Http::get('https://klinikneshnavya.com/api/users')->json()['data'];
 
         // Hanya ambil promo yang jenis_promo-nya Treatment
-        $promosResponse = Http::get('http://127.0.0.1:8080/api/promo');
+        $promosResponse = Http::get('https://klinikneshnavya.com/api/promo');
         $promos = collect($promosResponse->json()['data'])
             ->where('jenis_promo', 'Treatment')
             ->values();
-            
-        $treatments = Http::get('http://127.0.0.1:8080/api/treatments')->json()['data'];
-        $dokters = Http::get('http://127.0.0.1:8080/api/dokters')->json()['data'];
-        $beauticians = Http::get('http://127.0.0.1:8080/api/beauticians')->json()['data'];
-        $kompensasis = Http::get('http://127.0.0.1:8080/api/kompensasi-diberikan')->json() ?? [];
+
+        $jenisTreatments = Http::get('https://klinikneshnavya.com/api/jenisTreatments')->json()['data'] ?? [];
+        $treatments = Http::get('https://klinikneshnavya.com/api/treatments')->json()['data'];
+        $dokters = Http::get('https://klinikneshnavya.com/api/dokters')->json()['data'];
+        $beauticians = Http::get('https://klinikneshnavya.com/api/beauticians')->json()['data'];
+        $kompensasis = Http::get('https://klinikneshnavya.com/api/kompensasi-diberikan')->json() ?? [];
 
         // Gabungkan nama user
         $usersMap = [];
@@ -37,6 +38,12 @@ class DetailBookingTreatmentController extends Controller
             $booking['user_name'] = $usersMap[$booking['id_user']] ?? 'Unknown';
         }
 
+        // ⬅️ Tambahkan sort di sini
+        $bookingTreatments = collect($bookingTreatments)
+            ->sortByDesc('id_booking_treatment')   // Urut dari id terbesar
+            ->values()                             // Reset index ke 0,1,2...
+            ->all();
+
         return view('treatment.bookingTreatment', compact(
             'bookingTreatments',
             'users',
@@ -44,10 +51,24 @@ class DetailBookingTreatmentController extends Controller
             'treatments',
             'dokters',
             'beauticians',
-            'kompensasis'
+            'kompensasis',
+            'jenisTreatments'
         ));
     }
 
+    public function getSlots($tanggal)
+    {
+        $response = Http::get("https://klinikneshnavya.com/api/jadwal-treatment/{$tanggal}");
+
+        if ($response->successful()) {
+            return response()->json($response->json());
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal mengambil slot jadwal.'
+        ], 500);
+    }
 
     // Menyimpan data booking treatment
     public function store(Request $request)
@@ -55,6 +76,7 @@ class DetailBookingTreatmentController extends Controller
         $request->validate([
             'id_user' => 'required|integer',
             'waktu_treatment' => 'required|date',
+            // 'id_detail_jadwal_treatment' => 'required',
             'id_dokter' => 'nullable|integer',     // Tambahkan ini
             'id_beautician' => 'required|integer', // Tambahkan ini
             'details' => 'required|array',
@@ -64,6 +86,7 @@ class DetailBookingTreatmentController extends Controller
         $bookingData = [
             'id_user' => $request->id_user,
             'waktu_treatment' => $request->waktu_treatment,
+            // 'id_detail_jadwal_treatment' => $request->id_detail_jadwal_treatment,
             'id_dokter' => $request->id_dokter,         // Tambahkan ini
             'id_beautician' => $request->id_beautician, // Tambahkan ini
             'id_promo' => $request->id_promo,
@@ -71,7 +94,7 @@ class DetailBookingTreatmentController extends Controller
         ];
 
         // Kirim data ke API untuk menyimpan booking treatment
-        $response = Http::post('http://127.0.0.1:8080/api/detailBookingTreatments', $bookingData);
+        $response = Http::post('https://klinikneshnavya.com/api/detailBookingTreatments', $bookingData);
 
         if ($response->successful()) {
             return redirect()->route('detailBooking.index')->with('success', 'Booking Treatment berhasil ditambahkan!');
@@ -84,16 +107,16 @@ class DetailBookingTreatmentController extends Controller
     public function show($id)
     {
         // Mengambil detail booking treatment dari API
-        $bookingDetail = Http::get("http://127.0.0.1:8080/api/detailBookingTreatments/{$id}")->json();
+        $bookingDetail = Http::get("https://klinikneshnavya.com/api/detailBookingTreatments/{$id}")->json();
 
         // Mengambil data dokter dan beautician dari API
-        $dokters = Http::get('http://127.0.0.1:8080/api/dokters')->json('data');
-        $beauticians = Http::get('http://127.0.0.1:8080/api/beauticians')->json('data');
-        $treatments = Http::get('http://127.0.0.1:8080/api/treatments')->json('data');
-        $promosResponse = Http::get('http://127.0.0.1:8080/api/promo');
+        $dokters = Http::get('https://klinikneshnavya.com/api/dokters')->json('data');
+        $beauticians = Http::get('https://klinikneshnavya.com/api/beauticians')->json('data');
+        $treatments = Http::get('https://klinikneshnavya.com/api/treatments')->json('data');
+        $promosResponse = Http::get('https://klinikneshnavya.com/api/promo');
         $promos = collect($promosResponse->json()['data'])
-        ->where('jenis_promo', 'Treatment')
-        ->values();
+            ->where('jenis_promo', 'Treatment')
+            ->values();
 
         // Mengirim data ke view
         return view('treatment.detailBooking', [
@@ -108,7 +131,7 @@ class DetailBookingTreatmentController extends Controller
 
     public function update(Request $request, $id)
     {
-        $response = Http::put("http://127.0.0.1:8080/api/detailBookingTreatments/{$id}", [
+        $response = Http::put("https://klinikneshnavya.com/api/detailBookingTreatments/{$id}", [
             'id_dokter' => $request->input('id_dokter'),
             'id_beautician' => $request->input('id_beautician'),
         ]);
@@ -124,12 +147,12 @@ class DetailBookingTreatmentController extends Controller
     {
         // 1) Validasi input hanya boleh Selesai atau Dibatalkan
         $validated = $request->validate([
-            'status_booking_treatment' => 'required|string|in:Selesai,Dibatalkan',
+            'status_booking_treatment' => 'required|string|in:Treatment dimulai,Selesai,Dibatalkan',
         ]);
 
         // 2) Panggil endpoint internal untuk update status
         $response = Http::put(
-            "http://127.0.0.1:8080/api/statusBookingTreatments/{$id}",
+            "https://klinikneshnavya.com/api/statusBookingTreatments/{$id}",
             ['status_booking_treatment' => $validated['status_booking_treatment']]
         );
 

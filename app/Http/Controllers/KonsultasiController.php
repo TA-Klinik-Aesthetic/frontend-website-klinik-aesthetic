@@ -11,10 +11,10 @@ class KonsultasiController extends Controller
     {
         // $token = session('token'); // Mendapatkan token dari session
 
-        // $response = Http::withToken($token)->get('http://127.0.0.1:8080/api/konsultasi');
+        // $response = Http::withToken($token)->get('https://klinikneshnavya.com/api/konsultasi');
         // $data = $response->json();
 
-        $response = Http::get('http://127.0.0.1:8080/api/konsultasi');
+        $response = Http::get('https://klinikneshnavya.com/api/konsultasi');
         $data = $response->json();
 
         // Filter data untuk konsultasi dengan dokter
@@ -22,9 +22,9 @@ class KonsultasiController extends Controller
             return isset($item['dokter']); // Data memiliki dokter
         });
 
-        $usersResponse = Http::get('http://127.0.0.1:8080/api/users');
-        $doktersResponse = Http::get('http://127.0.0.1:8080/api/dokters');
-        $treatmentsResponse = Http::get('http://127.0.0.1:8080/api/treatments');
+        $usersResponse = Http::get('https://klinikneshnavya.com/api/users');
+        $doktersResponse = Http::get('https://klinikneshnavya.com/api/dokters');
+        $treatmentsResponse = Http::get('https://klinikneshnavya.com/api/treatments');
         
 
         $users = $usersResponse->json()['data'];
@@ -46,10 +46,10 @@ class KonsultasiController extends Controller
     // {
     //     // $token = session('token'); // Mendapatkan token dari session
 
-    //     // $response = Http::withToken($token)->get('http://127.0.0.1:8080/api/konsultasi');
+    //     // $response = Http::withToken($token)->get('https://klinikneshnavya.com/api/konsultasi');
     //     // $data = $response->json();
 
-    //     $response = Http::get('http://127.0.0.1:8080/api/konsultasi');
+    //     $response = Http::get('https://klinikneshnavya.com/api/konsultasi');
     //     $data = $response->json();
 
     //     // Filter data untuk konsultasi tanpa dokter
@@ -67,11 +67,11 @@ class KonsultasiController extends Controller
 
         // Ambil data dari API untuk dropdown
 
-        // $usersResponse = Http::withToken($token)->get('http://127.0.0.1:8080/api/users');
-        // $doktersResponse = Http::withToken($token)->get('http://127.0.0.1:8080/api/dokters');
+        // $usersResponse = Http::withToken($token)->get('https://klinikneshnavya.com/api/users');
+        // $doktersResponse = Http::withToken($token)->get('https://klinikneshnavya.com/api/dokters');
 
-        $usersResponse = Http::get('http://127.0.0.1:8080/api/users');
-        $doktersResponse = Http::get('http://127.0.0.1:8080/api/dokters');
+        $usersResponse = Http::get('https://klinikneshnavya.com/api/users');
+        $doktersResponse = Http::get('https://klinikneshnavya.com/api/dokters');
 
         $users = $usersResponse->json()['data'];
         $dokters = $doktersResponse->json()['data'];
@@ -88,9 +88,9 @@ class KonsultasiController extends Controller
     {
         // $token = session('token'); // Mendapatkan token dari session
 
-        // $response = Http::withToken($token)->post('http://127.0.0.1:8080/api/konsultasi', [
+        // $response = Http::withToken($token)->post('https://klinikneshnavya.com/api/konsultasi', [
 
-        $response = Http::post('http://127.0.0.1:8080/api/konsultasi', [
+        $response = Http::post('https://klinikneshnavya.com/api/konsultasi', [
             'id_user' => $request->id_user,
             'id_dokter' => $request->id_dokter,
             'waktu_konsultasi' => $request->waktu_konsultasi,
@@ -111,19 +111,19 @@ class KonsultasiController extends Controller
     //     // $token = session('token'); // Mendapatkan token dari session
 
     //     // // Ambil data konsultasi berdasarkan ID
-    //     // $response = Http::withToken($token)->get("http://127.0.0.1:8080/api/konsultasi/{$id}");
+    //     // $response = Http::withToken($token)->get("https://klinikneshnavya.com/api/konsultasi/{$id}");
 
     //     // $konsultasi = $response->json()['data'];
 
     //     // // Ambil semua dokter
-    //     // $dokters = Http::withToken($token)->get('http://127.0.0.1:8080/api/dokters')->json()['data'];
+    //     // $dokters = Http::withToken($token)->get('https://klinikneshnavya.com/api/dokters')->json()['data'];
 
-    //     $response = Http::get("http://127.0.0.1:8080/api/konsultasi/{$id}");
+    //     $response = Http::get("https://klinikneshnavya.com/api/konsultasi/{$id}");
 
     //     $konsultasi = $response->json()['data'];
 
     //     // Ambil semua dokter
-    //     $dokters = Http::get('http://127.0.0.1:8080/api/dokters')->json()['data'];
+    //     $dokters = Http::get('https://klinikneshnavya.com/api/dokters')->json()['data'];
 
     //     return view('konsultasi.edit', compact('konsultasi', 'dokters'));
     // }
@@ -132,11 +132,11 @@ class KonsultasiController extends Controller
     // {
     //     // $token = session('token'); // Mendapatkan token dari session
 
-    //     // $response = Http::withToken($token)->put("http://127.0.0.1:8080/api/konsultasi/{$id}", [
+    //     // $response = Http::withToken($token)->put("https://klinikneshnavya.com/api/konsultasi/{$id}", [
     //     //     'id_dokter' => $request->id_dokter,
     //     // ]);
 
-    //     $response = Http::put("http://127.0.0.1:8080/api/konsultasi/{$id}", [
+    //     $response = Http::put("https://klinikneshnavya.com/api/konsultasi/{$id}", [
     //         'id_dokter' => $request->id_dokter,
     //     ]);
 
@@ -153,9 +153,9 @@ class KonsultasiController extends Controller
     {
         // $token = session('token'); // Mendapatkan token dari session
 
-        // $response = Http::withToken($token)->delete("http://127.0.0.1:8080/api/konsultasi/{$id}");
+        // $response = Http::withToken($token)->delete("https://klinikneshnavya.com/api/konsultasi/{$id}");
 
-        $response = Http::delete("http://127.0.0.1:8080/api/konsultasi/{$id}");
+        $response = Http::delete("https://klinikneshnavya.com/api/konsultasi/{$id}");
 
         if ($response->successful()) {
             return redirect()->route('konsultasi.with-doctor')->with('success', 'Data berhasil dihapus');
@@ -167,7 +167,7 @@ class KonsultasiController extends Controller
     public function show($id)
     {
         // Ambil data konsultasi berdasarkan ID
-        $konsultasiResponse = Http::get("http://127.0.0.1:8080/api/konsultasi/{$id}");
+        $konsultasiResponse = Http::get("https://klinikneshnavya.com/api/konsultasi/{$id}");
 
         // Cek apakah request ke API berhasil
         if ($konsultasiResponse->successful()) {
@@ -200,10 +200,10 @@ class KonsultasiController extends Controller
     // public function editKeluhan($id)
     // {
     //     // Ambil data detail konsultasi berdasarkan ID konsultasi
-    //     $response = Http::get("http://127.0.0.1:8080/api/detail-konsultasi/{$id}");
+    //     $response = Http::get("https://klinikneshnavya.com/api/detail-konsultasi/{$id}");
 
     //     // Ambil daftar treatment dari API
-    //     $treatmentsResponse = Http::get("http://127.0.0.1:8080/api/treatments");
+    //     $treatmentsResponse = Http::get("https://klinikneshnavya.com/api/treatments");
 
     //     if ($response->successful() && $treatmentsResponse->successful()) {
     //         $data = $response->json()['data'];
@@ -218,7 +218,7 @@ class KonsultasiController extends Controller
 
     // public function updateKeluhan(Request $request, $id)
     // {
-    //     $response = Http::post("http://127.0.0.1:8080/api/detail-konsultasi", [
+    //     $response = Http::post("https://klinikneshnavya.com/api/detail-konsultasi", [
     //         'id_konsultasi' => $id,
     //         'keluhan_pelanggan' => $request->input('keluhan_pelanggan'),
     //         'saran_tindakan' => $request->input('saran_tindakan'),
@@ -235,11 +235,11 @@ class KonsultasiController extends Controller
     public function tambahDetail($id)
     {
         // Ambil data konsultasi berdasarkan ID
-        $konsultasiResponse = Http::get("http://127.0.0.1:8080/api/konsultasi/{$id}");
+        $konsultasiResponse = Http::get("https://klinikneshnavya.com/api/konsultasi/{$id}");
 
         if ($konsultasiResponse->successful()) {
             $konsultasi = $konsultasiResponse->json()['data'];
-            $treatmentsResponse = Http::get('http://127.0.0.1:8080/api/treatments');
+            $treatmentsResponse = Http::get('https://klinikneshnavya.com/api/treatments');
             $treatments = $treatmentsResponse->json()['data'];
 
             return view('konsultasi.tambahDetail', compact('konsultasi', 'treatments', 'id'));
@@ -254,7 +254,7 @@ class KonsultasiController extends Controller
         $details = $request->input('details');
 
         // Mengirimkan data dalam format yang diinginkan API
-        $response = Http::post("http://127.0.0.1:8080/api/detail-konsultasi/{$id}", [
+        $response = Http::post("https://klinikneshnavya.com/api/detail-konsultasi/{$id}", [
             'details' => $details
         ]);
 
@@ -273,7 +273,7 @@ class KonsultasiController extends Controller
         ]);
 
         // 2) Panggil endpoint internal untuk update status
-        $response = Http::put("http://127.0.0.1:8080/api/konsultasi/{$id}", [
+        $response = Http::put("https://klinikneshnavya.com/api/konsultasi/{$id}", [
             'status_booking_konsultasi' => $validated['status_booking_konsultasi'],
         ]);
 

@@ -14,24 +14,24 @@ class DashboardController extends Controller
         session(['dashboard_year' => $year]);
 
         // Panggil API untuk hitung konsultasi Verifikasi
-        $respKonsultasi = Http::get('http://127.0.0.1:8080/api/konsultasi/total-verifikasi');
+        $respKonsultasi = Http::get('https://klinikneshnavya.com/api/konsultasi/total-verifikasi');
         $consultCount   = $respKonsultasi->successful()
             ? $respKonsultasi->json('total_verifikasi', 0)
             : 0;
 
         // Panggil API untuk hitung booking treatment Verifikasi
-        $respTreatment = Http::get('http://127.0.0.1:8080/api/detailBookingTreatments/total-verifikasi');
+        $respTreatment = Http::get('https://klinikneshnavya.com/api/detailBookingTreatments/total-verifikasi');
         $treatCount    = $respTreatment->successful()
             ? $respTreatment->json('total_verifikasi', 0)
             : 0;
 
-        $respPending = Http::get('http://127.0.0.1:8080/api/komplain/total-pending');
+        $respPending = Http::get('https://klinikneshnavya.com/api/komplain/total-pending');
         $pendingCount = $respPending->successful()
             ? $respPending->json('total_pending', 0)
             : 0;
 
         // 1) Panggil API pembayaran treatment
-        $respT       = Http::get("http://127.0.0.1:8080/api/pembayaran-treatment/total-bayar?year={$year}");
+        $respT       = Http::get("https://klinikneshnavya.com/api/pembayaran-treatment/total-bayar?year={$year}");
         $treatMonthly = $respT->successful() ? $respT->json('bayar_perbulan', []) : [];
 
         // 2) Buat array semua bulan dari Jan–Des
@@ -51,7 +51,7 @@ class DashboardController extends Controller
         $treatmentData   = array_map(fn($mo) => $mapT[$mo] ?? 0, $allMonths);
 
         // 5) Panggil API pembayaran produk
-        $respP        = Http::get("http://127.0.0.1:8080/api/pembayaran-produk/total-bayar?year={$year}");
+        $respP        = Http::get("https://klinikneshnavya.com/api/pembayaran-produk/total-bayar?year={$year}");
         $prodMonthly  = $respP->successful() ? $respP->json('bayar_per_bulan', []) : [];
 
         // 6) Map total per bulan produk

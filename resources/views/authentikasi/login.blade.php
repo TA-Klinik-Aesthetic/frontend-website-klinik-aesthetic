@@ -53,13 +53,21 @@
                         <!-- Nested Row within Card Body -->
                         <div class="row">
                             <div class="col-lg-6 d-none d-lg-block bg-login-image">
-                                <img src="{{ asset('backend/img/logo_klinik.jpg') }}" alt="Logo Klinik" class="img-fluid w-100 h-100">
-                            </div>                           
+                                <img src="{{ asset('backend/img/logo_klinik.jpg') }}" alt="Logo Klinik"
+                                    class="img-fluid w-100 h-100">
+                            </div>
                             <div class="col-lg-6">
                                 <div class="p-5">
                                     <div class="text-center">
                                         <h1 class="h4 text-gray-900 mb-4">Selamat Datang</h1>
                                     </div>
+
+                                    {{-- Error umum dari API (Invalid credentials, Role not allowed) --}}
+                                    @if ($errors->has('message'))
+                                        <div class="alert alert-danger">
+                                            {{ $errors->first('message') }}
+                                        </div>
+                                    @endif
 
                                     <!-- Form Start -->
                                     <form class="user" method="POST" action="{{ route('login') }}">
@@ -68,7 +76,8 @@
                                         <!-- Email Input -->
                                         <div class="form-group">
                                             <input type="email" name="email" class="form-control form-control-user"
-                                                placeholder="Enter Email Address..." value="{{ old('email') }}" required>
+                                                placeholder="Enter Email Address..." value="{{ old('email') }}"
+                                                required>
                                             @error('email')
                                                 <span class="text-danger small">{{ $message }}</span>
                                             @enderror
@@ -76,8 +85,8 @@
 
                                         <!-- Password Input -->
                                         <div class="form-group">
-                                            <input type="password" name="password" class="form-control form-control-user"
-                                                placeholder="Password" required>
+                                            <input type="password" name="password"
+                                                class="form-control form-control-user" placeholder="Password" required>
                                             @error('password')
                                                 <span class="text-danger small">{{ $message }}</span>
                                             @enderror

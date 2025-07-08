@@ -31,7 +31,7 @@ class AuthController extends Controller
             'password' => 'required|string|min:8',
         ]);
 
-        $response = Http::post('http://127.0.0.1:8080/api/register', [
+        $response = Http::post('https://klinikneshnavya.com/api/register', [
             'nama_user' => $request->name,
             'no_telp' => $request->phone,
             'email' => $request->email,
@@ -51,10 +51,10 @@ class AuthController extends Controller
     {
         $request->validate([
             'email'    => 'required|email|max:255',
-            'password' => 'required|string|min:8',
+            'password' => 'required|string',
         ]);
 
-        $response = Http::post('http://127.0.0.1:8080/api/login', [
+        $response = Http::post('https://klinikneshnavya.com/api/login', [
             'email'    => $request->email,
             'password' => $request->password,
         ]);
@@ -79,7 +79,7 @@ class AuthController extends Controller
         }
 
         // Role lain (misal: pelanggan) tidak diizinkan ke dashboard
-        return back()->withErrors(['message' => 'Role not recognized or not allowed.']);
+        return back()->withErrors(['message' => 'Akun tidak memiliki akses login.']);
     }
 
 
@@ -91,7 +91,7 @@ class AuthController extends Controller
         // Panggil API logout, sertakan Bearer token
         Http::withToken($token)
             ->accept('application/json')
-            ->post('http://127.0.0.1:8080/api/logout');
+            ->post('https://klinikneshnavya.com/api/logout');
 
         // Hapus semua session
         Session::flush();

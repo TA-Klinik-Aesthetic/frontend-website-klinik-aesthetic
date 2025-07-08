@@ -1,4 +1,4 @@
-@extends('dashboard.index')
+{{-- @extends('dashboard.index')
 
 @section('content')
 <div class="container mt-5">
@@ -41,4 +41,4 @@
         </table>
     @endforeach
 </div>
-@endsection
+@endsection --}}

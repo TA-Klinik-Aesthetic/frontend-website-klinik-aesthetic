@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Http;
 
 class TreatmentController extends Controller
 {
-    protected $baseApiUrl = 'http://127.0.0.1:8080/api/treatments';
-    protected $apiJenisTreatment ='http://127.0.0.1:8080/api/jenisTreatments';
+    protected $baseApiUrl = 'https://klinikneshnavya.com/api/treatments';
+    protected $apiJenisTreatment ='https://klinikneshnavya.com/api/jenisTreatments';
 
 
 
@@ -66,7 +66,7 @@ class TreatmentController extends Controller
         if ($treatment) {
             if (!empty($treatment['gambar_treatment'])) {
                 // Gunakan URL backend langsung agar bisa diakses dari frontend
-                $treatment['gambar_treatment'] = "http://127.0.0.1:8080/" . ltrim($treatment['gambar_treatment'], '/');
+                $treatment['gambar_treatment'] = "https://klinikneshnavya.com/" . ltrim($treatment['gambar_treatment'], '/');
             }
     
             return view('treatment.detailTreatment', compact('treatment'));

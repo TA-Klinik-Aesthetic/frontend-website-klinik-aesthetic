@@ -160,17 +160,12 @@
                             <label for="edit_id_kompensasi">ID Kompensasi</label>
                             <select class="form-control" id="edit_id_kompensasi" name="id_kompensasi">
                                 <option value="">Pilih Kompensasi</option>
-                                @foreach ($kompensasiList as $kompensasi)
-                                    <option value="{{ $kompensasi['id_kompensasi'] }}">
-                                        {{ $kompensasi['nama_kompensasi'] }}
+                                @foreach ($kompensasiList as $k)
+                                    <option value="{{ $k['id_kompensasi'] }}" data-treatment-id="{{ $k['id_treatment'] }}">
+                                        {{ $k['nama_kompensasi'] }}
                                     </option>
                                 @endforeach
                             </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="edit_kode_kompensasi">Kode Kompensasi</label>
-                            <input type="text" class="form-control" id="edit_kode_kompensasi" name="kode_kompensasi">
                         </div>
 
                         <div class="form-group">
@@ -191,6 +186,9 @@
 
     @push('scripts')
         <script>
+            // ← TAMBAHAN: bawa daftar kompensasi ke JS
+            const kompensasiList = @json($kompensasiList);
+
             function populateEditModalFromButton(button) {
                 const komplain = JSON.parse(button.getAttribute('data-komplain'));
                 populateEditModal(komplain);
@@ -200,10 +198,41 @@
                 const form = document.getElementById('editKomplainForm');
                 form.action = `/komplain/${komplain.id_komplain}`;
 
+                // pasang detail-treatment-id agar skrip validasi tahu mana yang dibandingkan
+                form.dataset.detailTreatmentId = komplain.detail_booking_treatment.id_treatment;
+
                 document.getElementById('edit_nama_user').value = komplain.user.nama_user;
+                // 2) Waktu Treatment dari booking_treatment
+                document.getElementById('edit_waktu_treatment').value = komplain.booking_treatment.waktu_treatment; // ← DIUBAH
+
+                // 3) Nama Treatment dari detail_booking_treatment.treatment.nama_treatment
+                document.getElementById('edit_treatment').value = komplain.detail_booking_treatment.treatment
+                    .nama_treatment; // ← DIUBAH
+
                 document.getElementById('edit_teks_komplain').value = komplain.teks_komplain;
                 document.getElementById('edit_balasan_komplain').value = komplain.balasan_komplain ?? '';
-                document.getElementById('edit_waktu_treatment').value = komplain.waktu_treatment;
+
+                // —————— ▶️ TAMBAHAN: disable form jika kompensasi sudah diberikan
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (komplain.kompensasi_diberikan) {
+                    document.getElementById('edit_balasan_komplain').disabled = true;
+                    document.getElementById('edit_id_kompensasi').disabled = true;
+                    document.getElementById('edit_tanggal_berakhir_kompensasi').disabled = true;
+                    submitBtn.disabled = true;
+                } else {
+                    document.getElementById('edit_balasan_komplain').disabled = false;
+                    document.getElementById('edit_id_kompensasi').disabled = false;
+                    document.getElementById('edit_tanggal_berakhir_kompensasi').disabled = false;
+                    submitBtn.disabled = false;
+                }
+                // ◀️ SELESAI TAMBAHAN
+
+                // Jika ada kompensasi, set input kompensasi
+                if (komplain.kompensasi_diberikan) {
+                    document.getElementById('edit_id_kompensasi').value = komplain.kompensasi_diberikan.id_kompensasi;
+                    document.getElementById('edit_tanggal_berakhir_kompensasi').value =
+                        komplain.kompensasi_diberikan.tanggal_berakhir_kompensasi;
+                }
 
                 // Set Treatment List
                 // const treatmentListContainer = document.getElementById('edit_treatment_list');
@@ -216,18 +245,7 @@
                 //     treatmentListContainer.appendChild(treatmentItem);
                 // });
 
-                document.getElementById('edit_treatment').value = komplain.treatment;
-
-
-                // Jika ada kompensasi, set input kompensasi
-                if (komplain.kompensasi_diberikan) {
-                    document.getElementById('edit_id_kompensasi').value = komplain.kompensasi_diberikan.id_kompensasi;
-                    document.getElementById('edit_kode_kompensasi').value = komplain.kompensasi_diberikan.kode_kompensasi;
-                    document.getElementById('edit_tanggal_berakhir_kompensasi').value = komplain.kompensasi_diberikan
-                        .tanggal_berakhir_kompensasi;
-                }
-
-                const baseUrl = 'http://127.0.0.1:8080/';
+                const baseUrl = 'https://klinikneshnavya.com/';
 
                 // Debugging gambar_komplain
                 console.log('gambar_komplain:', komplain.gambar_komplain);
@@ -264,6 +282,21 @@
                 // document.getElementById('download_gambar_bukti_transaksi').href = komplain.gambar_bukti_transaksi ? (baseUrl +
                 //     komplain.gambar_bukti_transaksi) : '#';
             }
+            // ← TAMBAHAN: validasi sebelum submit form
+            document.addEventListener('DOMContentLoaded', () => {
+                const form = document.getElementById('editKomplainForm');
+                form.addEventListener('submit', function(e) {
+                    const detailTreatId = parseInt(this.dataset.detailTreatmentId, 10);
+                    const kompSelect = document.getElementById('edit_id_kompensasi');
+                    const opt = kompSelect.options[kompSelect.selectedIndex];
+                    const kompTreatId = parseInt(opt.dataset.treatmentId, 10); // ⬅️ TAMBAHAN
+
+                    if (kompSelect.value && (isNaN(kompTreatId) || kompTreatId !== detailTreatId)) {
+                        alert('Kompensasi yang Anda pilih tidak cocok dengan treatment yang dikomplain.');
+                        e.preventDefault();
+                    }
+                });
+            });
         </script>
     @endpush
 

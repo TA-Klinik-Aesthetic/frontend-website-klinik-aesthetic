@@ -71,10 +71,10 @@
 
 
         <!-- Divider -->
-        <hr class="sidebar-divider">
+        {{-- <hr class="sidebar-divider"> --}}
 
         <!-- Nav Item - Produk -->
-        <li class="nav-item">
+        {{-- <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" data-target="#collapseJadwal" aria-expanded="true"
                 aria-controls="collapseJadwal">
                 <span>Jadwal</span>
@@ -85,7 +85,7 @@
                     <a class="collapse-item" href="{{ url('/jadwal-beautician') }}">Jadwal Beautician</a>
                 </div>
             </div>
-        </li>
+        </li> --}}
 
         <!-- Divider -->
         <hr class="sidebar-divider">

@@ -7,10 +7,8 @@ use Illuminate\Support\Facades\Http;
 
 class KomplainController extends Controller
 {
-    protected $komplainApiUrl = 'http://127.0.0.1:8080/api/komplain';
-    protected $bookingTreatmentApiUrl = 'http://127.0.0.1:8080/api/detailBookingTreatments'; // API untuk mendapatkan data booking treatment
-    protected $kompensasiApiUrl = 'http://127.0.0.1:8080/api/kompensasi'; // API untuk mengambil daftar kompensasi
-    protected $detailBookingApiUrl = 'http://127.0.0.1:8080/api/detail-booking-treatment';
+    protected $komplainApiUrl = 'https://klinikneshnavya.com/api/komplain';
+    protected $kompensasiApiUrl = 'https://klinikneshnavya.com/api/kompensasi'; // API untuk mengambil daftar kompensasi
 
 
     public function index()
@@ -24,59 +22,18 @@ class KomplainController extends Controller
         $kompensasiResponse = Http::get($this->kompensasiApiUrl);
         $kompensasiList = $kompensasiResponse->json();
 
-        // Ambil data booking treatment
-        $bookingResponse = Http::get($this->bookingTreatmentApiUrl);
-        $bookingTreatments = $bookingResponse->json();
-
-        // Ambil data detail booking treatment
-        $detailBookingResponse = Http::get($this->detailBookingApiUrl);
-        $detailBookings = $detailBookingResponse->json();
-
-
-        // Ambil data komplain treatment
-        $komplainTreatmentResponse = Http::get('http://127.0.0.1:8080/api/komplain-treatment');
-        $komplainTreatments = $komplainTreatmentResponse->json();
-
         // Ambil data kompensasi yang sudah diberikan
-        $kompensasiDiberikanResponse = Http::get('http://127.0.0.1:8080/api/kompensasi-diberikan');
+        $kompensasiDiberikanResponse = Http::get('https://klinikneshnavya.com/api/kompensasi-diberikan');
         $kompensasiDiberikan = $kompensasiDiberikanResponse->json();
 
         // Gabungkan data komplain dengan waktu_treatment dan treatment
         foreach ($komplainList as &$komplain) {
-            $komplain['waktu_treatment'] = $this->getWaktuTreatment($komplain['id_booking_treatment'], $bookingTreatments);
-
-            // Menambahkan informasi treatment untuk setiap komplain
-            $komplain['treatment'] = $this->getTreatmentNameForKomplain($komplain['id_detail_booking_treatment'], $detailBookings);
 
             // Menambahkan kompensasi yang diberikan ke komplain
             $komplain['kompensasi_diberikan'] = $this->getKompensasiDiberikan($komplain['id_komplain'], $kompensasiDiberikan);
         }
 
         return view('komplain.listKomplain', compact('komplainList', 'kompensasiList', 'kompensasiDiberikan'));
-    }
-
-
-    // Fungsi untuk mendapatkan waktu treatment berdasarkan id_booking_treatment
-    private function getWaktuTreatment($idBookingTreatment, $bookingTreatments)
-    {
-        foreach ($bookingTreatments['booking_treatments'] as $booking) {
-            if ($booking['id_booking_treatment'] == $idBookingTreatment) {
-                return $booking['waktu_treatment'];
-            }
-        }
-        return null;
-    }
-
-    // Fungsi untuk mendapatkan treatment berdasarkan id_komplain
-    private function getTreatmentNameForKomplain($idDetailBookingTreatment, $detailBookings)
-    {
-        foreach ($detailBookings['detail_booking_treatments'] as $detail) {
-            if ($detail['id_detail_booking_treatment'] == $idDetailBookingTreatment) {
-                return $detail['treatment']['nama_treatment'];
-            }
-        }
-    
-        return '-';
     }
     
 
@@ -107,17 +64,16 @@ class KomplainController extends Controller
 
             if ($response->successful()) {
                 // Cek apakah ada kompensasi yang diberikan
-                if ($data['id_kompensasi'] && $data['kode_kompensasi'] && $data['tanggal_berakhir_kompensasi']) {
+                if ($data['id_kompensasi'] && $data['tanggal_berakhir_kompensasi']) {
                     // Simpan data kompensasi yang diberikan jika data kompensasi lengkap
                     $kompensasiData = [
                         'id_komplain' => $id,
                         'id_kompensasi' => $data['id_kompensasi'],
-                        'kode_kompensasi' => $data['kode_kompensasi'],
                         'tanggal_berakhir_kompensasi' => $data['tanggal_berakhir_kompensasi'],
                     ];
 
                     // Kirim data ke API kompensasi diberikan
-                    $kompensasiResponse = Http::post('http://127.0.0.1:8080/api/kompensasi-diberikan', $kompensasiData);
+                    $kompensasiResponse = Http::post('https://klinikneshnavya.com/api/kompensasi-diberikan', $kompensasiData);
 
                     if ($kompensasiResponse->successful()) {
                         return redirect()->route('komplain.index')->with('success', 'Komplain berhasil diperbarui dan kompensasi berhasil dikirim');

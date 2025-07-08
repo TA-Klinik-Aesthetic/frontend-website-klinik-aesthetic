@@ -1,12 +1,12 @@
-@extends('dashboard.index')
+{{-- @extends('dashboard.index')
 
 @section('content')
 <div class="container mt-5">
-    <h1 class="mb-4">Jadwal Praktik Dokter</h1>
+    <h1 class="mb-4">Jadwal Praktik Dokter</h1> --}}
 
     {{-- <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#jadwalModal"  onclick="showAddModal()">Tambah Jadwal</button> --}}
 
-    @if (isset($jadwals) && $jadwals->count() > 0)
+    {{-- @if (isset($jadwals) && $jadwals->count() > 0)
         <div id="jadwalTable">
             @foreach ($jadwals as $hari => $jadwalPerHari)
                 <h3>{{ ucfirst($hari) }}</h3>
@@ -18,7 +18,7 @@
                             <th>Jam Mulai</th>
                             <th>Jam Selesai</th>
                             {{-- <th>Aksi</th> --}}
-                        </tr>
+                        {{-- </tr>
                     </thead>
                     <tbody>
                         @foreach ($jadwalPerHari as $jadwal)
@@ -26,7 +26,7 @@
                                 <td>{{ $jadwal['dokter']['nama_dokter'] ?? 'Tidak Diketahui' }}</td>
                                 <td>{{ $jadwal['tgl_kerja'] }}</td>
                                 <td>{{ $jadwal['jam_mulai'] }}</td>
-                                <td>{{ $jadwal['jam_selesai'] }}</td>
+                                <td>{{ $jadwal['jam_selesai'] }}</td> --}}
                                 {{-- <td>
                                     <button class="btn btn-warning btn-sm" onclick="showEditModal({{ json_encode($jadwal) }})">Edit</button>
                                     <form action="{{ route('jadwal-dokter.destroy', $jadwal['id_jadwal_praktik_dokter']) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus jadwal ini?')">
@@ -35,7 +35,7 @@
                                         <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
                                     </form>
                                 </td> --}}
-                            </tr>
+                            {{-- </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -44,7 +44,7 @@
     @else
         <p>Tidak ada jadwal ditemukan.</p>
     @endif
-</div>
+</div> --}}
 
     {{-- <!-- Modal Tambah -->
     <div class="modal fade" id="jadwalModal" tabindex="-1" aria-labelledby="jadwalModalLabel" aria-hidden="true">

@@ -11,7 +11,7 @@ class LaporanController extends Controller
     public function indexTreatment()
     {
         // Get data from the backend API for laporan treatment
-        $response = Http::get('http://127.0.0.1:8080/api/laporan-penjualan-treatment');
+        $response = Http::get('https://klinikneshnavya.com/api/laporan-penjualan-treatment');
 
         // Check if the response is successful
         if ($response->successful()) {
@@ -29,7 +29,7 @@ class LaporanController extends Controller
         $tanggal = $request->input('tanggal');
 
         // Fetch the data for daily report from the backend API
-        $response = Http::get("http://127.0.0.1:8080/api/laporan-treatment-hari?tanggal={$tanggal}");
+        $response = Http::get("https://klinikneshnavya.com/api/laporan-treatment-hari?tanggal={$tanggal}");
 
         if ($response->successful()) {
             $data = $response->json();
@@ -48,7 +48,7 @@ class LaporanController extends Controller
         $bulan = substr($bulan, 5, 2);  // Extract month from the "YYYY-MM" format
 
         // Fetch the data for monthly report from the backend API
-        $response = Http::get("http://127.0.0.1:8080/api/laporan-treatment-bulan?tahun={$tahun}&bulan={$bulan}");
+        $response = Http::get("https://klinikneshnavya.com/api/laporan-treatment-bulan?tahun={$tahun}&bulan={$bulan}");
 
         if ($response->successful()) {
             $data = $response->json();
@@ -64,7 +64,7 @@ class LaporanController extends Controller
         $tanggal = $request->query('tanggal');
 
         // Fetch data from the 'laporan-treatment-hari' API endpoint
-        $response = Http::get("http://127.0.0.1:8080/api/laporan-treatment-hari?tanggal={$tanggal}");
+        $response = Http::get("https://klinikneshnavya.com/api/laporan-treatment-hari?tanggal={$tanggal}");
 
         if ($response->successful()) {
             $data = $response->json();
@@ -84,7 +84,7 @@ class LaporanController extends Controller
         $bulan = substr($bulan, 5, 2);  // Extract month from the "YYYY-MM" format
 
         // Fetch data from the 'laporan-treatment-bulan' API endpoint
-        $response = Http::get("http://127.0.0.1:8080/api/laporan-treatment-bulan?tahun={$tahun}&bulan={$bulan}");
+        $response = Http::get("https://klinikneshnavya.com/api/laporan-treatment-bulan?tahun={$tahun}&bulan={$bulan}");
 
         if ($response->successful()) {
             $data = $response->json();
@@ -101,7 +101,7 @@ class LaporanController extends Controller
     public function indexProduk()
     {
         // Get data from the backend API for laporan produk
-        $response = Http::get('http://127.0.0.1:8080/api/laporan-penjualan-produk');
+        $response = Http::get('https://klinikneshnavya.com/api/laporan-penjualan-produk');
 
         // Check if the response is successful
         if ($response->successful()) {
@@ -120,7 +120,7 @@ class LaporanController extends Controller
         $tanggal = $request->input('tanggal');
 
         // Fetch the data for daily report from the backend API
-        $response = Http::get("http://127.0.0.1:8080/api/laporan-produk-hari?tanggal={$tanggal}");
+        $response = Http::get("https://klinikneshnavya.com/api/laporan-produk-hari?tanggal={$tanggal}");
 
         if ($response->successful()) {
             $data = $response->json();
@@ -140,7 +140,7 @@ class LaporanController extends Controller
         $bulan = substr($bulan, 5, 2);  // Extract month from the "YYYY-MM" format
 
         // Fetch the data for monthly report from the backend API
-        $response = Http::get("http://127.0.0.1:8080/api/laporan-produk-bulan?bulan={$bulan}&tahun={$tahun}");
+        $response = Http::get("https://klinikneshnavya.com/api/laporan-produk-bulan?bulan={$bulan}&tahun={$tahun}");
 
         if ($response->successful()) {
             $data = $response->json();
@@ -157,7 +157,7 @@ class LaporanController extends Controller
         $tanggal = $request->query('tanggal');
 
         // Fetch data from the 'laporan-produk-hari' API endpoint
-        $response = Http::get("http://127.0.0.1:8080/api/laporan-produk-hari?tanggal={$tanggal}");
+        $response = Http::get("https://klinikneshnavya.com/api/laporan-produk-hari?tanggal={$tanggal}");
 
         if ($response->successful()) {
             $data = $response->json();
@@ -178,7 +178,7 @@ class LaporanController extends Controller
         $bulan = substr($bulan, 5, 2);  // Extract month from the "YYYY-MM" format
 
         // Fetch data from the 'laporan-produk-bulan' API endpoint
-        $response = Http::get("http://127.0.0.1:8080/api/laporan-produk-bulan?bulan={$bulan}&tahun={$tahun}");
+        $response = Http::get("https://klinikneshnavya.com/api/laporan-produk-bulan?bulan={$bulan}&tahun={$tahun}");
 
         if ($response->successful()) {
             $data = $response->json();

@@ -11,11 +11,11 @@ class ProdukController extends Controller
     public function index()
     {
         // Ambil daftar produk
-        $response       = Http::get('http://127.0.0.1:8080/api/produk');
+        $response       = Http::get('https://klinikneshnavya.com/api/produk');
         $produkList     = $response->successful() ? $response->json('data', []) : [];
 
         // Ambil daftar kategori untuk modal tambah
-        $katResponse    = Http::get('http://127.0.0.1:8080/api/kategori');
+        $katResponse    = Http::get('https://klinikneshnavya.com/api/kategori');
         $kategoriList   = $katResponse->successful() ? $katResponse->json() : [];
 
         return view('produk.listProduk', compact('produkList', 'kategoriList'));
@@ -24,7 +24,7 @@ class ProdukController extends Controller
     // Menampilkan form untuk membuat produk baru
     public function create()
     {
-        $kategoriList = Http::get('http://127.0.0.1:8080/api/kategori')->json();
+        $kategoriList = Http::get('https://klinikneshnavya.com/api/kategori')->json();
         return view('produk.createProduk', compact('kategoriList'));
     }
 
@@ -46,7 +46,7 @@ class ProdukController extends Controller
             'gambar_produk',
             file_get_contents($request->file('gambar_produk')->getRealPath()),
             $request->file('gambar_produk')->getClientOriginalName()
-        )->post('http://127.0.0.1:8080/api/produk', [
+        )->post('https://klinikneshnavya.com/api/produk', [
             'id_kategori' => $request->id_kategori,
             'nama_produk' => $request->nama_produk,
             'deskripsi_produk' => $request->deskripsi_produk,
@@ -65,13 +65,13 @@ class ProdukController extends Controller
     // Method untuk menampilkan detail produk
     public function show($id)
     {
-        $response = Http::get("http://127.0.0.1:8080/api/produk/{$id}");
+        $response = Http::get("https://klinikneshnavya.com/api/produk/{$id}");
         $produk = $response->json()['data'] ?? null;
 
         if ($produk) {
             // Jika gambar tersimpan di storage server backend, pastikan URL gambar sesuai
             if (!empty($produk['gambar_produk'])) {
-                $produk['gambar_produk'] = "http://127.0.0.1:8080/" . ltrim($produk['gambar_produk'], '/');
+                $produk['gambar_produk'] = "https://klinikneshnavya.com/" . ltrim($produk['gambar_produk'], '/');
             }
 
             return view('produk.detailProduk', compact('produk'));
@@ -84,10 +84,10 @@ class ProdukController extends Controller
     public function edit($id)
     {
         // Ambil data produk berdasarkan ID
-        $produkResponse = Http::get("http://127.0.0.1:8080/api/produk/$id");
+        $produkResponse = Http::get("https://klinikneshnavya.com/api/produk/$id");
 
         // Ambil data kategori
-        $kategoriResponse = Http::get("http://127.0.0.1:8080/api/kategori");
+        $kategoriResponse = Http::get("https://klinikneshnavya.com/api/kategori");
 
         // Pastikan kedua API berhasil diakses
         if ($produkResponse->successful() && $kategoriResponse->successful()) {
@@ -135,7 +135,7 @@ class ProdukController extends Controller
         }
     
         // sisipkan method spoofing untuk PUT
-        $http = $http->asMultipart()->post("http://127.0.0.1:8080/api/produk/{$id}", [
+        $http = $http->asMultipart()->post("https://klinikneshnavya.com/api/produk/{$id}", [
             '_method'         => 'PUT',
             'nama_produk'     => $validated['nama_produk'],
             'deskripsi_produk'=> $validated['deskripsi_produk'],
@@ -158,7 +158,7 @@ class ProdukController extends Controller
     // Menghapus produk
     public function destroy($id)
     {
-        $response = Http::delete("http://127.0.0.1:8080/api/produk/$id");
+        $response = Http::delete("https://klinikneshnavya.com/api/produk/$id");
 
         if ($response->successful()) {
             return redirect()->route('produk.index')->with('success', 'Produk berhasil dihapus.');

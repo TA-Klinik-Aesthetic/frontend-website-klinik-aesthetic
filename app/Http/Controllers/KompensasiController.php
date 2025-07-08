@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Http;
 class KompensasiController extends Controller
 {
 
-    protected $baseApiUrl = 'http://127.0.0.1:8080/api/kompensasi';
-    protected $ApiTreatment = 'http://127.0.0.1:8080/api/treatments';
+    protected $baseApiUrl = 'https://klinikneshnavya.com/api/kompensasi';
+    protected $ApiTreatment = 'https://klinikneshnavya.com/api/treatments';
 
     public function index()
     {

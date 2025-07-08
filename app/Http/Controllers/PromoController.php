@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 
 class PromoController extends Controller
 {
-    protected $baseApiUrl = 'http://127.0.0.1:8080/api/promo';
+    protected $baseApiUrl = 'https://klinikneshnavya.com/api/promo';
 
     public function index()
     {
@@ -24,7 +24,7 @@ class PromoController extends Controller
 
         if ($promo) {
             if (!empty($promo['gambar_promo'])) {
-                $promo['gambar_promo'] = "http://127.0.0.1:8080/" . ltrim($promo['gambar_promo'], '/');
+                $promo['gambar_promo'] = "https://klinikneshnavya.com/" . ltrim($promo['gambar_promo'], '/');
             }
             return view('promo.detailPromo', compact('promo'));
         }

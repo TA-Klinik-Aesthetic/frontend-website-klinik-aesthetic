@@ -63,37 +63,48 @@
             <table id="laporanBookingTreatmentTable" class="table table-bordered" width="100%" cellspacing="0">
                 <thead>
                     <tr>
+                        <th style="display:none;">ID</th> <!-- kolom ID -->
                         <th>Nama User</th>
                         <th>Waktu Treatment</th>
                         <th>Status Booking</th>
-                        <th>Harga Total</th>
-                        <th>Potongan Harga</th>
-                        <th>Harga Akhir</th>
+                        <th>Treatment Mulai</th>
+                        <th>Treatment Selesai</th>
+                        <th>Estimasi Selesai</th> <!-- Kolom baru -->
+                        <th>Total</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($bookingTreatments as $booking)
+                        @php
+                            $waktuAwal = $booking['treatment_mulai'] ?? $booking['waktu_treatment'];
+                            $totalEstimasiMenit = 0;
+
+                            if (!empty($booking['detail_booking'])) {
+                                foreach ($booking['detail_booking'] as $detail) {
+                                    $estimasiDurasi = $detail['treatment']['estimasi_treatment'] ?? null;
+
+                                    if ($estimasiDurasi) {
+                                        // Ubah estimasi_treatment (format: "HH:MM:SS") menjadi menit
+                                        [$jam, $menit, $detik] = explode(':', $estimasiDurasi);
+                                        $durasiMenit = $jam * 60 + $menit;
+                                        $totalEstimasiMenit += $durasiMenit;
+                                    }
+                                }
+                            }
+
+                            $estimasiSelesai = \Carbon\Carbon::parse($waktuAwal)
+                                ->addMinutes($totalEstimasiMenit)
+                                ->format('Y-m-d H:i');
+                        @endphp
                         <tr>
+                            <td style="display:none;">{{ $booking['id_booking_treatment'] }}</td>
                             <td>{{ $booking['user_name'] }}</td>
                             <td>{{ $booking['waktu_treatment'] }}</td>
                             <td>{{ $booking['status_booking_treatment'] }}</td>
-                            <td>Rp{{ number_format($booking['harga_total'], 0, ',', '.') }}</td>
-                            <td>
-                                @php
-                                    $promo = collect($promos)->firstWhere('id_promo', $booking['id_promo']);
-                                @endphp
-
-                                @if ($promo)
-                                    @if ($promo['tipe_potongan'] === 'Diskon')
-                                        {{ number_format($promo['potongan_harga']) }}%
-                                    @else
-                                        Rp{{ number_format($booking['potongan_harga'], 0, ',', '.') }}
-                                    @endif
-                                @else
-                                    -
-                                @endif
-                            </td>
+                            <td>{{ $booking['treatment_mulai'] ?? '-' }}</td>
+                            <td>{{ $booking['treatment_selesai'] ?? '-' }}</td>
+                            <td>{{ $totalEstimasiMenit > 0 ? $estimasiSelesai : '-' }}</td>
                             <td>Rp{{ number_format($booking['harga_akhir_treatment'], 0, ',', '.') }}</td>
                             <td>
                                 <a href="{{ route('booking.detail', $booking['id_booking_treatment']) }}"
@@ -198,8 +209,10 @@
                             <div class="form-group">
                                 <label for="status-{{ $booking['id_booking_treatment'] }}">Status Baru</label>
                                 <select id="status-{{ $booking['id_booking_treatment'] }}" name="status_booking_treatment"
-                                    class="form-control" required>
+                                    class="form-control status-select"
+                                    data-current="{{ $booking['status_booking_treatment'] }}" required>
                                     <option value="">-- Pilih Status --</option>
+                                    <option value="Treatment dimulai">Treatment dimulai</option>
                                     <option value="Selesai">Selesai</option>
                                     <option value="Dibatalkan">Dibatalkan</option>
                                 </select>
@@ -241,9 +254,16 @@
 
                         <div class="form-group">
                             <label for="waktu_treatment">Waktu Treatment</label>
-                            <input type="datetime-local" name="waktu_treatment" id="waktu_treatment"
-                                class="form-control" required>
+                            <input type="datetime-local" name="waktu_treatment" class="form-control"
+                                id="waktu_treatment" required>
                         </div>
+
+                        {{-- <div class="form-group">
+                            <label for="slot">Slot Waktu</label>
+                            <select name="id_detail_jadwal_treatment" id="slot" class="form-control" required>
+                                <option value="">Pilih Slot</option>
+                            </select>
+                        </div> --}}
 
                         <div class="form-group">
                             <label for="dokter">Dokter</label>
@@ -309,6 +329,18 @@
                         <div id="treatmentDetails">
                             <!-- Kolom treatment pertama -->
                             <div class="treatment-group">
+                                <!-- Tambahkan di setiap treatment-group -->
+                                <div class="form-group">
+                                    <label for="jenis_treatment">Jenis Treatment</label>
+                                    <select class="form-control jenis-treatment-select" required>
+                                        <option value="">Pilih Jenis Treatment</option>
+                                        @foreach ($jenisTreatments as $jenis)
+                                            <option value="{{ $jenis['id_jenis_treatment'] }}">
+                                                {{ $jenis['nama_jenis_treatment'] }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
                                 <div class="form-group">
                                     <label for="treatment">Treatment</label>
                                     <select name="details[0][id_treatment]" class="form-control treatment" required>
@@ -361,17 +393,27 @@
     <script>
         const kompensasis = @json($kompensasis);
 
+        // 1️⃣ Initialize Select2 (definisi paling atas supaya aman)
         function initializeSelect2(container) {
             $(container).find('.select2').each(function() {
                 const parentGroup = $(this).closest('.treatment-group');
 
+                // Destroy dulu jika sudah ada select2 sebelumnya
+                if ($(this).hasClass('select2-hidden-accessible')) {
+                    $(this).select2('destroy');
+                }
+
                 $(this).select2({
                     dropdownParent: parentGroup,
-                    width: '100%'
+                    width: '100%',
+                    placeholder: 'Ketik atau pilih kode kompensasi',
+                    allowClear: true,
+                    minimumInputLength: 1
                 });
             });
         }
 
+        // 2️⃣ Filter Kompensasi (harus di atas addTreatmentGroup karena dipanggil di dalamnya)
         function filterKompensasi(selectElement, userId, treatmentId) {
             const group = $(selectElement).closest('.treatment-group');
             const kompensasiSelect = group.find('select[name$="[id_kompensasi_diberikan]"]');
@@ -394,60 +436,67 @@
 
         let treatmentIndex = 1;
 
+        // 3️⃣ Add Treatment Group (definisi di bawah semua function yang dipanggilnya)
         function addTreatmentGroup() {
             const container = document.getElementById('treatmentDetails');
 
             const html = `
-    <div class="treatment-group">
-        <div class="form-group">
-            <label>Treatment</label>
-            <select name="details[${treatmentIndex}][id_treatment]" class="form-control treatment" required>
-                <option value="">Pilih Treatment</option>
-                @foreach ($treatments as $treatment)
-                <option value="{{ $treatment['id_treatment'] }}">
-                    {{ $treatment['nama_treatment'] }} -
-                    Rp{{ number_format($treatment['biaya_treatment'], 0, ',', '.') }}
-                </option>
-                @endforeach
-            </select>
-        </div>
+            <div class="treatment-group">
+                <div class="form-group">
+                    <label>Jenis Treatment</label>
+                    <select class="form-control jenis-treatment-select" required>
+                        <option value="">Pilih Jenis Treatment</option>
+                        @foreach ($jenisTreatments as $jenis)
+                            <option value="{{ $jenis['id_jenis_treatment'] }}">{{ $jenis['nama_jenis_treatment'] }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
-        <div class="form-group">
-            <label>Kode Kompensasi</label>
-            <select name="details[${treatmentIndex}][id_kompensasi_diberikan]" class="form-control select2 kompensasi-select" style="width: 100%;">
-                <option value="">Pilih Kode Kompensasi</option>
-                @foreach ($kompensasis as $kompensasi)
-                    @if ($kompensasi['status_kompensasi'] === 'Belum digunakan')
-                        <option value="{{ $kompensasi['id_kompensasi_diberikan'] }}"
-                            data-user="{{ $kompensasi['komplain']['id_user'] }}"
-                            data-treatment="{{ $kompensasi['kompensasi']['id_treatment'] }}">
-                            {{ $kompensasi['kode_kompensasi'] }}
-                        </option>
-                    @endif
-                @endforeach
-            </select>
-        </div>
+                <div class="form-group">
+                    <label>Treatment</label>
+                    <select name="details[${treatmentIndex}][id_treatment]" class="form-control treatment" required>
+                        <option value="">Pilih Treatment</option>
+                        @foreach ($treatments as $treatment)
+                            <option value="{{ $treatment['id_treatment'] }}">
+                                {{ $treatment['nama_treatment'] }} - Rp{{ number_format($treatment['biaya_treatment'], 0, ',', '.') }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-        <button type="button" class="btn btn-success mt-2 addTreatmentGroup">+ Tambah Treatment</button>
-    </div>
-    `;
+                <div class="form-group">
+                    <label>Kode Kompensasi</label>
+                    <select name="details[${treatmentIndex}][id_kompensasi_diberikan]" class="form-control select2 kompensasi-select" style="width: 100%;">
+                        <option value="">Pilih Kode Kompensasi</option>
+                        @foreach ($kompensasis as $kompensasi)
+                            @if ($kompensasi['status_kompensasi'] === 'Belum digunakan')
+                                <option value="{{ $kompensasi['id_kompensasi_diberikan'] }}"
+                                    data-user="{{ $kompensasi['komplain']['id_user'] }}"
+                                    data-treatment="{{ $kompensasi['kompensasi']['id_treatment'] }}">
+                                    {{ $kompensasi['kode_kompensasi'] }}
+                                </option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
 
-            // Hapus tombol tambah dari group sebelumnya
+                <button type="button" class="btn btn-success mt-2 addTreatmentGroup">+ Tambah Treatment</button>
+            </div>
+            `;
+
             const groups = container.querySelectorAll('.treatment-group');
             const lastGroup = groups[groups.length - 1];
             const oldBtn = lastGroup.querySelector('.addTreatmentGroup');
             if (oldBtn) oldBtn.remove();
 
-            // Tambahkan group baru
             container.insertAdjacentHTML('beforeend', html);
 
-            // Reinisialisasi Select2
             initializeSelect2(container.lastElementChild);
 
             treatmentIndex++;
         }
 
-
+        // 4️⃣ Document Ready + Event Binding
         document.addEventListener('DOMContentLoaded', function() {
             initializeSelect2(document);
 
@@ -575,17 +624,26 @@
         });
     </script>
     <script>
-        // Tangkap event submit untuk semua form dengan class .status-update-form
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.status-update-form').forEach(function(form) {
                 form.addEventListener('submit', function(e) {
-                    // baca status saat ini
-                    const current = form.querySelector('input[name="current_status"]').value;
-                    if (current.trim() !== 'Berhasil dibooking') {
+                    const statusSelect = form.querySelector('.status-select');
+                    const selectedStatus = statusSelect.value;
+                    const currentStatus = statusSelect.dataset.current;
+
+                    if (selectedStatus === 'Treatment dimulai' && currentStatus !==
+                        'Berhasil dibooking') {
                         alert(
-                            'Hanya booking dengan status "Berhasil Dibooking" yang boleh diubah statusnya.'
+                            'Status "Treatment dimulai" hanya dapat dipilih jika status sebelumnya adalah "Berhasil dibooking".'
                         );
-                        e.preventDefault(); // batalkan submit
+                        e.preventDefault();
+                    }
+
+                    if (selectedStatus === 'Selesai' && currentStatus !== 'Treatment dimulai') {
+                        alert(
+                            'Status "Selesai" hanya dapat dipilih jika status sebelumnya adalah "Treatment dimulai".'
+                        );
+                        e.preventDefault();
                     }
                 });
             });
@@ -593,9 +651,77 @@
     </script>
 @endpush
 
+{{-- @push('scripts')
+    <script>
+        $('#waktu_treatment').on('change', function() {
+            const date = $(this).val();
+            const slotSel = $('#slot');
+            slotSel.empty().append('<option value="">Pilih Slot</option>');
+
+            if (!date) return;
+
+            const url = `{{ url('booking-treatment/slots') }}/${date}`;
+
+            $.getJSON(url, function(res) {
+                if (res.success && res.data.details.length) {
+                    res.data.details.forEach(detail => {
+                        // hanya yang status_jadwal 'tersedia'
+                        if (detail.status_jadwal.toLowerCase() === 'tersedia') {
+                            slotSel.append(
+                                `<option value="${detail.id_detail}">
+                                ${detail.waktu_tersedia.replace(':00','')} 
+                            </option>`
+                            );
+                        }
+                    });
+                    if (slotSel.children().length === 1) {
+                        // hanya option default -> tidak ada slot tersedia
+                        slotSel.append('<option disabled>— Tidak ada slot tersedia —</option>');
+                    }
+                } else {
+                    alert(`Jadwal pada ${date} belum tersedia.`);
+                }
+            }).fail(function() {
+                alert('Gagal mengambil data slot, silakan coba lagi.');
+            });
+        });
+    </script>
+@endpush --}}
+
 @push('scripts')
     <script>
         $(document).ready(function() {
+            // Validasi jam & tanggal saat waktu treatment berubah
+            $('#waktu_treatment').on('change', function() {
+                const val = $(this).val();
+                if (!val) return;
+
+                const sel = new Date(val);
+                const now = new Date();
+
+                // Cek 1: tanggal tidak boleh di masa lalu (tanpa memperhatikan jam)
+                const selDate = new Date(sel.getFullYear(), sel.getMonth(), sel.getDate());
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                if (selDate < today) {
+                    alert('Tidak bisa memilih tanggal yang sudah lewat.');
+                    return $(this).val('');
+                }
+
+                // Cek 2: untuk tanggal hari ini, jam pun tidak boleh kurang dari sekarang
+                if (selDate.getTime() === today.getTime() && sel < now) {
+                    alert('Tidak bisa memilih jam yang sudah lewat hari ini.');
+                    return $(this).val('');
+                }
+
+                // Cek 3: jam harus antara 10–20
+                const jam = sel.getHours();
+                if (jam < 10 || jam >= 20) {
+                    alert('Waktu treatment harus antara jam 10:00 dan 20:00.');
+                    return $(this).val('');
+                }
+            });
+
+            // DataTables
             $('#laporanBookingTreatmentTable').DataTable({
                 responsive: true,
                 pageLength: 25,
@@ -604,6 +730,9 @@
                     [10, 25, 50, 100]
                 ],
                 pagingType: 'simple_numbers',
+                order: [
+                    [0, 'desc'] // Urut berdasarkan kolom ke-2 (index 1)
+                ],
                 dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 text-right'f>>" +
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 text-right'p>>",
@@ -616,6 +745,39 @@
                     });
                 }
             });
+        });
+    </script>
+@endpush
+
+@push('scripts')
+    <script>
+        const jenisTreatments = @json($jenisTreatments);
+
+        // Ketika jenis treatment dipilih
+        $('#treatmentDetails').on('change', '.jenis-treatment-select', function() {
+            const selectedJenisId = $(this).val();
+            const group = $(this).closest('.treatment-group');
+            const treatmentSelect = group.find('.treatment');
+
+            treatmentSelect.empty().append('<option value="">Pilih Treatment</option>');
+
+            if (!selectedJenisId) return;
+
+            // Cari data treatment dari jenisTreatments
+            const jenis = jenisTreatments.find(j => j.id_jenis_treatment == selectedJenisId);
+            if (jenis && jenis.treatment.length) {
+                jenis.treatment.forEach(t => {
+                    const harga = new Intl.NumberFormat('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR'
+                    }).format(t.biaya_treatment);
+                    treatmentSelect.append(
+                        `<option value="${t.id_treatment}">${t.nama_treatment} - ${harga}</option>`);
+                });
+            }
+
+            // Trigger change untuk update kompensasi
+            treatmentSelect.trigger('change');
         });
     </script>
 @endpush
