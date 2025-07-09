@@ -4,6 +4,24 @@
 <head>
     <title>Laporan Harian</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        /* Logo */
+        .report-logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .report-logo img {
+            display: block;
+            margin: 0 auto;
+            width: 200px;
+            /* atur lebar sesuai kebutuhan */
+            height: auto;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -24,6 +42,10 @@
 </head>
 
 <body>
+    <div class="report-logo">
+        <img src="{{ public_path('backend/img/new-logo.jpg') }}" alt="Logo Klinik">
+    </div>
+
     <h2>Laporan Harian Treatment - {{ $tanggal }}</h2>
     <table>
         <thead>
@@ -67,13 +89,13 @@
                         <td>{{ $promoName }}</td>
                         <td>{{ $promoDetails['count'] }}</td>
                         <td>
-                            @if(isset($promoDetails['tipe_potongan']) && $promoDetails['tipe_potongan'] === 'Diskon')
+                            @if (isset($promoDetails['tipe_potongan']) && $promoDetails['tipe_potongan'] === 'Diskon')
                                 {{ rtrim(rtrim(number_format($promoDetails['potongan_harga'], 2, '.', ''), '0'), '.') }}%
                             @else
                                 Rp {{ number_format($promoDetails['potongan_harga'], 0, ',', '.') }}
                             @endif
                         </td>
-                        
+
                     </tr>
                 @endforeach
             </tbody>

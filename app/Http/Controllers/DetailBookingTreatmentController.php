@@ -56,19 +56,19 @@ class DetailBookingTreatmentController extends Controller
         ));
     }
 
-    public function getSlots($tanggal)
-    {
-        $response = Http::get("https://klinikneshnavya.com/api/jadwal-treatment/{$tanggal}");
+    // public function getSlots($tanggal)
+    // {
+    //     $response = Http::get("https://klinikneshnavya.com/api/jadwal-treatment/{$tanggal}");
 
-        if ($response->successful()) {
-            return response()->json($response->json());
-        }
+    //     if ($response->successful()) {
+    //         return response()->json($response->json());
+    //     }
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Gagal mengambil slot jadwal.'
-        ], 500);
-    }
+    //     return response()->json([
+    //         'success' => false,
+    //         'message' => 'Gagal mengambil slot jadwal.'
+    //     ], 500);
+    // }
 
     // Menyimpan data booking treatment
     public function store(Request $request)
@@ -106,27 +106,18 @@ class DetailBookingTreatmentController extends Controller
 
     public function show($id)
     {
-        // Mengambil detail booking treatment dari API
-        $bookingDetail = Http::get("https://klinikneshnavya.com/api/detailBookingTreatments/{$id}")->json();
-
-        // Mengambil data dokter dan beautician dari API
-        $dokters = Http::get('https://klinikneshnavya.com/api/dokters')->json('data');
-        $beauticians = Http::get('https://klinikneshnavya.com/api/beauticians')->json('data');
-        $treatments = Http::get('https://klinikneshnavya.com/api/treatments')->json('data');
-        $promosResponse = Http::get('https://klinikneshnavya.com/api/promo');
-        $promos = collect($promosResponse->json()['data'])
-            ->where('jenis_promo', 'Treatment')
-            ->values();
-
-        // Mengirim data ke view
-        return view('treatment.detailBooking', [
-            'bookingDetail' => $bookingDetail,
-            'dokters' => $dokters,
-            'beauticians' => $beauticians,
-            'treatments' => $treatments,
-            'promos' => $promos
-        ]);
+        $response = Http::get("https://klinikneshnavya.com/api/detailBookingTreatments/{$id}");
+    
+        if (! $response->successful()) {
+            return redirect()->back()->with('error', 'Gagal mengambil detail booking.');
+        }
+    
+        // langsung ambil objek booking_treatment
+        $booking = $response->json('booking_treatment');
+    
+        return view('treatment.detailBooking', compact('booking'));
     }
+    
 
 
     public function update(Request $request, $id)

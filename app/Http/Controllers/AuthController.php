@@ -70,6 +70,9 @@ class AuthController extends Controller
         session([
             'user'  => $user,
             'token' => $token,
+            'user_id'   => $user['id_user'],
+            'user_name' => $user['nama_user'],
+            'user_role' => $user['role'],
         ]);
 
         // Redirect berdasarkan role user (hanya staf klinik)

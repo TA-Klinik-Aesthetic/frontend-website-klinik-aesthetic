@@ -112,84 +112,67 @@ class PembelianProdukController extends Controller
 
     public function show($id)
     {
-        // Fetch the detail of the purchase
-        $purchaseResponse = Http::get("https://klinikneshnavya.com/api/penjualan-produk/$id");
-        $pembelian = $purchaseResponse->json();
-
-        // Fetch users
-        $userResponse = Http::get('https://klinikneshnavya.com/api/users');
-        $users = $userResponse->json()['data'];
-
-        // Fetch products
-        $productResponse = Http::get('https://klinikneshnavya.com/api/produk');
-        $products = $productResponse->json('data');
-
-        // **Tambah: Fetch semua pembayaran, lalu cari yang id_penjualan_produk == $id**
-        $paymentResponse = Http::get('https://klinikneshnavya.com/api/pembayaran-produk');
-        $allPayments     = collect($paymentResponse->json());
-        $payment         = $allPayments->firstWhere('id_penjualan_produk', $id);
-
-        if ($purchaseResponse->successful() && $userResponse->successful() && $productResponse->successful()) {
-            return view('pembelian-produk.detailPembelian', [
-                'pembelian' => $pembelian,
-                'users'     => $users,
-                'products'  => $products,
-                'payment'   => $payment,   // passing payment data (null jika belum)
-            ]);
+        $response = Http::get("https://klinikneshnavya.com/api/penjualan-produk/{$id}");
+    
+        if (! $response->successful()) {
+            return redirect()->back()->with('error', 'Gagal mengambil data detail penjualan.');
         }
-
-        return redirect()->back()->with('error', 'Gagal mengambil data pembelian, pengguna, atau produk.');
+    
+        $pembelian = $response->json();
+    
+        return view('pembelian-produk.detailPembelian', compact('pembelian'));
     }
+    
 
 
-    public function edit($id)
-    {
-        $purchaseResponse = Http::get("https://klinikneshnavya.com/api/penjualan-produk/$id");
-        $pembelian = $purchaseResponse->json();
+    // public function edit($id)
+    // {
+    //     $purchaseResponse = Http::get("https://klinikneshnavya.com/api/penjualan-produk/$id");
+    //     $pembelian = $purchaseResponse->json();
 
-        // Map detail_pembelian ke produk
-        $pembelian['produk'] = collect($pembelian['detail_pembelian'])->map(function ($detail) {
-            return [
-                'id_produk' => $detail['id_produk'],
-                'jumlah_produk' => $detail['jumlah_produk']
-            ];
-        })->toArray();
+    //     // Map detail_pembelian ke produk
+    //     $pembelian['produk'] = collect($pembelian['detail_pembelian'])->map(function ($detail) {
+    //         return [
+    //             'id_produk' => $detail['id_produk'],
+    //             'jumlah_produk' => $detail['jumlah_produk']
+    //         ];
+    //     })->toArray();
 
-        $productResponse = Http::get('https://klinikneshnavya.com/api/produk');
-        $products = $productResponse->json('data');
+    //     $productResponse = Http::get('https://klinikneshnavya.com/api/produk');
+    //     $products = $productResponse->json('data');
 
-        $promoResponse = Http::get('https://klinikneshnavya.com/api/promos');
-        $promos = $promoResponse->json('data');
+    //     $promoResponse = Http::get('https://klinikneshnavya.com/api/promos');
+    //     $promos = $promoResponse->json('data');
 
-        if ($purchaseResponse->successful() && $productResponse->successful()) {
-            return view('pembelian-produk.editPembelianProduk', [
-                'pembelian' => $pembelian,
-                'products' => $products,
-                'promos' => $promos
-            ]);
-        }
+    //     if ($purchaseResponse->successful() && $productResponse->successful()) {
+    //         return view('pembelian-produk.editPembelianProduk', [
+    //             'pembelian' => $pembelian,
+    //             'products' => $products,
+    //             'promos' => $promos
+    //         ]);
+    //     }
 
-        return redirect()->back()->with('error', 'Gagal mengambil data pembelian, pengguna, atau produk.');
-    }
+    //     return redirect()->back()->with('error', 'Gagal mengambil data pembelian, pengguna, atau produk.');
+    // }
 
-    public function update(Request $request, $id)
-    {
-        $data = $request->validate([
-            'id_promo' => 'nullable|integer',
-            'produk' => 'required|array',
-            'produk.*.id_produk' => 'required|integer',
-            'produk.*.jumlah_produk' => 'required|integer',
-        ]);
+    // public function update(Request $request, $id)
+    // {
+    //     $data = $request->validate([
+    //         'id_promo' => 'nullable|integer',
+    //         'produk' => 'required|array',
+    //         'produk.*.id_produk' => 'required|integer',
+    //         'produk.*.jumlah_produk' => 'required|integer',
+    //     ]);
 
-        // Kirim data ke API
-        $response = Http::put("https://klinikneshnavya.com/api/penjualan-produk/$id", $data);
+    //     // Kirim data ke API
+    //     $response = Http::put("https://klinikneshnavya.com/api/penjualan-produk/$id", $data);
 
-        if ($response->ok()) {
-            return redirect()->route('pembelianProduk.index')->with('success', 'Data berhasil diperbarui!');
-        } else {
-            return back()->withErrors('Gagal memperbarui data. Silakan coba lagi.');
-        }
-    }
+    //     if ($response->ok()) {
+    //         return redirect()->route('pembelianProduk.index')->with('success', 'Data berhasil diperbarui!');
+    //     } else {
+    //         return back()->withErrors('Gagal memperbarui data. Silakan coba lagi.');
+    //     }
+    // }
 
     public function updateStatus(Request $request, $id)
     {
@@ -210,20 +193,20 @@ class PembelianProdukController extends Controller
         return back()->with('error', 'Gagal memperbarui status pengambilan.');
     }
 
-    public function destroy($id)
-    {
-        // Panggil endpoint API DELETE
-        $response = Http::delete("https://klinikneshnavya.com/api/penjualan-produk/{$id}");
+    // public function destroy($id)
+    // {
+    //     // Panggil endpoint API DELETE
+    //     $response = Http::delete("https://klinikneshnavya.com/api/penjualan-produk/{$id}");
 
-        if ($response->successful()) {
-            return redirect()
-                ->route('pembelianProduk.index')  // sesuaikan nama route index-mu
-                ->with('success', 'Penjualan produk berhasil dihapus.');
-        }
+    //     if ($response->successful()) {
+    //         return redirect()
+    //             ->route('pembelianProduk.index')  // sesuaikan nama route index-mu
+    //             ->with('success', 'Penjualan produk berhasil dihapus.');
+    //     }
 
-        return back()
-            ->with('error', 'Gagal menghapus penjualan produk: ' . $response->body());
-    }
+    //     return back()
+    //         ->with('error', 'Gagal menghapus penjualan produk: ' . $response->body());
+    // }
 
     public function generateInvoice($paymentId)
     {
@@ -250,6 +233,7 @@ class PembelianProdukController extends Controller
             'metode_pembayaran' => $dataPay['metode_pembayaran'],
             'subtotal'          => $dataSale['harga_total'],
             'potongan_harga'    => $dataSale['potongan_harga'],
+            'tipe_potongan'     => data_get($dataSale, 'promo.tipe_potongan'), 
             'pajak'             => $dataSale['besaran_pajak'],
             'total'             => $dataSale['harga_akhir'],
             'uang'              => $dataPay['uang'],
@@ -273,5 +257,33 @@ class PembelianProdukController extends Controller
         }
 
         return redirect()->back()->with('error', 'Gagal konfirmasi: '.$response->body());
+    }
+
+    public function updatePayment(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'uang' => 'required|numeric|min:0',
+        ]);
+
+        try {
+            $response = Http::put("https://klinikneshnavya.com/api/pembayaran-produk/{$id}", [
+                'metode_pembayaran' => 'Tunai',    
+                'uang'              => $validated['uang'],
+            ]);
+
+            if ($response->successful()) {
+                return redirect()
+                    ->route('pembelianProduk.index')
+                    ->with('success', 'Pembayaran tunai berhasil diperbarui.');
+            }
+
+            return redirect()
+                ->route('pembelianProduk.index')
+                ->with('error', 'Gagal memperbarui pembayaran tunai.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('pembelianProduk.index')
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }

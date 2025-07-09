@@ -125,16 +125,33 @@
                                     <button type="submit" class="btn btn-pale mb-3">
                                         Hapus
                                     </button> --}}
-                                @if ($pembelian['id_pembayaran'] && $pembelian['status_pembayaran'] === 'Belum Dibayar' && optional($pembelian['pembayaran_produk'])['metode_pembayaran'] === 'Non Tunai')
+                                @if (
+                                    $pembelian['id_pembayaran'] &&
+                                        $pembelian['status_pembayaran'] === 'Belum Dibayar' &&
+                                        optional($pembelian['pembayaran_produk'])['metode_pembayaran'] === 'Non Tunai')
                                     <form action="{{ route('pembayaran-produk.confirm', $pembelian['id_pembayaran']) }}"
                                         method="POST" style="display:inline" class="form-confirm"
                                         data-metode="{{ $pembelian['pembayaran_produk']['metode_pembayaran'] }}">
                                         @csrf
                                         @method('PUT')
                                         <button type="submit" class="btn btn-pale mb-3">
-                                            <i class="fas fa-check-circle"></i> Konfirmasi Pembayaran
+                                            <i class="fas fa-check-circle"></i> Konfirmasi Non Tunai
                                         </button>
                                     </form>
+                                @endif
+
+                                @php
+                                    // Cek apakah metode Tunai & Belum Dibayar
+                                    $pay = $pembelian['pembayaran_produk'] ?? null;
+                                @endphp
+
+                                @if ($pay && $pay['metode_pembayaran'] === 'Tunai' && $pay['status_pembayaran'] === 'Belum Dibayar')
+                                    <button class="btn btn-pale mb-3 btn-edit-payment"
+                                        data-id="{{ $pay['id_pembayaran'] }}" data-uang="{{ $pay['uang'] }}"
+                                        data-harga="{{ $pembelian['harga_akhir'] }}" data-toggle="modal"
+                                        data-target="#editPaymentModal">
+                                        Bayar Tunai
+                                    </button>
                                 @endif
 
 
@@ -160,6 +177,36 @@
             </table>
         </div>
     </div>
+
+    <!-- Modal Edit Uang Pembayaran Tunai -->
+    <div class="modal fade" id="editPaymentModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form id="editPaymentForm" method="POST" action="">
+                @csrf
+                @method('PUT')
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Bayar Tunai</h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="payment_uang">Jumlah Uang</label>
+                            <input type="number" step="0.01" class="form-control" id="payment_uang" name="uang"
+                                required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-pale">Simpan</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     {{-- Status Update Modal --}}
     @foreach ($pembelianProduk as $pembelian)
@@ -207,89 +254,10 @@
         </div>
     @endforeach
 
-    {{-- @foreach ($pembelianProduk as $pembelian)
-        <div class="modal fade" id="editModal{{ $pembelian['id_penjualan_produk'] }}" tabindex="-1" role="dialog"
-            aria-labelledby="editModalLabel{{ $pembelian['id_penjualan_produk'] }}" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <form action="{{ route('pembelian-produk.update', $pembelian['id_penjualan_produk']) }}"
-                        method="POST">
-                        @csrf
-                        @method('PUT')
-                        <div class="modal-header">
-                            <h5 class="modal-title">Edit Penjualan Produk</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-
-                        <div class="modal-body">
-                            <!-- Promo -->
-                            <div class="form-group mb-3">
-                                <label for="id_promo">Promo</label>
-                                <select name="id_promo" class="form-control">
-                                    <option value="">-- Pilih Promo --</option>
-                                    @foreach ($promos as $promo)
-                                        <option value="{{ $promo['id_promo'] }}"
-                                            {{ $promo['id_promo'] == $pembelian['id_promo'] ? 'selected' : '' }}>
-                                            {{ $promo['nama_promo'] }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <!-- Daftar Produk -->
-                            <div id="produk-list-{{ $pembelian['id_penjualan_produk'] }}">
-                                @php $produkList = $pembelian['produk'] ?? []; @endphp
-                                @foreach ($produkList as $index => $produk)
-                                    <div class="row mb-3"
-                                        id="edit-produk-{{ $pembelian['id_penjualan_produk'] }}-{{ $index }}">
-                                        <div class="col-md-6">
-                                            <label>Nama Produk</label>
-                                            <select name="produk[{{ $index }}][id_produk]" class="form-control"
-                                                required>
-                                                @foreach ($products as $product)
-                                                    <option value="{{ $product['id_produk'] }}"
-                                                        {{ $product['id_produk'] == $produk['id_produk'] ? 'selected' : '' }}>
-                                                        {{ $product['nama_produk'] }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label>Jumlah</label>
-                                            <input type="number" name="produk[{{ $index }}][jumlah_produk]"
-                                                class="form-control" value="{{ $produk['jumlah_produk'] }}" required>
-                                        </div>
-                                        <div class="col-md-3 d-flex align-items-end">
-                                            <button type="button" class="btn btn-danger btn-sm remove-produk"
-                                                onclick="removeProduk('{{ $pembelian['id_penjualan_produk'] }}', {{ $index }})">
-                                                Hapus
-                                            </button>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                            <!-- Tombol Tambah Produk -->
-                            <button type="button" class="btn btn-secondary btn-sm"
-                                onclick="addProduk('{{ $pembelian['id_penjualan_produk'] }}')">
-                                Tambah Produk
-                            </button>
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Update</button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    @endforeach --}}
-
 
     <!-- Modal Tambah -->
-    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <form action="{{ url('pembelian-produk/store') }}" method="POST">
@@ -322,7 +290,8 @@
                                     <select class="form-control kategori-select" required>
                                         <option value="">-- Pilih Kategori --</option>
                                         @foreach ($categories as $cat)
-                                            <option value="{{ $cat['id_kategori'] }}">{{ $cat['nama_kategori'] }}</option>
+                                            <option value="{{ $cat['id_kategori'] }}">{{ $cat['nama_kategori'] }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -794,6 +763,44 @@
                             `Stok: ${p.stok_produk}`;
                         prodSelect.appendChild(opt);
                     });
+            });
+        });
+    </script>
+@endpush
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = $('#editPaymentModal');
+            const form = document.getElementById('editPaymentForm');
+            const uangInput = document.getElementById('payment_uang');
+
+            // when “Bayar Tunai” clicked…
+            $('.btn-edit-payment').on('click', function() {
+                const id = this.dataset.id;
+                const uang = this.dataset.uang || '';
+                const harga = this.dataset.harga; // grab the total due
+
+                // set action to your PUT route
+                form.action = `/pembelian-produk/${id}/pembayaran`;
+                // remember the total for validation
+                form.dataset.hargaAkhir = harga;
+                // prefill
+                uangInput.value = uang;
+            });
+
+            // on form submit, ensure cash >= total
+            form.addEventListener('submit', function(e) {
+                const entered = parseFloat(uangInput.value) || 0;
+                const due = parseFloat(this.dataset.hargaAkhir);
+
+                if (entered < due) {
+                    alert(
+                        `Jumlah uang tidak boleh kurang dari total tagihan ` +
+                        `Rp${due.toLocaleString('id-ID')}.`
+                    );
+                    e.preventDefault();
+                }
             });
         });
     </script>

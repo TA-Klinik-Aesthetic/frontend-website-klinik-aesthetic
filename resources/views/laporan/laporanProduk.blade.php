@@ -57,12 +57,14 @@
     <form action="{{ route('laporan-produk.harian') }}" method="get" class="d-flex align-items-center mb-4">
         <div class="form-group mb-0 mr-2">
             <label for="tanggal" class="sr-only">Tanggal:</label>
-            <input type="date" name="tanggal" id="tanggal" class="form-control" style="width: 150px;">
+            <input type="date" name="tanggal" id="tanggal" class="form-control" style="width: 150px;"
+                value="{{ request('tanggal') }}" {{-- repopulate --}}>
         </div>
         <button type="submit" class="btn btn-pale">Filter Harian</button>
-        <!-- Button to Export Daily Report to PDF -->
-        <a href="{{ route('laporan-produk.export-harian', ['tanggal' => request()->input('tanggal')]) }}"
-            class="btn btn-pale ml-2">
+
+        <!-- Export Harian -->
+        <a href="{{ route('laporan-produk.export-harian', ['tanggal' => request('tanggal')]) }}"
+            class="btn btn-pale ml-2 export-harian">
             Export Harian to PDF
         </a>
     </form>
@@ -71,13 +73,14 @@
     <form action="{{ route('laporan-produk.bulanan') }}" method="get" class="d-flex align-items-center mb-4">
         <div class="form-group mb-0 mr-2">
             <label for="bulan" class="sr-only">Bulan:</label>
-            <input type="month" name="bulan" id="bulan" class="form-control" style="width: 180px;">
-            <!-- Increased width here -->
+            <input type="month" name="bulan" id="bulan" class="form-control" style="width: 180px;"
+                value="{{ request('bulan') }}" {{-- repopulate --}}>
         </div>
         <button type="submit" class="btn btn-pale">Filter Bulanan</button>
-        <!-- Button to Export Monthly Report to PDF -->
-        <a href="{{ route('laporan-produk.export-bulanan', ['bulan' => request()->input('bulan'), 'tahun' => request()->input('tahun')]) }}"
-            class="btn btn-pale ml-2">
+
+        <!-- Export Bulanan -->
+        <a href="{{ route('laporan-produk.export-bulanan', ['bulan' => request('bulan')]) }}"
+            class="btn btn-pale ml-2 export-bulanan">
             Export Bulanan to PDF
         </a>
     </form>
@@ -130,6 +133,46 @@
                             .removeClass('paginate_button')
                             .addClass('btn btn-sm btn-outline-primary mx-1');
                     });
+                }
+            });
+        });
+    </script>
+@endpush
+
+@push('scripts')
+    <script>
+        $(function() {
+            function hasQueryParam(param) {
+                return new URLSearchParams(window.location.search).has(param);
+            }
+
+            // Export Harian
+            $('.export-harian').on('click', function(e) {
+                const t = $('#tanggal').val();
+                if (!t) {
+                    alert('Silakan pilih tanggal sebelum Export Harian.');
+                    e.preventDefault();
+                    return;
+                }
+                // sudah pilih tanggal, tapi belum tekan Filter Harian?
+                if (!hasQueryParam('tanggal')) {
+                    alert('Setelah memilih tanggal, tekan tombol "Filter Harian" terlebih dahulu.');
+                    e.preventDefault();
+                }
+            });
+
+            // Export Bulanan
+            $('.export-bulanan').on('click', function(e) {
+                const b = $('#bulan').val();
+                if (!b) {
+                    alert('Silakan pilih bulan sebelum Export Bulanan.');
+                    e.preventDefault();
+                    return;
+                }
+                // sudah pilih bulan, tapi belum tekan Filter Bulanan?
+                if (!hasQueryParam('bulan')) {
+                    alert('Setelah memilih bulan, tekan tombol "Filter Bulanan" terlebih dahulu.');
+                    e.preventDefault();
                 }
             });
         });

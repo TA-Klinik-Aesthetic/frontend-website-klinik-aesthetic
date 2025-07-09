@@ -184,6 +184,12 @@ Route::get('/pembelian-produk/{paymentId}/invoice',
 Route::put('pembayaran-produk/{id}/konfirmasi', 
     [PembelianProdukController::class, 'confirmPayment'])
     ->name('pembayaran-produk.confirm');
+    // setelah route pembayaran-produk.confirm...
+Route::put(
+    '/pembelian-produk/{id}/pembayaran',
+    [PembelianProdukController::class, 'updatePayment']
+)->name('pembelian-produk.updatePayment');
+
 // Route untuk halaman pembelian produk
 Route::get('/pembelian-produk', [PembelianProdukController::class, 'index'])->name('pembelianProduk.index');
 // Route::get('pembelian-produk/create', [PembelianProdukController::class, 'create'])->name('pembelian-produk.create'); // Menampilkan form tambah pembelian

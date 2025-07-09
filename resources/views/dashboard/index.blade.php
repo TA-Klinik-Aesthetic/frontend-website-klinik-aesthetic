@@ -9,7 +9,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Klinik Aesthetic</title>
+    <link rel="icon" type="image/jpg" href="{{ asset('backend/img/new-logo.jpg') }}">
+
+    <title>Neshnavya Klinik</title>
 
     <!-- Custom fonts for this template-->
     <link href="{{ asset('backend/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">

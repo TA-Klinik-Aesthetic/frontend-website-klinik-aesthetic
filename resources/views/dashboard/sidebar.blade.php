@@ -41,6 +41,16 @@
 
         <hr class="sidebar-divider">
 
+        <!-- Penjualan Produk -->
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('pembayaran-treatment.index') }}">
+                <span>Pembayaran Treatment</span>
+            </a>
+        </li>
+
+
+        {{-- <hr class="sidebar-divider">
+
         <!-- Pembayaran -->
         <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" data-target="#collapsePembayaran" aria-expanded="true">
@@ -56,7 +66,7 @@
                     </a>
                 </div>
             </div>
-        </li>
+        </li> --}}
     @else
         <!-- Divider -->
         <hr class="sidebar-divider">

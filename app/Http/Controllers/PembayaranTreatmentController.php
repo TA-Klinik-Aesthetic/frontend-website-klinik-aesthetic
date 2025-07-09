@@ -117,10 +117,13 @@ class PembayaranTreatmentController extends Controller
             'no_telp'             => $dataBook['user']['no_telp'] ?? '-',
             'email'               => $dataBook['user']['email'] ?? '-',
             'waktu_treatment'     => $dataBook['waktu_treatment'],
+            'treatment_mulai'   => $dataBook['treatment_mulai']   ?? '-',
+            'treatment_selesai' => $dataBook['treatment_selesai'] ?? '-',
             'metode_pembayaran'   => $dataPay['metode_pembayaran'],
             // Subtotal sebelum potongan = harga_total
             'subtotal'            => $dataBook['harga_total'],
             'potongan_harga'      => $dataBook['potongan_harga'],
+            'tipe_potongan'       => data_get($dataBook, 'promo.tipe_potongan'),
             // besaran_pajak adalah nominal pajak (misal 67500)
             'pajak'               => $dataBook['besaran_pajak'],
             // total setelah diskon + pajak

@@ -94,24 +94,28 @@
                                 <button class="btn btn-pale mb-3" data-toggle="modal" data-target="#editPembayaranModal"
                                     data-id="{{ $pembayaran['id_pembayaran'] }}"
                                     data-metode="{{ $pembayaran['metode_pembayaran'] }}"
-                                    data-uang="{{ $pembayaran['uang'] }}"
-                                    data-harga="{{ $pembayaran['harga_akhir'] }}" >
+                                    data-uang="{{ $pembayaran['uang'] }}" data-harga="{{ $pembayaran['harga_akhir'] }}">
                                     Bayar
                                 </button>
 
-                                @if($pembayaran['metode_pembayaran'] === 'Non Tunai' && $pembayaran['status_pembayaran'] !== 'Sudah Dibayar')
-                                <a href="{{ route('pembayaran-treatment.confirm', $pembayaran['id_pembayaran']) }}"
-                                   class="btn btn-pale mb-3">
-                                   Konfirmasi
-                                </a>
-                            @endif
+                                @if ($pembayaran['metode_pembayaran'] === 'Non Tunai' && $pembayaran['status_pembayaran'] !== 'Sudah Dibayar')
+                                    <a href="{{ route('pembayaran-treatment.confirm', $pembayaran['id_pembayaran']) }}"
+                                        class="btn btn-pale mb-3">
+                                        Konfirmasi
+                                    </a>
+                                @endif
 
-                                <!-- Tombol Buat Invoice -->
-                                <a href="{{ route('invoice.pembayaran-treatment', $pembayaran['id_pembayaran']) }}"
-                                    class="btn btn-pale mb-3">
-                                    <i class="fas fa-file-invoice"></i>
-                                    Invoice
-                                </a>
+                                {{-- ► Tombol Invoice: hanya aktif kalau Sudah Dibayar --}}
+                                @if (!empty($pembayaran['status_pembayaran']) && $pembayaran['status_pembayaran'] === 'Sudah Dibayar')
+                                    <a href="{{ route('invoice.pembayaran-treatment', $pembayaran['id_pembayaran']) }}"
+                                        class="btn btn-pale mb-3">
+                                        <i class="fas fa-file-invoice"></i> Invoice
+                                    </a>
+                                @else
+                                    <button class="btn btn-pale mb-3" disabled>
+                                        Belum Dibayar
+                                    </button>
+                                @endif
                             </td>
                         </tr>
                     @endforeach
@@ -119,59 +123,6 @@
             </table>
         </div>
     </div>
-
-
-    <!-- Modal Tambah Pembayaran Treatment -->
-    {{-- <!-- Modal Tambah Pembayaran Treatment -->
-        <div class="modal fade" id="tambahPembayaranModal" tabindex="-1" role="dialog"
-            aria-labelledby="tambahPembayaranModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <form action="{{ route('pembayaran-treatment.store') }}" method="POST" id="tambahPembayaranForm">
-                        @csrf
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="tambahPembayaranModalLabel">Tambah Pembayaran Treatment</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <!-- ID Booking Treatment -->
-                            <div class="form-group">
-                                <label for="id_booking_treatment">Booking Treatment</label>
-                                <select class="form-control" id="id_booking_treatment" name="id_booking_treatment" required>
-                                    <option value="">Pilih User</option>
-                                    @foreach ($bookingTreatments as $booking)
-                                        <option value="{{ $booking['id_booking_treatment'] }}">
-                                            {{ $booking['user']['nama_user'] }} - {{ $booking['waktu_treatment'] }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <!-- Metode Pembayaran -->
-                            <div class="form-group">
-                                <label for="metode_pembayaran">Metode Pembayaran</label>
-                                <select class="form-control" id="metode_pembayaran" name="metode_pembayaran" required>
-                                    <option value="Tunai">Tunai</option>
-                                    <option value="Non Tunai">Non Tunai</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="pajak">Pajak (%)</label>
-                                <input type="number" class="form-control" id="pajak" name="pajak" required>
-                            </div>
-
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary">Simpan Pembayaran</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div> --}}
 
     <!-- Modal Edit Pembayaran Treatment -->
     <div class="modal fade" id="editPembayaranModal" tabindex="-1" role="dialog"
@@ -244,7 +195,8 @@
                     }
                     if (uang < hargaAkhir) {
                         alert(
-                            `Jumlah uang tidak boleh kurang dari Total (${hargaAkhir.toLocaleString('id-ID',{style:'currency',currency:'IDR'})}).`);
+                            `Jumlah uang tidak boleh kurang dari Total (${hargaAkhir.toLocaleString('id-ID',{style:'currency',currency:'IDR'})}).`
+                            );
                         e.preventDefault();
                     }
                 } else {

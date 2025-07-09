@@ -9,6 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
+    <link rel="icon" type="image/jpg" href="{{ asset('backend/img/new-logo.jpg') }}">
     <title>Login</title>
 
     <!-- Custom fonts for this template-->
@@ -39,6 +40,12 @@
             border-color: #d18d3f !important;
             color: #fff !important;
         }
+
+        .card-body hr {
+            border: none;
+            border-top: 1px solid #fff !important;
+            margin: 1rem 0;
+        }
     </style>
 
     <div class="container">
@@ -53,7 +60,7 @@
                         <!-- Nested Row within Card Body -->
                         <div class="row">
                             <div class="col-lg-6 d-none d-lg-block bg-login-image">
-                                <img src="{{ asset('backend/img/logo_klinik.jpg') }}" alt="Logo Klinik"
+                                <img src="{{ asset('backend/img/new-logo.jpg') }}" alt="Logo Klinik"
                                     class="img-fluid w-100 h-100">
                             </div>
                             <div class="col-lg-6">
