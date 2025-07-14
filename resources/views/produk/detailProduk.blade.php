@@ -31,8 +31,6 @@
                 @else
                     <p>Gambar tidak tersedia.</p>
                 @endif
-
-                <a href="{{ route('produk.index') }}" class="btn btn-secondary mt-3">Kembali ke List Produk</a>
             </div>
         </div>
     </div>

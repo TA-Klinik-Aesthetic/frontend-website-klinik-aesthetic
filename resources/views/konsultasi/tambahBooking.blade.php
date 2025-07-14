@@ -61,6 +61,7 @@
             <table id="laporanKonsultasiTable" class="table table-bordered" width="100%" cellspacing="0">
                 <thead>
                     <tr>
+                        <th style="display:none">ID</th> {{-- kolom tersembunyi --}}
                         <th>Nama Pelanggan</th>
                         <th>Waktu Konsultasi</th>
                         <th>Dokter</th>
@@ -71,6 +72,7 @@
                 <tbody>
                     @foreach ($data->reverse() as $item)
                         <tr>
+                            <td style="display:none">{{ $item['id_konsultasi'] }}</td>
                             <td>{{ $item['user']['nama_user'] ?? 'Tidak ada nama pelanggan' }}</td>
                             <td>{{ $item['waktu_konsultasi'] }}</td>
                             <td>{{ $item['dokter']['nama_dokter'] }}</td>
@@ -158,12 +160,12 @@
                                 </div>
                             </div>
 
-                            <button type="button" class="btn btn-info"
-                                onclick="addDetail('{{ $item['id_konsultasi'] }}')">Tambah Baris</button>
+                            <button type="button" class="btn btn-pale"
+                                onclick="addDetail('{{ $item['id_konsultasi'] }}')">Tambah Detail</button>
                         </div>
 
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-success">Simpan</button>
+                            <button type="submit" class="btn btn-pale">Simpan</button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                         </div>
                     </div>
@@ -204,7 +206,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Simpan Status</button>
+                            <button type="submit" class="btn btn-pale">Simpan Status</button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                         </div>
                     </div>
@@ -265,7 +267,7 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-success">Simpan</button>
+                        <button type="submit" class="btn btn-pale">Simpan</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                     </div>
                 </div>
@@ -320,6 +322,15 @@
                 dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 text-right'f>>" +
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 text-right'p>>",
+                // sembunyikan kolom pertama (ID) dan gunakan untuk sorting
+                columnDefs: [{
+                    targets: 0,
+                    visible: false,
+                    searchable: false
+                }],
+                order: [
+                    [0, 'desc']
+                ], // urutkan berdasarkan kolom ID (index 0) descending
                 drawCallback: function(settings) {
                     // styling ulang pagination setiap draw
                     $('.dataTables_wrapper .dataTables_paginate a').each(function() {

@@ -74,7 +74,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($pembelianProduk as $index => $pembelian)
+                    @foreach ($pembelianProduk as $index => $pembelian)
                         <tr>
                             {{-- <td>{{ $index + 1 }}</td> --}}
                             <td>{{ $pembelian['nama_user'] }}</td>
@@ -129,15 +129,11 @@
                                     $pembelian['id_pembayaran'] &&
                                         $pembelian['status_pembayaran'] === 'Belum Dibayar' &&
                                         optional($pembelian['pembayaran_produk'])['metode_pembayaran'] === 'Non Tunai')
-                                    <form action="{{ route('pembayaran-produk.confirm', $pembelian['id_pembayaran']) }}"
-                                        method="POST" style="display:inline" class="form-confirm"
-                                        data-metode="{{ $pembelian['pembayaran_produk']['metode_pembayaran'] }}">
-                                        @csrf
-                                        @method('PUT')
-                                        <button type="submit" class="btn btn-pale mb-3">
-                                            <i class="fas fa-check-circle"></i> Konfirmasi Non Tunai
-                                        </button>
-                                    </form>
+                                    <!-- Button trigger modal -->
+                                    <button type="button" class="btn btn-pale mb-3 btn-confirm-non-tunai"
+                                        data-id="{{ $pembelian['id_pembayaran'] }}">
+                                        <i class="fas fa-check-circle"></i> Konfirmasi Non Tunai
+                                    </button>
                                 @endif
 
                                 @php
@@ -168,11 +164,7 @@
 
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="text-center">Data tidak tersedia.</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -207,6 +199,34 @@
         </div>
     </div>
 
+    <!-- Modal Konfirmasi Non‑Tunai (sekali saja) -->
+    <div class="modal fade" id="confirmNonTunaiModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <form id="confirmNonTunaiForm" method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PUT'){{-- spoof PUT --}}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmNonTunaiLabel">Upload Bukti Pembayaran</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="gambarBukti">Gambar Bukti Pembayaran</label>
+                            <input type="file" name="gambar_bukti_pembayaran" id="gambarBukti" class="form-control"
+                                accept="image/*" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-pale">Kirim & Konfirmasi</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
     {{-- Status Update Modal --}}
     @foreach ($pembelianProduk as $pembelian)
@@ -326,7 +346,7 @@
                         </div>
 
                         <!-- Tombol Tambah Produk -->
-                        <button type="button" class="btn btn-secondary btn-sm mt-3 mb-3"
+                        <button type="button" class="btn btn-pale mb-3"
                             onclick="addProdukTambah()">Tambah
                             Produk</button>
 
@@ -353,15 +373,6 @@
                             </select>
                         </div>
 
-                        <!-- **Status Pengambilan Produk** -->
-                        <div class="form-group">
-                            <label for="status_pengambilan_produk">Status Pengambilan Produk</label>
-                            <select name="status_pengambilan_produk" id="status_pengambilan_produk" class="form-control">
-                                <option value="Belum diambil" selected>Belum diambil</option>
-                                <option value="Sudah diambil">Sudah diambil</option>
-                            </select>
-                        </div>
-
                         <!-- ➤ Ringkasan Harga -->
                         <hr>
                         <h5>Ringkasan Harga</h5>
@@ -382,7 +393,7 @@
                             <input type="text" id="calc_total" class="form-control" readonly>
                         </div>
 
-                        <button type="button" class="btn btn-secondary mb-3" id="btnHitungHarga">
+                        <button type="button" class="btn btn-pale mb-3" id="btnHitungHarga">
                             Hitung Harga
                         </button>
 
@@ -396,14 +407,14 @@
                         </div>
 
                         <!-- Uang Bayar -->
-                        <div class="form-group">
+                        <div class="form-group" id="wrapper_uang_tambah">
                             <label for="uang">Jumlah Bayar</label>
                             <input type="number" name="uang" id="uang" class="form-control" min="0">
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <button type="submit" class="btn btn-pale">Simpan</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                     </div>
                 </form>
@@ -411,98 +422,6 @@
         </div>
     </div>
 @endsection
-
-{{-- @push('scripts')
-    <script>
-        function removeProduk(penjualanId, index) {
-            const element = document.getElementById(`edit-produk-${penjualanId}-${index}`);
-            if (element) {
-                element.remove();
-            }
-        }
-
-        function addProduk(penjualanId) {
-            const list = document.getElementById(`produk-list-${penjualanId}`);
-            const count = list.querySelectorAll('.row').length;
-
-            const html = `
-        <div class="row mb-3" id="edit-produk-${penjualanId}-${count}">
-            <div class="col-md-6">
-                <label>Nama Produk</label>
-                <select name="produk[${count}][id_produk]" class="form-control" required>
-                    <option value="">-- Pilih Produk --</option>
-                    @foreach ($products as $product)
-                        <option value="{{ $product['id_produk'] }}">{{ $product['nama_produk'] }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label>Jumlah</label>
-                <input type="number" name="produk[${count}][jumlah_produk]" class="form-control" required>
-            </div>
-            <div class="col-md-3 d-flex align-items-end">
-                <button type="button" class="btn btn-danger btn-sm"
-                    onclick="removeProduk('${penjualanId}', ${count})">Hapus</button>
-            </div>
-        </div>`;
-            list.insertAdjacentHTML('beforeend', html);
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const promos = @json($promos);
-            const products = @json($products);
-
-
-            @foreach ($pembelianProduk as $pembelian)
-                const editForm{{ $pembelian['id_penjualan_produk'] }} = document.querySelector(
-                    `#editModal{{ $pembelian['id_penjualan_produk'] }} form`
-                );
-
-                if (editForm{{ $pembelian['id_penjualan_produk'] }}) {
-                    editForm{{ $pembelian['id_penjualan_produk'] }}.addEventListener('submit', function(e) {
-                        const promoSelect = editForm{{ $pembelian['id_penjualan_produk'] }}.querySelector(
-                            'select[name="id_promo"]');
-                        const promoId = promoSelect ? promoSelect.value : null;
-                        if (!promoId) return;
-
-                        const selectedPromo = promos.find(p => p.id_promo == promoId);
-                        if (!selectedPromo) return;
-
-                        // ❗ Validasi minimal belanja
-                        if (selectedPromo.minimal_belanja > 0) {
-                            let totalBelanja = 0;
-
-                            const rows = document.querySelectorAll(
-                                `#produk-list-{{ $pembelian['id_penjualan_produk'] }} .row`);
-                            rows.forEach(row => {
-                                const idProduk = row.querySelector('select')?.value;
-                                const jumlah = parseInt(row.querySelector('input')?.value) || 0;
-                                const produk = products.find(p => p.id_produk == idProduk);
-                                if (produk) {
-                                    totalBelanja += produk.harga_produk * jumlah;
-                                }
-                            });
-
-                            if (totalBelanja < selectedPromo.minimal_belanja) {
-                                const formatRupiah = new Intl.NumberFormat('id-ID', {
-                                    style: 'currency',
-                                    currency: 'IDR'
-                                });
-
-                                alert(
-                                    `Promo "${selectedPromo.nama_promo}" tidak dapat digunakan.\n\n` +
-                                    `Total belanja Anda: ${formatRupiah.format(totalBelanja)}\n` +
-                                    `Minimal belanja: ${formatRupiah.format(selectedPromo.minimal_belanja)}`
-                                );
-                                e.preventDefault();
-                            }
-                        }
-                    });
-                }
-            @endforeach
-        });
-    </script>
-@endpush --}}
 
 
 @push('scripts')
@@ -732,6 +651,33 @@
             });
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const metodeSel = document.getElementById('metode_pembayaran');
+            const wrapper = document.getElementById('wrapper_uang_tambah');
+            const inputU = document.getElementById('uang');
+
+            function toggleUang() {
+                if (metodeSel.value === 'Non Tunai') {
+                    wrapper.style.display = 'none';
+                    inputU.disabled = true;
+                    inputU.value = '';
+                } else {
+                    wrapper.style.display = '';
+                    inputU.disabled = false;
+                }
+            }
+
+            // Saat pilihan metode berubah
+            metodeSel.addEventListener('change', toggleUang);
+
+            // Saat modal dibuka, langsung jalankan sekali
+            $('#addModal').on('show.bs.modal', toggleUang);
+
+            // Inisialisasi default (misal: jika ada repopulate value)
+            toggleUang();
+        });
+    </script>
 @endpush
 
 @push('scripts')
@@ -802,6 +748,87 @@
                     e.preventDefault();
                 }
             });
+        });
+    </script>
+@endpush
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            // bila tombol “Konfirmasi Non‑Tunai” diklik…
+            $(document).on('click', '.btn-confirm-non-tunai', function() {
+                const id = $(this).data('id');
+
+                // set form action sesuai route Laravel
+                $('#confirmNonTunaiForm').attr('action',
+                    `{{ url('pembayaran-produk') }}/${id}/konfirmasi`
+                );
+
+                // buka modal
+                $('#confirmNonTunaiModal').modal('show');
+            });
+        });
+    </script>
+@endpush
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const wrapper = document.getElementById('produk-list-tambah');
+
+            // Saat user memilih produk
+            wrapper.addEventListener('change', e => {
+                if (!e.target.classList.contains('produk-select')) return;
+                const prodId = e.target.value;
+                const prod = products.find(p => p.id_produk == prodId);
+                if (!prod) return;
+
+                // jika stok habis
+                if (prod.stok_produk <= 0) {
+                    alert(`Stok produk "${prod.nama_produk}" sedang habis.`);
+                    e.target.value = ''; // batalkan pilihan
+                }
+            });
+
+            // Saat user memasukkan jumlah
+            wrapper.addEventListener('input', e => {
+                if (e.target.tagName !== 'INPUT' || e.target.type !== 'number') return;
+                const row = e.target.closest('.row');
+                const sel = row.querySelector('select.produk-select');
+                const prodId = sel ? sel.value : null;
+                const prod = products.find(p => p.id_produk == prodId);
+                if (!prod) return;
+
+                const qty = parseInt(e.target.value) || 0;
+                if (qty > prod.stok_produk) {
+                    alert(`Jumlah tidak boleh lebih dari stok (${prod.stok_produk}).`);
+                    e.target.value = prod.stok_produk; // set ke stok maksimal
+                }
+            });
+
+            // Tambahan: validasi sekali lagi saat submit form tambah
+            const tambahForm = document.querySelector('#addModal form');
+            if (tambahForm) {
+                tambahForm.addEventListener('submit', e => {
+                    let valid = true;
+                    wrapper.querySelectorAll('.row').forEach(row => {
+                        const sel = row.querySelector('select.produk-select');
+                        const input = row.querySelector('input[type="number"]');
+                        const prod = products.find(p => p.id_produk == sel.value);
+                        if (prod) {
+                            if (prod.stok_produk <= 0) {
+                                alert(`Produk "${prod.nama_produk}" stoknya habis.`);
+                                valid = false;
+                            }
+                            if (parseInt(input.value) > prod.stok_produk) {
+                                alert(`Jumlah untuk produk "${prod.nama_produk}" melebihi stok.`);
+                                valid = false;
+                            }
+                        }
+                    });
+                    if (!valid) e.preventDefault();
+                });
+            }
         });
     </script>
 @endpush

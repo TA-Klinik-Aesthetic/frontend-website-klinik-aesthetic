@@ -1,6 +1,7 @@
 @extends('dashboard.index')
 
 @section('content')
+
     <style>
         /* pastikan kontainer filter benar-benar rata-kanan */
         .dataTables_filter {
@@ -62,6 +63,7 @@
             <table id="listTreatmentTable" class="table table-bordered" width="100%" cellspacing="0">
                 <thead>
                     <tr>
+                        <th style="display:none">ID</th>
                         <th>Nama Treatment</th>
                         <th>Jenis Treatment</th>
                         <th>Aksi</th>
@@ -70,6 +72,7 @@
                 <tbody>
                     @foreach ($treatments as $treatment)
                         <tr>
+                            <td style="display:none">{{ $treatment['id_treatment'] }}</td>
                             <td>{{ $treatment['nama_treatment'] }}</td>
                             <td>{{ $treatment['jenis_treatment']['nama_jenis_treatment'] }}</td>
                             <td>
@@ -86,11 +89,11 @@
                                 </button>
 
                                 <form action="{{ route('treatment.destroy', $treatment['id_treatment']) }}" method="POST"
-                                    style="display: inline;">
+                                    class="delete-treatment-form" data-used="{{ $treatment['detail_booking_treatment_count'] }}"
+                                    style="display:inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-pale mb-3"
-                                        onclick="return confirm('Apakah Anda yakin ingin menghapus treatment ini?')">
+                                    <button type="submit" class="btn btn-pale mb-3">
                                         Hapus
                                     </button>
                                 </form>
@@ -117,7 +120,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="id_jenis_treatment">ID Jenis Treatment</label>
+                            <label for="id_jenis_treatment">Jenis Treatment</label>
                             <select name="id_jenis_treatment" class="form-control" id="id_jenis_treatment" required>
                                 <option value="">Pilih Jenis Treatment</option>
                                 @foreach ($jenisTreatments as $jenisTreatment)
@@ -151,7 +154,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <button type="submit" class="btn btn-pale">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -227,7 +230,7 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-pale">
                             Simpan Perubahan
                         </button>
                     </div>
@@ -266,6 +269,15 @@
                     dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 text-right'f>>" +
                         "<'row'<'col-sm-12'tr>>" +
                         "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 text-right'p>>",
+                    columnDefs: [{
+                            targets: 0,
+                            visible: false,
+                            searchable: false
+                        } // sembunyikan kolom ID
+                    ],
+                    order: [
+                        [0, 'desc']
+                    ], // urutkan berdasarkan ID treatment menurun
                     drawCallback: function(settings) {
                         // styling ulang pagination setiap draw
                         $('.dataTables_wrapper .dataTables_paginate a').each(function() {
@@ -274,6 +286,26 @@
                                 .addClass('btn btn-sm btn-outline-primary mx-1');
                         });
                     }
+                });
+            });
+        </script>
+    @endpush
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                document.querySelectorAll('.delete-treatment-form').forEach(form => {
+                    form.addEventListener('submit', e => {
+                        const used = parseInt(form.dataset.used, 10);
+                        if (used > 0) {
+                            e.preventDefault();
+                            alert('Tidak dapat menghapus: treatment ini sudah ada yang booking.');
+                            return;
+                        }
+                        if (!confirm('Apakah Anda yakin ingin menghapus treatment ini?')) {
+                            e.preventDefault();
+                        }
+                    });
                 });
             });
         </script>

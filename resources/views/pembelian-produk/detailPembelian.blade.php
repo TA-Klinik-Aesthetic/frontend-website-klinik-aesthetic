@@ -1,86 +1,99 @@
 @extends('dashboard.index')
 
 @section('content')
-<div class="container">
-    <h1 class="mb-4 text-gray-800">Detail Penjualan Produk</h1>
+    <div class="container">
+        <h1 class="mb-4 text-gray-800">Detail Penjualan Produk</h1>
 
-    {{-- Informasi Umum --}}
-    <div class="card shadow mb-4">
-        <div class="card-header">
-            <h5>Informasi Penjualan</h5>
-        </div>
-        <div class="card-body">
-            <p><strong>Nama User:</strong> {{ $pembelian['user']['nama_user'] }}</p>
-            <p><strong>Tanggal Pembelian:</strong> {{ $pembelian['tanggal_pembelian'] }}</p>
-            <p><strong>Harga Total:</strong> Rp{{ number_format($pembelian['harga_total'], 2, ',', '.') }}</p>
-            <p>
-                <strong>Potongan Harga:</strong>
-                @if(!empty($pembelian['promo']))
-                    @php $promo = $pembelian['promo']; @endphp
-                    @if($promo['tipe_potongan'] === 'Diskon')
-                        {{ (int) $pembelian['potongan_harga'] }}%
+        {{-- Informasi Umum --}}
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5>Informasi Penjualan</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Nama User:</strong> {{ $pembelian['user']['nama_user'] }}</p>
+                <p><strong>Tanggal Pembelian:</strong> {{ $pembelian['tanggal_pembelian'] }}</p>
+                <p><strong>Harga Total:</strong> Rp{{ number_format($pembelian['harga_total'], 2, ',', '.') }}</p>
+                <p>
+                    <strong>Potongan Harga:</strong>
+                    @if (!empty($pembelian['promo']))
+                        @php $promo = $pembelian['promo']; @endphp
+                        @if ($promo['tipe_potongan'] === 'Diskon')
+                            {{ (int) $pembelian['potongan_harga'] }}%
+                        @else
+                            Rp{{ number_format($pembelian['potongan_harga'], 0, ',', '.') }}
+                        @endif
                     @else
-                        Rp{{ number_format($pembelian['potongan_harga'], 0, ',', '.') }}
+                        -
+                    @endif
+                </p>
+                <p><strong>Besaran Pajak (10%):</strong> Rp{{ number_format($pembelian['besaran_pajak'], 2, ',', '.') }}</p>
+                <p><strong>Harga Akhir:</strong> Rp{{ number_format($pembelian['harga_akhir'], 2, ',', '.') }}</p>
+                <p><strong>Status Pengambilan Produk:</strong> {{ $pembelian['status_pengambilan_produk'] }}</p>
+                <p><strong>Waktu pengambilan:</strong> {{ $pembelian['waktu_pengambilan'] }}</p>
+
+            </div>
+        </div>
+
+        {{-- Detail Produk --}}
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5>Detail Produk</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-bordered mb-0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Nama Produk</th>
+                            <th>Jumlah</th>
+                            <th>Harga Satuan</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($pembelian['detail_pembelian'] as $d)
+                            <tr>
+                                <td>{{ $d['produk']['nama_produk'] }}</td>
+                                <td>{{ $d['jumlah_produk'] }}</td>
+                                <td>Rp{{ number_format($d['harga_penjualan_produk'], 2, ',', '.') }}</td>
+                                <td>Rp{{ number_format($d['harga_penjualan_produk'] * $d['jumlah_produk'], 2, ',', '.') }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Informasi Pembayaran --}}
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5>Informasi Pembayaran</h5>
+            </div>
+            <div class="card-body">
+                @if ($pembelian['pembayaran_produk'])
+                    @php $pay = $pembelian['pembayaran_produk']; @endphp
+                    <p><strong>Metode:</strong> {{ $pay['metode_pembayaran'] }}</p>
+                    <p><strong>Uang Bayar:</strong> Rp{{ number_format($pay['uang'], 2, ',', '.') }}</p>
+                    <p><strong>Kembalian:</strong> Rp{{ number_format($pay['kembalian'], 2, ',', '.') }}</p>
+                    <p><strong>Status:</strong> {{ $pay['status_pembayaran'] }}</p>
+                    <p><strong>Waktu Bayar:</strong> {{ $pay['waktu_pembayaran'] }}</p>
+                    <p><strong>Gambar Bukti Pembayaran:</strong></p>
+                    {{-- Gambar Bukti Pembayaran --}}
+                    @if (!empty($pembelian['pembayaran_produk']['gambar_bukti_pembayaran'] ?? null))
+                        <div class="text-center mb-4">
+                            <a href="{{ $pembelian['pembayaran_produk']['gambar_bukti_pembayaran'] }}" target="_blank">
+                                <img src="{{ $pembelian['pembayaran_produk']['gambar_bukti_pembayaran'] }}"
+                                    alt="Bukti Pembayaran" class="img-fluid"
+                                    style="max-width:800px; width:100%; height:auto; border:1px solid #ddd; padding:4px;">
+                            </a>
+                        </div>
                     @endif
                 @else
-                    -
+                    <div class="alert alert-warning mb-0">
+                        Belum ada pembayaran untuk penjualan ini.
+                    </div>
                 @endif
-            </p>
-            <p><strong>Besaran Pajak (10%):</strong> Rp{{ number_format($pembelian['besaran_pajak'], 2, ',', '.') }}</p>
-            <p><strong>Harga Akhir:</strong> Rp{{ number_format($pembelian['harga_akhir'], 2, ',', '.') }}</p>
+            </div>
         </div>
     </div>
-
-    {{-- Detail Produk --}}
-    <div class="card shadow mb-4">
-        <div class="card-header">
-            <h5>Detail Produk</h5>
-        </div>
-        <div class="card-body p-0">
-            <table class="table table-bordered mb-0">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Nama Produk</th>
-                        <th>Jumlah</th>
-                        <th>Harga Satuan</th>
-                        <th>Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($pembelian['detail_pembelian'] as $d)
-                        <tr>
-                            <td>{{ $d['produk']['nama_produk'] }}</td>
-                            <td>{{ $d['jumlah_produk'] }}</td>
-                            <td>Rp{{ number_format($d['harga_penjualan_produk'], 2, ',', '.') }}</td>
-                            <td>Rp{{ number_format($d['harga_penjualan_produk'] * $d['jumlah_produk'], 2, ',', '.') }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    {{-- Informasi Pembayaran --}}
-    <div class="card shadow mb-4">
-        <div class="card-header">
-            <h5>Informasi Pembayaran</h5>
-        </div>
-        <div class="card-body">
-            @if ($pembelian['pembayaran_produk'])
-                @php $pay = $pembelian['pembayaran_produk']; @endphp
-                <p><strong>Metode:</strong> {{ $pay['metode_pembayaran'] }}</p>
-                <p><strong>Uang Bayar:</strong> Rp{{ number_format($pay['uang'], 2, ',', '.') }}</p>
-                <p><strong>Kembalian:</strong> Rp{{ number_format($pay['kembalian'], 2, ',', '.') }}</p>
-                <p><strong>Status:</strong> {{ $pay['status_pembayaran'] }}</p>
-                <p><strong>Waktu Bayar:</strong> {{ $pay['waktu_pembayaran'] }}</p>
-            @else
-                <div class="alert alert-warning mb-0">
-                    Belum ada pembayaran untuk penjualan ini.
-                </div>
-            @endif
-        </div>
-    </div>
-
-    <a href="{{ url('pembelian-produk') }}" class="btn btn-secondary">Kembali</a>
-</div>
 @endsection

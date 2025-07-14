@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\Rule;
 
 class AkunPelangganController extends Controller
 {
@@ -23,13 +24,24 @@ class AkunPelangganController extends Controller
     public function register(Request $request)
     {
         $data = $request->validate([
-            'nama_user' => 'required|string|max:255',
-            'no_telp'   => 'required|string',
-            'email'     => 'required|email',
-            'password'  => 'required|string|min:6',
+            'nama_user'         => 'required|string|max:255',
+            'no_telp'           => 'required|string|max:15',
+            'email'             => 'required|email|max:255',
+            'password'          => 'required|string|min:6|confirmed',
+            'tanggal_lahir'     => 'nullable|date',
+            'jenis_kelamin'     => ['nullable', Rule::in(['Laki-laki', 'Perempuan'])],
         ]);
 
-        $api = Http::post('https://klinikneshnavya.com/api/register', $data);
+        // 2. Kirim ke API sebagai form data
+        $api = Http::asForm()->post('https://klinikneshnavya.com/api/register', [
+            'nama_user'             => $data['nama_user'],
+            'no_telp'               => $data['no_telp'],
+            'email'                 => $data['email'],
+            'password'              => $data['password'],
+            'password_confirmation' => $request->input('password_confirmation'),
+            'tanggal_lahir'         => $data['tanggal_lahir'] ?? null,
+            'jenis_kelamin'         => $data['jenis_kelamin'] ?? null,
+        ]);
 
         if ($api->status() === 201) {
             return redirect()->route('register.form')
@@ -46,7 +58,7 @@ class AkunPelangganController extends Controller
             ->with('error', $api->json('message', 'Gagal mendaftar, silakan coba lagi'))
             ->withInput();
     }
-     public function updatePassword(Request $request, $id)
+    public function updatePassword(Request $request, $id)
     {
         // Validasi input
         $validator = Validator::make($request->all(), [

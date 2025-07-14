@@ -62,18 +62,22 @@
             <table id="laporanAkunPelangganTable" class="table table-bordered" width="100%" cellspacing="0">
                 <thead>
                     <tr>
+                        <th style="display:none">ID</th>
                         <th>Nama</th>
                         <th>No. Telp</th>
                         <th>Email</th>
+                        <th>Jenis Kelamin</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($users as $u)
+                    @foreach($users as $u)
                         <tr>
+                            <td style="display:none">{{ $u['id_user'] }}</td>
                             <td>{{ $u['nama_user'] }}</td>
                             <td>{{ $u['no_telp'] }}</td>
                             <td>{{ $u['email'] }}</td>
+                            <td>{{ $u['jenis_kelamin'] }}</td>
                             <td>
                                 <button class="btn btn-pale btn-warning" data-toggle="modal" data-target="#passwordModal"
                                     onclick="openPasswordModal({{ $u['id_user'] }}, '{{ $u['nama_user'] }}')">
@@ -81,11 +85,7 @@
                                 </button>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="text-center">Belum ada pelanggan.</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -113,14 +113,32 @@
                         <label>Email</label>
                         <input type="email" name="email" class="form-control" required>
                     </div>
+                    <!-- Tanggal Lahir -->
+                    <div class="form-group">
+                        <label for="tanggal_lahir">Tanggal Lahir</label>
+                        <input type="date" name="tanggal_lahir" id="tanggal_lahir" class="form-control">
+                    </div>
+                    <!-- Jenis Kelamin -->
+                    <div class="form-group">
+                        <label for="jenis_kelamin">Jenis Kelamin</label>
+                        <select name="jenis_kelamin" id="jenis_kelamin" class="form-control">
+                            <option value="">-- Pilih --</option>
+                            <option value="Laki-laki">Laki-laki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                    </div>
                     <div class="form-group">
                         <label>Password</label>
                         <input type="password" name="password" class="form-control" required>
                     </div>
+                    <div class="form-group">
+                        <label>Ulangi Password</label>
+                        <input type="password" name="password_confirmation" class="form-control" required>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button class="btn btn-primary">Daftar</button>
+                    <button class="btn btn-pale">Daftar</button>
                 </div>
             </form>
         </div>
@@ -149,7 +167,7 @@
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <button type="submit" class="btn btn-pale">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -239,6 +257,16 @@
                 dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 text-right'f>>" +
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 text-right'p>>",
+
+                order: [
+                    [0, 'desc']
+                ], // sort by kolom ID (index 0), descending
+                columnDefs: [{
+                        targets: 0,
+                        visible: false
+                    } // sembunyikan kolom ID
+                ],
+
                 drawCallback: function(settings) {
                     // styling ulang pagination setiap draw
                     $('.dataTables_wrapper .dataTables_paginate a').each(function() {
@@ -248,6 +276,49 @@
                     });
                 }
             });
+        });
+    </script>
+@endpush
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ▶ VALIDASI REGISTER FORM
+            const regForm = document.querySelector('#registerModal form');
+            if (regForm) {
+                regForm.addEventListener('submit', e => {
+                    const pwd = regForm.querySelector('input[name="password"]').value;
+                    const pwd2 = regForm.querySelector('input[name="password_confirmation"]').value;
+                    if (pwd.length < 8) {
+                        alert('Password harus minimal 8 karakter.');
+                        e.preventDefault();
+                        return;
+                    }
+                    if (pwd !== pwd2) {
+                        alert('Password dan Ulangi Password tidak sama.');
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            // ▶ VALIDASI UBAH PASSWORD AJAX FORM
+            const pwForm = document.getElementById('passwordForm');
+            if (pwForm) {
+                pwForm.addEventListener('submit', e => {
+                    const pwd = document.getElementById('new_password').value;
+                    const pwd2 = document.getElementById('new_password_confirmation').value;
+                    if (pwd.length < 8) {
+                        alert('Password baru harus minimal 8 karakter.');
+                        e.preventDefault();
+                        return;
+                    }
+                    if (pwd !== pwd2) {
+                        alert('Password baru dan konfirmasi tidak sama.');
+                        e.preventDefault();
+                    }
+                    // kalau lolos validasi, biarkan AJAX-fetch lanjut
+                });
+            }
         });
     </script>
 @endpush

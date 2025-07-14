@@ -14,48 +14,50 @@ class PembelianProdukController extends Controller
         $respSale    = Http::get('https://klinikneshnavya.com/api/penjualan-produk');
         $rawSales    = $respSale->json();          // <-- gunakan ini saja
         $pembelian   = collect($rawSales);
-    
+
         // 2) Data pendukung
         $categories = Http::get('https://klinikneshnavya.com/api/kategori')->json();
         $users    = collect(Http::get('https://klinikneshnavya.com/api/users')->json('data') ?? []);
         $products = Http::get('https://klinikneshnavya.com/api/produk')->json('data') ?? [];
         $promos   = collect(Http::get('https://klinikneshnavya.com/api/promo')
-                       ->json('data') ?? [])
-                       ->where('jenis_promo','Produk')
-                       ->values();
-    
+            ->json('data') ?? [])
+            ->where('jenis_promo', 'Produk')
+            ->where('status_promo', 'Aktif')
+            ->values();
+
         // 3) Semua pembayaran
         $allPays = collect(Http::get('https://klinikneshnavya.com/api/pembayaran-produk')
-        ->json() ?? []);
-    
+            ->json() ?? []);
+
         // 4) Map: tambahkan nama_user, daftar produk, promo dan id_pembayaran
-        $pembelianProduk = $pembelian->map(function($p) use($users,$products,$promos,$allPays){
+        $pembelianProduk = $pembelian->map(function ($p) use ($users, $products, $promos, $allPays) {
             // nama user
-            $u = $users->firstWhere('id_user',$p['id_user']);
+            $u = $users->firstWhere('id_user', $p['id_user']);
             $p['nama_user'] = $u['nama_user'] ?? 'Tidak Diketahui';
-    
+
             // list produk (modal edit)
             $p['produk'] = collect($p['detail_pembelian'] ?? [])
-                ->map(fn($d)=>[
-                    'id_produk'=>$d['id_produk'],
-                    'jumlah_produk'=>$d['jumlah_produk'],
+                ->map(fn($d) => [
+                    'id_produk' => $d['id_produk'],
+                    'jumlah_produk' => $d['jumlah_produk'],
                 ])->toArray();
-    
+
             // promo
-            $p['promo_dipakai'] = $promos->firstWhere('id_promo',$p['id_promo']);
-    
+            $p['promo_dipakai'] = $promos->firstWhere('id_promo', $p['id_promo']);
+
             // id_pembayaran yang cocok
-            $pay = $allPays->firstWhere('id_penjualan_produk',$p['id_penjualan_produk']);
-            $p['id_pembayaran'] = data_get($pay,'id_pembayaran');
+            $pay = $allPays->firstWhere('id_penjualan_produk', $p['id_penjualan_produk']);
+            $p['id_pembayaran'] = data_get($pay, 'id_pembayaran');
             $p['status_pembayaran'] = data_get($pay, 'status_pembayaran', 'Belum Dibayar');
             return $p;
         });
-    
-        return view('pembelian-produk.pembelian', 
-            compact('pembelianProduk','users','products','promos', 'categories')
+
+        return view(
+            'pembelian-produk.pembelian',
+            compact('pembelianProduk', 'users', 'products', 'promos', 'categories')
         );
     }
-    
+
 
 
 
@@ -76,10 +78,9 @@ class PembelianProdukController extends Controller
             'produk.*.id_produk' => 'required|integer',
             'produk.*.jumlah_produk' => 'required|integer',
             'id_promo' => 'nullable|integer',
-            'status_pengambilan_produk' => 'nullable',
             // baru:
             'metode_pembayaran'        => 'required|string|in:Tunai,Non Tunai',
-            'uang'                     => 'nullable|numeric|min:0',
+            'uang'              => 'required_if:metode_pembayaran,Tunai|nullable|numeric|min:0',
         ]);
 
         // 1) Buat penjualan
@@ -92,11 +93,16 @@ class PembelianProdukController extends Controller
         // ambil ID penjualan yang baru
         $penjId = $resp->json('data.id_penjualan_produk');
 
-        // 2) Buat pembayaran
+        // 2) Tentukan $uang: null kalau non tunai
+        $uang = $data['metode_pembayaran'] === 'Tunai'
+            ? $data['uang']
+            : null;
+
+        // 3) Buat pembayaran
         $payResp = Http::post('https://klinikneshnavya.com/api/pembayaran-produk', [
             'id_penjualan_produk' => $penjId,
             'metode_pembayaran'   => $data['metode_pembayaran'],
-            'uang'                => $data['uang'],
+            'uang'                => $uang,
         ]);
 
         if (! $payResp->successful()) {
@@ -113,16 +119,22 @@ class PembelianProdukController extends Controller
     public function show($id)
     {
         $response = Http::get("https://klinikneshnavya.com/api/penjualan-produk/{$id}");
-    
+
         if (! $response->successful()) {
             return redirect()->back()->with('error', 'Gagal mengambil data detail penjualan.');
         }
-    
+
         $pembelian = $response->json();
-    
+
+        if (! empty($pembelian['pembayaran_produk']['gambar_bukti_pembayaran'] ?? null)) {
+            $path = $pembelian['pembayaran_produk']['gambar_bukti_pembayaran'];
+            $pembelian['pembayaran_produk']['gambar_bukti_pembayaran'] =
+                'https://klinikneshnavya.com/' . ltrim($path, '/');
+        }
+
         return view('pembelian-produk.detailPembelian', compact('pembelian'));
     }
-    
+
 
 
     // public function edit($id)
@@ -233,7 +245,7 @@ class PembelianProdukController extends Controller
             'metode_pembayaran' => $dataPay['metode_pembayaran'],
             'subtotal'          => $dataSale['harga_total'],
             'potongan_harga'    => $dataSale['potongan_harga'],
-            'tipe_potongan'     => data_get($dataSale, 'promo.tipe_potongan'), 
+            'tipe_potongan'     => data_get($dataSale, 'promo.tipe_potongan'),
             'pajak'             => $dataSale['besaran_pajak'],
             'total'             => $dataSale['harga_akhir'],
             'uang'              => $dataPay['uang'],
@@ -247,17 +259,36 @@ class PembelianProdukController extends Controller
         return $pdf->download("invoice_pembayaran_{$paymentId}.pdf");
     }
 
-    public function confirmPayment($id)
+    public function confirmPayment(Request $request, $id)
     {
-        // panggil API konfirmasi
-        $response = Http::put("https://klinikneshnavya.com/api/pembayaran-produk/{$id}/konfirmasi");
-
+        $request->validate([
+            'gambar_bukti_pembayaran' => 'required|image',
+        ]);
+    
+        // bangun Multipart client
+        $http = Http::withHeaders(['Accept' => 'application/json'])
+                    ->asMultipart();   // <<< penting
+    
+        // attach file
+        $http->attach(
+            'gambar_bukti_pembayaran',
+            file_get_contents($request->file('gambar_bukti_pembayaran')->getRealPath()),
+            $request->file('gambar_bukti_pembayaran')->getClientOriginalName()
+        );
+    
+        // spoof PUT via _method dan kirim dengan POST
+        $response = $http->post(
+            "https://klinikneshnavya.com/api/pembayaran-produk/{$id}/konfirmasi",
+            ['_method' => 'PUT']
+        );
+    
         if ($response->successful()) {
             return redirect()->back()->with('success', 'Pembayaran berhasil dikonfirmasi.');
         }
-
-        return redirect()->back()->with('error', 'Gagal konfirmasi: '.$response->body());
+    
+        return redirect()->back()->with('error', 'Gagal konfirmasi: ' . $response->body());
     }
+    
 
     public function updatePayment(Request $request, $id)
     {
@@ -267,7 +298,7 @@ class PembelianProdukController extends Controller
 
         try {
             $response = Http::put("https://klinikneshnavya.com/api/pembayaran-produk/{$id}", [
-                'metode_pembayaran' => 'Tunai',    
+                'metode_pembayaran' => 'Tunai',
                 'uang'              => $validated['uang'],
             ]);
 

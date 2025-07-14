@@ -63,6 +63,7 @@
             <table id="listKompensasiTable" class="table table-bordered" width="100%" cellspacing="0">
                 <thead>
                     <tr>
+                        <th style="display:none">ID</th>
                         <th>Nama Kompensasi</th>
                         <th>Nama Treatment</th>
                         <th>Deskripsi</th>
@@ -72,6 +73,7 @@
                 <tbody>
                     @foreach ($kompensasiList as $kompensasi)
                         <tr>
+                            <td style="display:none">{{ $kompensasi['id_kompensasi'] }}</td>
                             <td>{{ $kompensasi['nama_kompensasi'] }}</td>
                             <td>{{ $kompensasi['nama_treatment'] }}</td>
                             <td>{{ $kompensasi['deskripsi_kompensasi'] }}</td>
@@ -124,7 +126,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <button type="submit" class="btn btn-pale">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -168,7 +170,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        <button type="submit" class="btn btn-pale">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -203,6 +205,14 @@
                     dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 text-right'f>>" +
                         "<'row'<'col-sm-12'tr>>" +
                         "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 text-right'p>>",
+                    columnDefs: [{
+                        targets: 0,
+                        visible: false,
+                        searchable: false
+                    }],
+                    order: [
+                        [0, 'desc']
+                    ], // urutkan berdasarkan kolom ID (index 0) descending    
                     drawCallback: function(settings) {
                         // styling ulang pagination setiap draw
                         $('.dataTables_wrapper .dataTables_paginate a').each(function() {

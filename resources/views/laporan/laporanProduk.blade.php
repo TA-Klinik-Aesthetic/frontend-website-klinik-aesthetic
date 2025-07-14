@@ -126,6 +126,9 @@
                 dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 text-right'f>>" +
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 text-right'p>>",
+                order: [
+                    [0, 'desc']
+                ],
                 drawCallback: function(settings) {
                     // styling ulang pagination setiap draw
                     $('.dataTables_wrapper .dataTables_paginate a').each(function() {

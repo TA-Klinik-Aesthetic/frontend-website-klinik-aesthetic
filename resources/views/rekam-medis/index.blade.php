@@ -53,11 +53,11 @@
         }
     </style>
 
-    @if (session('success'))
+    {{-- @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @elseif(session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
+    @endif --}}
 
     <!-- Tabel Rekam Medis -->
     <div class="card shadow mb-4">
@@ -65,6 +65,7 @@
             <table id="laporanRekamMedisTable" class="table table-bordered" width="100%" cellspacing="0">
                 <thead>
                     <tr>
+                        <th style="display:none;">ID</th>
                         <th>Nama Pengguna</th>
                         <th>Total Konsultasi</th>
                         <th>Total Booking Treatment</th>
@@ -74,6 +75,7 @@
                 <tbody>
                     @foreach ($rekamMedisData as $data)
                         <tr>
+                            <td style="display:none;">{{ $data['user']['id_user'] }}</td>
                             <td>{{ $data['user']['nama_user'] }}</td>
                             <td>{{ $data['total_konsultasi'] }}</td>
                             <td>{{ $data['total_booking_treatment'] }}</td>
@@ -81,6 +83,12 @@
                                 <!-- Tombol Detail -->
                                 <a href="{{ route('rekam-medis.detail', $data['user']['id_user']) }}"
                                     class="btn btn-pale mb-3">Detail</a>
+
+                                <!-- Tombol PDF -->
+                                <a href="{{ route('rekam-medis.export-pdf', $data['user']['id_user']) }}"
+                                    class="btn btn-pale mb-3">
+                                    <i class="fas fa-file-pdf"></i> PDF
+                                </a>
                             </td>
                         </tr>
                     @endforeach
@@ -104,6 +112,14 @@
                 dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 text-right'f>>" +
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 text-right'p>>",
+                columnDefs: [{
+                    targets: 0,
+                    visible: false,
+                    searchable: false
+                }],
+                order: [
+                    [0, 'desc']
+                ],
                 drawCallback: function(settings) {
                     // styling ulang pagination setiap draw
                     $('.dataTables_wrapper .dataTables_paginate a').each(function() {

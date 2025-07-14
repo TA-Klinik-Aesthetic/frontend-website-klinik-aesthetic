@@ -21,13 +21,24 @@ class DetailBookingTreatmentController extends Controller
         $promosResponse = Http::get('https://klinikneshnavya.com/api/promo');
         $promos = collect($promosResponse->json()['data'])
             ->where('jenis_promo', 'Treatment')
+            ->where('status_promo', 'Aktif')
             ->values();
 
-        $jenisTreatments = Http::get('https://klinikneshnavya.com/api/jenisTreatments')->json()['data'] ?? [];
-        $treatments = Http::get('https://klinikneshnavya.com/api/treatments')->json()['data'];
+        $jenisResp           = Http::get('https://klinikneshnavya.com/api/jenisTreatments');
+        $jenisTreatments     = $jenisResp->json()['data'] ?? [];
+
+        $treatResp           = Http::get('https://klinikneshnavya.com/api/treatments');
+        $treatments          = $treatResp->json()['data'] ?? [];
+
         $dokters = Http::get('https://klinikneshnavya.com/api/dokters')->json()['data'];
         $beauticians = Http::get('https://klinikneshnavya.com/api/beauticians')->json()['data'];
         $kompensasis = Http::get('https://klinikneshnavya.com/api/kompensasi-diberikan')->json() ?? [];
+
+        $groupedByJenis = collect($treatments)->groupBy('id_jenis_treatment')->toArray();
+        foreach ($jenisTreatments as &$jenis) {
+            $jenis['treatment'] = $groupedByJenis[$jenis['id_jenis_treatment']] ?? [];
+        }
+        unset($jenis);
 
         // Gabungkan nama user
         $usersMap = [];
@@ -107,17 +118,17 @@ class DetailBookingTreatmentController extends Controller
     public function show($id)
     {
         $response = Http::get("https://klinikneshnavya.com/api/detailBookingTreatments/{$id}");
-    
+
         if (! $response->successful()) {
             return redirect()->back()->with('error', 'Gagal mengambil detail booking.');
         }
-    
+
         // langsung ambil objek booking_treatment
         $booking = $response->json('booking_treatment');
-    
+
         return view('treatment.detailBooking', compact('booking'));
     }
-    
+
 
 
     public function update(Request $request, $id)

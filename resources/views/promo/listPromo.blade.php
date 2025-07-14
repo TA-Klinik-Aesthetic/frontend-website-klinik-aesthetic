@@ -64,6 +64,7 @@
             <table id="laporanPromoTable" class="table table-bordered" width="100%" cellspacing="0">
                 <thead>
                     <tr>
+                        <th style="display:none;">ID</th>
                         <th>Nama Promo</th>
                         <th>Potongan Harga</th>
                         <th>Status</th>
@@ -73,6 +74,7 @@
                 <tbody>
                     @foreach ($promos as $promo)
                         <tr>
+                            <td style="display:none">{{ $promo['id_promo'] }}</td>
                             <td>{{ $promo['nama_promo'] }}</td>
                             <td>
                                 @if ($promo['tipe_potongan'] === 'Diskon')
@@ -171,7 +173,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <button type="submit" class="btn btn-pale">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -249,7 +251,7 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button class="btn btn-primary">Update</button>
+                    <button class="btn btn-pale">Simpan</button>
                 </div>
             </form>
         </div>
@@ -316,6 +318,14 @@
                 dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 text-right'f>>" +
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 text-right'p>>",
+                columnDefs: [{
+                    targets: 0,
+                    visible: false,
+                    searchable: false
+                }],
+                order: [
+                    [0, 'desc']
+                ],
                 drawCallback: function(settings) {
                     // styling ulang pagination setiap draw
                     $('.dataTables_wrapper .dataTables_paginate a').each(function() {

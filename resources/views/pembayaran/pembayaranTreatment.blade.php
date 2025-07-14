@@ -53,11 +53,11 @@
 
     <h1 class="h3 mb-2 text-gray-800">Data Pembayaran Treatment</h1>
 
-    @if (session('success'))
+    {{-- @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @elseif(session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
+    @endif --}}
 
     <!-- Tombol untuk Menambah Pembayaran -->
     {{-- <button class="btn btn-success mb-3" data-toggle="modal" data-target="#tambahPembayaranModal"
@@ -90,19 +90,27 @@
                             <td>{{ $pembayaran['waktu_pembayaran'] }}</td>
                             {{-- <td>{{ $pembayaran['booking_treatment']['status_pembayaran'] }}</td> --}}
                             <td>
+                                <a href="{{ route('pembayaran-treatment.show', $pembayaran['id_pembayaran']) }}"
+                                    class="btn btn-pale mb-3">
+                                    Detail
+                                </a>
+
                                 <!-- Tombol Edit -->
-                                <button class="btn btn-pale mb-3" data-toggle="modal" data-target="#editPembayaranModal"
-                                    data-id="{{ $pembayaran['id_pembayaran'] }}"
-                                    data-metode="{{ $pembayaran['metode_pembayaran'] }}"
-                                    data-uang="{{ $pembayaran['uang'] }}" data-harga="{{ $pembayaran['harga_akhir'] }}">
-                                    Bayar
-                                </button>
+                                @if ($pembayaran['status_pembayaran'] !== 'Sudah Dibayar')
+                                    <button class="btn btn-pale mb-3" data-toggle="modal" data-target="#editPembayaranModal"
+                                        data-id="{{ $pembayaran['id_pembayaran'] }}"
+                                        data-metode="{{ $pembayaran['metode_pembayaran'] }}"
+                                        data-uang="{{ $pembayaran['uang'] }}"
+                                        data-harga="{{ $pembayaran['harga_akhir'] }}">
+                                        Bayar
+                                    </button>
+                                @endif
 
                                 @if ($pembayaran['metode_pembayaran'] === 'Non Tunai' && $pembayaran['status_pembayaran'] !== 'Sudah Dibayar')
-                                    <a href="{{ route('pembayaran-treatment.confirm', $pembayaran['id_pembayaran']) }}"
-                                        class="btn btn-pale mb-3">
-                                        Konfirmasi
-                                    </a>
+                                    <button class="btn btn-pale mb-3 btn-confirm-treatment"
+                                        data-id="{{ $pembayaran['id_pembayaran'] }}">
+                                        Konfirmasi Non Tunai
+                                    </button>
                                 @endif
 
                                 {{-- ► Tombol Invoice: hanya aktif kalau Sudah Dibayar --}}
@@ -123,6 +131,8 @@
             </table>
         </div>
     </div>
+
+
 
     <!-- Modal Edit Pembayaran Treatment -->
     <div class="modal fade" id="editPembayaranModal" tabindex="-1" role="dialog"
@@ -146,13 +156,40 @@
                             </select>
                         </div>
                         <!-- Uang Dibayar -->
-                        <div class="form-group">
+                        <div class="form-group" id="wrapper_edit_uang">
                             <label for="edit_uang">Uang</label>
                             <input type="number" step="0.01" name="uang" id="edit_uang" class="form-control">
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <button type="submit" class="btn btn-pale">Simpan</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Non‑Tunai Treatment -->
+    <div class="modal fade" id="confirmNonTunaiTreatmentModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <form id="confirmNonTunaiTreatmentForm" method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PUT') {{-- spoof PUT --}}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Upload Bukti Pembayaran Treatment</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="gambarBuktiTreatment">Gambar Bukti Pembayaran</label>
+                            <input type="file" name="gambar_bukti_pembayaran" id="gambarBuktiTreatment"
+                                class="form-control" accept="image/*" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-pale">Kirim & Konfirmasi</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                     </div>
                 </div>
@@ -196,17 +233,37 @@
                     if (uang < hargaAkhir) {
                         alert(
                             `Jumlah uang tidak boleh kurang dari Total (${hargaAkhir.toLocaleString('id-ID',{style:'currency',currency:'IDR'})}).`
-                            );
-                        e.preventDefault();
-                    }
-                } else {
-                    // Non Tunai: uang harus kosong
-                    if (inpUang.value) {
-                        alert('Untuk metode Non Tunai, kolom Uang harus dikosongkan.');
+                        );
                         e.preventDefault();
                     }
                 }
             });
+            (function() {
+                const metodeSelect = document.getElementById('edit_metode_pembayaran');
+                const wrapperUang = document.getElementById('wrapper_edit_uang');
+                const inputUang = document.getElementById('edit_uang');
+
+                function toggleUang() {
+                    if (metodeSelect.value === 'Non Tunai') {
+                        // disable & sembunyikan
+                        inputUang.value = '';
+                        inputUang.disabled = true;
+                        wrapperUang.style.display = 'none';
+                    } else {
+                        // enable & tampilkan
+                        inputUang.disabled = false;
+                        wrapperUang.style.display = '';
+                    }
+                }
+
+                // jalankan sekali saat modal dibuka
+                $('#editPembayaranModal').on('show.bs.modal', function() {
+                    toggleUang();
+                });
+
+                // jalankan tiap ganti pilihan
+                metodeSelect.addEventListener('change', toggleUang);
+            })();
         });
     </script>
 @endpush
@@ -225,6 +282,9 @@
                 dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 text-right'f>>" +
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 text-right'p>>",
+                order: [
+                    [6, 'desc'] // 6 = indeks kolom "Waktu Pembayaran"
+                ],
                 drawCallback: function(settings) {
                     // styling ulang pagination setiap draw
                     $('.dataTables_wrapper .dataTables_paginate a').each(function() {
@@ -233,6 +293,24 @@
                             .addClass('btn btn-sm btn-outline-primary mx-1');
                     });
                 }
+            });
+        });
+    </script>
+@endpush
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            // ketika tombol “Konfirmasi” treatment (Non Tunai) diklik…
+            $(document).on('click', '.btn-confirm-treatment', function() {
+                const id = $(this).data('id');
+                // set action form ke route Laravel
+                $('#confirmNonTunaiTreatmentForm').attr(
+                    'action',
+                    `/pembayaran-treatment/${id}/konfirmasi`
+                );
+                // tampilkan modal
+                $('#confirmNonTunaiTreatmentModal').modal('show');
             });
         });
     </script>

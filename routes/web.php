@@ -181,9 +181,7 @@ Route::get('booking-treatment/slots/{tanggal}', [DetailBookingTreatmentControlle
 Route::get('/pembelian-produk/{paymentId}/invoice', 
     [PembelianProdukController::class, 'generateInvoice']
 )->name('pembelian-produk.invoice');
-Route::put('pembayaran-produk/{id}/konfirmasi', 
-    [PembelianProdukController::class, 'confirmPayment'])
-    ->name('pembayaran-produk.confirm');
+Route::put('pembayaran-produk/{id}/konfirmasi', [PembelianProdukController::class, 'confirmPayment'])->name('pembayaran-produk.confirm');
     // setelah route pembayaran-produk.confirm...
 Route::put(
     '/pembelian-produk/{id}/pembayaran',
@@ -260,10 +258,11 @@ Route::get('/kompensasi-diberikan', [KompensasiDiberikanController::class, 'inde
 Route::post('/kompensasi-diberikan', [KompensasiDiberikanController::class, 'store'])->name('kompensasi-diberikan.store');
 
 Route::get('/pembayaran-treatment', [PembayaranTreatmentController::class, 'index'])->name('pembayaran-treatment.index');
+Route::get('pembayaran-treatment/{id}', [PembayaranTreatmentController::class, 'show'])->name('pembayaran-treatment.show');
 Route::post('/pembayaran-treatment', [PembayaranTreatmentController::class, 'store'])->name('pembayaran-treatment.store');
 Route::put('/pembayaran-treatment/{id}', [PembayaranTreatmentController::class, 'update'])->name('pembayaran-treatment.update');
 Route::get('pembayaran-treatment/invoice/{id}', [PembayaranTreatmentController::class, 'generateInvoice'])->name('invoice.pembayaran-treatment');
-Route::get('pembayaran-treatment/{id}/confirm', [PembayaranTreatmentController::class, 'confirmPaymentTreatment'])->name('pembayaran-treatment.confirm');
+Route::put('pembayaran-treatment/{id}/konfirmasi', [PembayaranTreatmentController::class, 'confirmPaymentTreatment'])->name('pembayaran-treatment.confirm');
 
 
 
@@ -282,7 +281,7 @@ Route::prefix('pembayaran-produk')->group(function () {
 
 
 
-
+Route::get('rekam-medis/{id}/export-pdf', [RekamMedisController::class, 'exportPdf'])->name('rekam-medis.export-pdf');
 Route::get('/rekam-medis', [RekamMedisController::class, 'rekamMedis'])->name('rekam-medis.index');
 Route::get('/rekam-medis/{id}', [RekamMedisController::class, 'rekamMedisDetail'])->name('rekam-medis.detail');
 

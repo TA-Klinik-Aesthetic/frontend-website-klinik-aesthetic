@@ -1,6 +1,12 @@
 @extends('dashboard.index')
 
 @section('content')
+    @if (session('error'))
+        <script>
+            alert(@json(session('error')));
+        </script>
+    @endif
+
     <style>
         /* pastikan kontainer filter benar-benar rata-kanan */
         .dataTables_filter {
@@ -62,6 +68,7 @@
             <table id="laporanProdukTable" class="table table-bordered" width="100%" cellspacing="0">
                 <thead>
                     <tr>
+                        <th style="display:none;">ID</th>
                         <th>Nama Produk</th>
                         <th>Harga</th>
                         <th>Status</th>
@@ -70,8 +77,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($produkList as $produk)
+                    @foreach ($produkList as $produk)
                         <tr>
+                            <td style="display:none">{{ $produk['id_produk'] }}</td>
                             <td>{{ $produk['nama_produk'] }}</td>
                             <td>Rp{{ number_format($produk['harga_produk'], 2, ',', '.') }}</td>
                             <td>{{ $produk['status_produk'] }}</td>
@@ -88,19 +96,17 @@
                                 </button>
 
                                 <form action="{{ route('produk.destroy', $produk['id_produk']) }}" method="POST"
-                                    style="display:inline-block;">
+                                    class="delete-produk-form" data-used="{{ $produk['detail_pembelian_produk_count'] }}"
+                                    style="display:inline-block">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-pale mb-3"
-                                        onclick="return confirm('Yakin ingin menghapus?')">Hapus</button>
+                                    <button type="submit" class="btn btn-pale mb-3">
+                                        Hapus
+                                    </button>
                                 </form>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="text-center">Tidak ada data produk tersedia.</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -172,7 +178,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan Produk</button>
+                        <button type="submit" class="btn btn-pale">Simpan Produk</button>
                     </div>
                 </div>
             </form>
@@ -263,7 +269,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                            <button type="submit" class="btn btn-pale">Simpan Perubahan</button>
                         </div>
                     </div>
                 </form>
@@ -301,6 +307,14 @@
                 dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 text-right'f>>" +
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 text-right'p>>",
+                columnDefs: [{
+                    targets: 0,
+                    visible: false,
+                    searchable: false
+                }],
+                order: [
+                    [0, 'desc']
+                ],
                 drawCallback: function(settings) {
                     // styling ulang pagination setiap draw
                     $('.dataTables_wrapper .dataTables_paginate a').each(function() {
@@ -309,6 +323,30 @@
                             .addClass('btn btn-sm btn-outline-primary mx-1');
                     });
                 }
+            });
+        });
+    </script>
+@endpush
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.delete-produk-form').forEach(form => {
+                form.addEventListener('submit', e => {
+                    const used = parseInt(form.dataset.used, 10);
+
+                    if (used > 0) {
+                        // sudah dipakai di penjualan
+                        e.preventDefault();
+                        alert('Tidak dapat menghapus: produk ini sudah dipakai di penjualan.');
+                        return;
+                    }
+
+                    // minta konfirmasi jika belum dipakai
+                    if (!confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
+                        e.preventDefault();
+                    }
+                });
             });
         });
     </script>

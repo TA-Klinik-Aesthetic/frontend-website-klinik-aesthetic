@@ -170,8 +170,8 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-pale">Simpan</button>
                         </div>
                     </form>
                 </div>
@@ -210,7 +210,8 @@
                                 <label for="status-{{ $booking['id_booking_treatment'] }}">Status Baru</label>
                                 <select id="status-{{ $booking['id_booking_treatment'] }}" name="status_booking_treatment"
                                     class="form-control status-select"
-                                    data-current="{{ $booking['status_booking_treatment'] }}" required>
+                                    data-current="{{ $booking['status_booking_treatment'] }}"
+                                    data-waktu="{{ $booking['waktu_treatment'] }}" required>
                                     <option value="">-- Pilih Status --</option>
                                     <option value="Treatment dimulai">Treatment dimulai</option>
                                     <option value="Selesai">Selesai</option>
@@ -219,7 +220,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Simpan</button>
+                            <button type="submit" class="btn btn-pale">Simpan</button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                         </div>
                     </div>
@@ -372,12 +373,12 @@
                                 </div>
 
                                 <!-- Tombol tambah hanya di group terakhir -->
-                                <button type="button" class="btn btn-success mt-2 addTreatmentGroup">+ Tambah
+                                <button type="button" class="btn btn-pale mt-2 addTreatmentGroup">Tambah
                                     Treatment</button>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Simpan</button>
+                            <button type="submit" class="btn btn-pale">Simpan</button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                         </div>
                     </div>
@@ -388,6 +389,34 @@
     </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        const allTreatments = @json($treatments);
+
+        $('#treatmentDetails').on('change', '.jenis-treatment-select', function() {
+            const jenisId = $(this).val();
+            const group = $(this).closest('.treatment-group');
+            const sel = group.find('select.treatment');
+
+            sel.empty().append('<option value="">Pilih Treatment</option>');
+
+            allTreatments
+                .filter(t => t.id_jenis_treatment == jenisId)
+                .forEach(t => {
+                    const harga = new Intl.NumberFormat('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR'
+                    }).format(t.biaya_treatment);
+                    sel.append(`<option value="${t.id_treatment}">
+                          ${t.nama_treatment} - ${harga}
+                        </option>`);
+                });
+
+            sel.trigger('change'); // kalau butuh update kompensasi juga
+        });
+    </script>
+@endpush
 
 @push('scripts')
     <script>
@@ -480,7 +509,7 @@
                     </select>
                 </div>
 
-                <button type="button" class="btn btn-success mt-2 addTreatmentGroup">+ Tambah Treatment</button>
+                <button type="button" class="btn btn-pale mt-2 addTreatmentGroup">Tambah Treatment</button>
             </div>
             `;
 
@@ -630,6 +659,15 @@
                     const statusSelect = form.querySelector('.status-select');
                     const selectedStatus = statusSelect.value;
                     const currentStatus = statusSelect.dataset.current;
+                    const waktuTreatment = statusSelect.dataset.waktu; // e.g. "2025-07-15 10:30"
+
+                    // helper: normalize ke timestamp tanggal saja
+                    function dateOnly(ts) {
+                        const d = new Date(ts);
+                        return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+                    }
+                    const todayDate = dateOnly(new Date());
+                    const treatDate = dateOnly(waktuTreatment);
 
                     if (selectedStatus === 'Treatment dimulai' && currentStatus !==
                         'Berhasil dibooking') {
@@ -644,6 +682,20 @@
                             'Status "Selesai" hanya dapat dipilih jika status sebelumnya adalah "Treatment dimulai".'
                         );
                         e.preventDefault();
+                    }
+
+                    // 2) Cek tanggal kalau pilih "Treatment dimulai"
+                    if (selectedStatus === 'Treatment dimulai') {
+                        // Jika tanggal booking masih di masa depan
+                        if (treatDate > todayDate) {
+                            alert(
+                                `Tanggal treatment adalah ${waktuTreatment.split(' ')[0]}. ` +
+                                `Anda belum bisa memulai treatment sebelum tanggal tersebut.`
+                            );
+                            e.preventDefault();
+                            return;
+                        }
+                        // Kalau treatDate === todayDate atau treatDate < todayDate → OK
                     }
                 });
             });
@@ -730,6 +782,12 @@
                     [10, 25, 50, 100]
                 ],
                 pagingType: 'simple_numbers',
+                columnDefs: [{
+                        targets: 0,
+                        visible: false,
+                        searchable: false
+                    } // sembunyikan kolom ID
+                ],
                 order: [
                     [0, 'desc'] // Urut berdasarkan kolom ke-2 (index 1)
                 ],

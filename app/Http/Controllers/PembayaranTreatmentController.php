@@ -19,28 +19,48 @@ class PembayaranTreatmentController extends Controller
     // Menampilkan semua pembayaran treatment
     public function index()
     {
+        // 1) Panggil API pembayaran‐treatment saja
         $response = Http::get($this->apiUrlPembayaran);
-        $list = $response->json();
     
-        // Ambil booking treatments
-        $bookingResponse = Http::get($this->apiUrlBooking);
-        $bookings = collect($bookingResponse->json()['booking_treatments']);
+        if (! $response->successful()) {
+            abort(500, 'Gagal mengambil data pembayaran treatment.');
+        }
     
-        // Flatten: tambahkan user_name & harga_akhir langsung ke setiap pembayaran
-        $flattened = collect($list)->map(function($p) use ($bookings) {
-            if (isset($p['booking_treatment'])) {
-                $bt = $p['booking_treatment'];
-                $p['user_name'] = data_get($bt, 'user.nama_user', '-');
-                $p['harga_akhir'] = data_get($bt, 'harga_akhir_treatment', 0);
-            } else {
-                $p['user_name'] = '-';
-                $p['harga_akhir'] = 0;
-            }
+        $list = $response->json(); // ini array of pembayaran
+    
+        // 2) Flatten: untuk tiap pembayaran ambil nama_user & harga_akhir_treatment
+        $flattened = collect($list)->map(function ($p) {
+            $p['user_name']  = data_get($p, 'booking_treatment.user.nama_user', '-');
+            $p['harga_akhir'] = data_get($p, 'booking_treatment.harga_akhir_treatment', 0);
             return $p;
         });
     
+        // 3) Tampilkan ke view
         return view('pembayaran.pembayaranTreatment', [
             'pembayaranTreatmentList' => $flattened,
+        ]);
+    }
+
+    public function show($id)
+    {
+        // Memanggil API
+        $response = Http::get("https://klinikneshnavya.com/api/pembayaran-treatment/{$id}");
+
+        if (! $response->successful()) {
+            return redirect()->route('pembayaran-treatment.index')
+                ->with('error', 'Gagal mengambil detail pembayaran treatment.');
+        }
+
+        $data = $response->json()['data'];
+
+        // Jika ada gambar, tambahkan domain prefix
+        if (! empty($data['gambar_bukti_pembayaran'])) {
+            $data['gambar_bukti_pembayaran'] =
+                'https://klinikneshnavya.com/' . ltrim($data['gambar_bukti_pembayaran'], '/');
+        }
+
+        return view('pembayaran.detailTreatment', [
+            'payment' => $data,
         ]);
     }
 
@@ -74,22 +94,27 @@ class PembayaranTreatmentController extends Controller
     {
         $validated = $request->validate([
             'metode_pembayaran' => 'required|in:Tunai,Non Tunai',
-            'uang'              => 'nullable|numeric|min:0',
+            'uang'              => 'required_if:metode_pembayaran,Tunai|nullable|numeric|min:0',
         ]);
-    
+
         try {
+
+            $uang = $validated['metode_pembayaran'] === 'Tunai'
+                ? $validated['uang']
+                : null;
+
             // Kirim data lengkap ke API
             $response = Http::put("{$this->apiUrlPembayaran}/{$id}", [
                 'metode_pembayaran' => $validated['metode_pembayaran'],
-                'uang'              => $validated['uang'],
+                'uang'              => $uang,
             ]);
-    
+
             if ($response->successful()) {
                 return redirect()
                     ->route('pembayaran-treatment.index')
                     ->with('success', 'Pembayaran treatment berhasil diperbarui');
             }
-    
+
             // jika API merespon error
             return redirect()
                 ->route('pembayaran-treatment.index')
@@ -106,11 +131,11 @@ class PembayaranTreatmentController extends Controller
         // Ambil data pembayaran
         $respPay = Http::get("{$this->apiUrlPembayaran}/{$id}");
         $dataPay = $respPay->json()['data'] ?? abort(404, 'Pembayaran tidak ditemukan');
-    
+
         // Ambil data booking treatment
         $respBook = Http::get("{$this->apiUrlBooking}/{$dataPay['id_booking_treatment']}");
         $dataBook = $respBook->json()['booking_treatment'] ?? abort(404, 'Booking tidak ditemukan');
-    
+
         // Siapkan data untuk view
         $invoiceData = [
             'user_name'           => $dataBook['user']['nama_user'] ?? '-',
@@ -133,26 +158,38 @@ class PembayaranTreatmentController extends Controller
             'detail_booking'      => $dataBook['detail_booking'],
             'waktu_pembayaran'    => $dataPay['waktu_pembayaran'],
         ];
-    
+
         $pdf = PDF::loadView('invoice.pembayaranTreatment', $invoiceData);
         return $pdf->download("invoice_pembayaran_{$dataPay['id_pembayaran']}.pdf");
     }
 
-    public function confirmPaymentTreatment($id)
+    public function confirmPaymentTreatment(Request $request, $id)
     {
-        // Panggil endpoint API eksternal
-        $response = Http::put("https://klinikneshnavya.com/api/pembayaran-treatment/{$id}/konfirmasi");
+        $request->validate([
+            'gambar_bukti_pembayaran' => 'required|image',
+        ]);
+
+        // bangun client multipart
+        $http = Http::withHeaders(['Accept' => 'application/json'])
+            ->asMultipart()
+            ->attach(
+                'gambar_bukti_pembayaran',
+                file_get_contents($request->file('gambar_bukti_pembayaran')->getRealPath()),
+                $request->file('gambar_bukti_pembayaran')->getClientOriginalName()
+            );
+
+        // spoof PUT via _method
+        $response = $http->post(
+            "https://klinikneshnavya.com/api/pembayaran-treatment/{$id}/konfirmasi",
+            ['_method' => 'PUT']
+        );
 
         if ($response->successful()) {
-            return redirect()->back()
-                ->with('success', 'Pembayaran treatment berhasil dikonfirmasi.');
+            return redirect()->back()->with('success', 'Pembayaran treatment berhasil dikonfirmasi.');
         }
 
-        // Jika gagal, ambil pesan error dari body API
         $body = $response->json();
         $msg  = $body['message'] ?? $response->body();
-
-        return redirect()->back()
-            ->with('error', 'Gagal konfirmasi: '.$msg);
+        return redirect()->back()->with('error', 'Gagal konfirmasi: ' . $msg);
     }
 }

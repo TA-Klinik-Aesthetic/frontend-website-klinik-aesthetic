@@ -11,38 +11,17 @@ class FeedbackTreatmentController extends Controller
 
     public function index()
     {
-        // Ambil data feedback treatment
-        $feedbackResponse = Http::get($this->baseApiUrl);
-        $feedbacks = $feedbackResponse->json()['data'] ?? [];
-        
-        // Ambil data detail booking treatment
-        $detailBookingResponse = Http::get('https://klinikneshnavya.com/api/detailBookingTreatments');
-        $detailBookingData = $detailBookingResponse->json()['booking_treatments'][0]['detail_booking'] ?? [];  // Sesuaikan dengan struktur JSON
-    
-        // Buat mapping id_detail_booking_treatment ke detail booking
-        $detailBookingMap = [];
-        foreach ($detailBookingData as $detail) {
-            $detailBookingMap[$detail['id_detail_booking_treatment']] = $detail;
-        }
-        
-        // Gabungkan data feedback dengan detail booking treatment
-        foreach ($feedbacks as &$feedback) {
-            $idDetail = $feedback['id_detail_booking_treatment'];
-            
-            if (isset($detailBookingMap[$idDetail])) {
-                $detail = $detailBookingMap[$idDetail];
+        // 1) Ambil seluruh feedback treatment
+        $response  = Http::get($this->baseApiUrl);
+        $feedbacks = $response->json()['data'] ?? [];
 
-                // Ambil nama treatment
-                $treatment = $detail['treatment'] ? $detail['treatment']['nama_treatment'] : '-';
-        
-                $feedback['nama_treatment'] = $treatment;  // Menambahkan nama treatment
-                
-            } else {
-                // Jika tidak ditemukan, set default '-'
-                $feedback['nama_treatment'] = '-';
-            }
+        // 2) Untuk setiap feedback, tambahkan langsung nama treatment dari nested detail_booking → treatment
+        foreach ($feedbacks as &$f) {
+            $f['nama_treatment'] = data_get($f, 'detail_booking.treatment.nama_treatment', '-');
         }
-        
+        unset($f);
+
+        // 3) Kirim ke view
         return view('feedback.feedbackTreatment', compact('feedbacks'));
     }
     

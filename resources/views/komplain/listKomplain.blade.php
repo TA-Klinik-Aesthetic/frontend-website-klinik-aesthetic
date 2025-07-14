@@ -33,6 +33,10 @@
             background-color: #F3A14B !important;
             border-color: #F3A14B !important;
         }
+
+        #wrapper_tanggal_berakhir_kompensasi {
+            display: none;
+        }
     </style>
 
     <style>
@@ -76,6 +80,7 @@
             <table id="laporanKomplainTable" class="table table-bordered" width="100%" cellspacing="0">
                 <thead>
                     <tr>
+                        <th style="display:none">ID</th>
                         <th>Nama Pengguna</th>
                         <th>Teks Komplain</th>
                         <th>Balasan Komplain</th>
@@ -86,6 +91,7 @@
                 <tbody>
                     @foreach ($komplainList as $komplain)
                         <tr>
+                            <td style="display:none">{{ $komplain['id_komplain'] }}</td>
                             <td>{{ $komplain['user']['nama_user'] }}</td>
                             <td>{{ $komplain['teks_komplain'] }}</td>
                             <td>{{ $komplain['balasan_komplain'] }}</td>
@@ -157,7 +163,7 @@
 
                         <!-- Input Kompensasi -->
                         <div class="form-group">
-                            <label for="edit_id_kompensasi">ID Kompensasi</label>
+                            <label for="edit_id_kompensasi">Kompensasi</label>
                             <select class="form-control" id="edit_id_kompensasi" name="id_kompensasi">
                                 <option value="">Pilih Kompensasi</option>
                                 @foreach ($kompensasiList as $k)
@@ -168,7 +174,7 @@
                             </select>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" id="wrapper_tanggal_berakhir_kompensasi">
                             <label for="edit_tanggal_berakhir_kompensasi">Tanggal Berakhir Kompensasi</label>
                             <input type="date" class="form-control" id="edit_tanggal_berakhir_kompensasi"
                                 name="tanggal_berakhir_kompensasi">
@@ -177,12 +183,39 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        <button type="submit" class="btn btn-pale">Kirim</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const kompSelect = document.getElementById('edit_id_kompensasi');
+                const tanggalWrapper = document.getElementById('wrapper_tanggal_berakhir_kompensasi');
+                const tanggalInput = document.getElementById('edit_tanggal_berakhir_kompensasi');
+
+                function toggleTanggal() {
+                    if (kompSelect.value) {
+                        // ada kompensasi terpilih → tampilkan
+                        tanggalWrapper.style.display = 'block';
+                    } else {
+                        // tidak ada kompensasi → sembunyikan dan kosongkan
+                        tanggalWrapper.style.display = 'none';
+                        tanggalInput.value = '';
+                    }
+                }
+
+                // Saat modal Komplain dibuka, jalankan sekali untuk set initial visibility
+                $('#editKomplainModal').on('show.bs.modal', toggleTanggal);
+
+                // Saat pilihan kompensasi berubah
+                kompSelect.addEventListener('change', toggleTanggal);
+            });
+        </script>
+    @endpush
 
     @push('scripts')
         <script>
@@ -286,6 +319,25 @@
             document.addEventListener('DOMContentLoaded', () => {
                 const form = document.getElementById('editKomplainForm');
                 form.addEventListener('submit', function(e) {
+                    // 1) Validasi tanggal berakhir kompensasi
+                    const endDateStr = document.getElementById('edit_tanggal_berakhir_kompensasi').value;
+                    if (endDateStr) {
+                        // parse jadi year, month, day
+                        const [y, m, d] = endDateStr.split('-').map(Number);
+                        // buat Date lokal (monthIndex = m-1)
+                        const endDate = new Date(y, m - 1, d);
+                        // buat objek hari ini jam 00:00:00
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+
+                        if (endDate <= today) {
+                            alert('Tanggal berakhir kompensasi harus setelah hari ini.');
+                            e.preventDefault();
+                            return;
+                        }
+                    }
+
+                    // 2) Validasi kecocokan kompensasi ↔ treatment
                     const detailTreatId = parseInt(this.dataset.detailTreatmentId, 10);
                     const kompSelect = document.getElementById('edit_id_kompensasi');
                     const opt = kompSelect.options[kompSelect.selectedIndex];
@@ -314,6 +366,14 @@
                     dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 text-right'f>>" +
                         "<'row'<'col-sm-12'tr>>" +
                         "<'row mt-2'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 text-right'p>>",
+                    columnDefs: [{
+                        targets: 0,
+                        visible: false,
+                        searchable: false
+                    }],
+                    order: [
+                        [0, 'desc']
+                    ], // urutkan berdasarkan kolom ID (index 0) descending        
                     drawCallback: function(settings) {
                         // styling ulang pagination setiap draw
                         $('.dataTables_wrapper .dataTables_paginate a').each(function() {

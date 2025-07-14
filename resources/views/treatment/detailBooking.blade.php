@@ -76,7 +76,5 @@
                 </table>
             </div>
         </div>
-
-        <a href="{{ route('detailBooking.index') }}" class="btn btn-secondary">Kembali</a>
     </div>
 @endsection

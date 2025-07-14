@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
@@ -25,17 +26,22 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:15',
+            'nama_user' => 'required|string|max:255',
+            'no_telp' => 'required|string|max:15',
             'email' => 'required|email|max:255',
-            'password' => 'required|string|min:8',
+            'password'  => 'required|string|min:8|confirmed',
+            'tanggal_lahir' => 'nullable|date',
+            'jenis_kelamin' => ['nullable', Rule::in(['Laki-laki','Perempuan'])],
         ]);
 
-        $response = Http::post('https://klinikneshnavya.com/api/register', [
-            'nama_user' => $request->name,
-            'no_telp' => $request->phone,
+        $response = Http::asForm()->post('https://klinikneshnavya.com/api/register', [
+            'nama_user' => $request->nama_user,
+            'no_telp' => $request->no_telp,
             'email' => $request->email,
             'password' => $request->password,
+            'password_confirmation' => $request->password_confirmation, 
+            'tanggal_lahir' => $request->tanggal_lahir,
+            'jenis_kelamin' => $request->jenis_kelamin,
         ]);
 
         if ($response->successful()) {
