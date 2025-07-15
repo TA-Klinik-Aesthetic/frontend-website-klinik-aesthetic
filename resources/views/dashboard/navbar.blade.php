@@ -57,7 +57,7 @@
             <div class="modal-footer">
                 <form action="{{ route('logout') }}" method="POST" class="w-100">
                     @csrf
-                    <button type="button" class="btn btn-pale" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-pale">Logout</button>
                 </form>
             </div>

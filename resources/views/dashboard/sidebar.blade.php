@@ -15,7 +15,7 @@
 
     <!-- Sidebar - Brand -->
     <a class="sidebar-brand d-flex align-items-center justify-content-center">
-        <div class="mx-3">Klinik Aesthetic</div>
+        <div class="mx-3">Klinik Neshnavya</div>
     </a>
 
     <!-- Divider -->

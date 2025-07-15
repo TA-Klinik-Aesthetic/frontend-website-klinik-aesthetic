@@ -1,6 +1,22 @@
 @extends('dashboard.index')
 
 @section('content')
+    {{-- Definisi kelas “pale” langsung di Blade --}}
+    <style>
+        .border-left-pale {
+            border-left: .25rem solid #F3A14B !important;
+        }
+
+        .text-pale {
+            color: #F3A14B !important;
+        }
+
+        .bg-pale {
+            background-color: #F3A14B !important;
+            color: #fff !important;
+        }
+    </style>
+
     <!-- Begin Page Content -->
 
     <!-- Page Heading -->
@@ -13,12 +29,12 @@
 
         <!-- Booking Konsultasi -->
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card border-left-pale shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Booking Konsultasi
+                            <div class="text-xs font-weight-bold text-pale text-uppercase mb-1">
+                                Booking Konsultasi (Verifikasi)
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 {{ $consultCount }}
@@ -34,12 +50,12 @@
 
         <!-- Booking Treatment -->
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
+            <div class="card border-left-pale shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Booking Treatment
+                            <div class="text-xs font-weight-bold text-pale text-uppercase mb-1">
+                                Booking Treatment (Verifikasi)
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 {{ $treatCount }}
@@ -53,11 +69,11 @@
             </div>
         </div>
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card border-left-pale shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            <div class="text-xs font-weight-bold text-pale text-uppercase mb-1">
                                 Komplain (Belum Dibalas)
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
@@ -90,7 +106,7 @@
         <div class="col-12">
             <div class="card shadow">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">
+                    <h6 class="m-0 font-weight-bold text-secondary">
                         Pembayaran Treatment / Bulan ({{ $year }})
                     </h6>
                 </div>
@@ -106,7 +122,7 @@
         <div class="col-12">
             <div class="card shadow">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-success">
+                    <h6 class="m-0 font-weight-bold text-secondary">
                         Pembayaran Produk / Bulan ({{ $year }})
                     </h6>
                 </div>
@@ -142,7 +158,7 @@
                     labels: treatLabels,
                     datasets: [{
                         label: 'Jumlah Pembayaran',
-                        backgroundColor: '#4e73df',
+                        backgroundColor: '#F3A14B',
                         data: treatData
                     }]
                 },
@@ -169,7 +185,7 @@
                     labels: prodLabels,
                     datasets: [{
                         label: 'Jumlah Pembayaran',
-                        backgroundColor: '#1cc88a',
+                        backgroundColor: '#F3A14B',
                         data: prodData
                     }]
                 },
