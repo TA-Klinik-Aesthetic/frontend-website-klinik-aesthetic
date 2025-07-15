@@ -20,7 +20,7 @@ class DashboardController extends Controller
             : 0;
 
         // Panggil API untuk hitung booking treatment Verifikasi
-        $respTreatment = Http::get('https://klinikneshnavya.com/api/detailBookingTreatments/total-verifikasi');
+        $respTreatment = Http::get('https://klinikneshnavya.com/api/bookingTreatments/total-verifikasi');
         $treatCount    = $respTreatment->successful()
             ? $respTreatment->json('total_verifikasi', 0)
             : 0;
