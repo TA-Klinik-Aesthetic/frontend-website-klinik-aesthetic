@@ -160,21 +160,14 @@ Route::prefix('booking')->name('bookingTreatment.')->group(function () {
 });
 
 
-Route::prefix('detailBooking')->name('detailBooking.')->group(function () {
+Route::prefix('bookingTreatment')->name('bookingTreatment.')->group(function () {
     Route::get('/', [DetailBookingTreatmentController::class, 'index'])->name('index');
-    Route::post('/store', [DetailBookingTreatmentController::class, 'store'])->name('store');
-    Route::get('/{id}', [DetailBookingTreatmentController::class, 'show'])->name('show');
-    Route::delete('/{id}', [DetailBookingTreatmentController::class, 'destroy'])->name('destroy');
 });
 // Route::get('/autocomplete-kompensasi', [DetailBookingTreatmentController::class, 'autocompleteKompensasi']);
 Route::put('/detailBooking/{id}/update-status', [DetailBookingTreatmentController::class, 'updateStatus'])->name('bookingTreatment.updateStatus');
-
-
-Route::get('/booking/create', [DetailBookingTreatmentController::class, 'create'])->name('booking.create');
 Route::post('/booking', [DetailBookingTreatmentController::class, 'store'])->name('booking.store');
 Route::get('/booking/detail/{id}', [DetailBookingTreatmentController::class, 'show'])->name('booking.detail');
 Route::put('/detailBooking/update/{id}', [DetailBookingTreatmentController::class, 'update'])->name('detailBooking.update');
-Route::get('booking-treatment/slots/{tanggal}', [DetailBookingTreatmentController::class, 'getSlots'])->name('booking.slots');
 
 
 

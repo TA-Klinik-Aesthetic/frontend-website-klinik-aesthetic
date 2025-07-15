@@ -108,7 +108,7 @@ class DetailBookingTreatmentController extends Controller
         $response = Http::post('https://klinikneshnavya.com/api/detailBookingTreatments', $bookingData);
 
         if ($response->successful()) {
-            return redirect()->route('detailBooking.index')->with('success', 'Booking Treatment berhasil ditambahkan!');
+            return redirect()->route('bookingTreatment.index')->with('success', 'Booking Treatment berhasil ditambahkan!');
         } else {
             return back()->with('error', 'Terjadi kesalahan, silakan coba lagi.');
         }
@@ -161,7 +161,7 @@ class DetailBookingTreatmentController extends Controller
         // 3) Jika sukses, redirect dengan pesan sukses
         if ($response->successful()) {
             return redirect()
-                ->route('detailBooking.index')  // sesuaikan dengan nama route index-mu
+                ->route('bookingTreatment.index')  // sesuaikan dengan nama route index-mu
                 ->with('success', 'Status booking treatment berhasil diperbarui.');
         }
 
