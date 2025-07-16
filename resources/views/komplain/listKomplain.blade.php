@@ -73,7 +73,7 @@
         }
     </style>
 
-    <h1 class="h3 mb-2 text-gray-800">Komplain Pelanggan</h1>
+    <h1 class="h3 mb-2 text-gray-800">Komplain</h1>
 
     <div class="card shadow mb-4">
         <div class="card-body">
@@ -151,7 +151,7 @@
 
                         <!-- Link Download Gambar Komplain -->
                         <div class="form-group">
-                            <label>Unduh Gambar Komplain</label><br>
+                            <label>Gambar Komplain</label><br>
                             <div id="gambar_komplain_links"></div>
                         </div>
 
@@ -302,10 +302,10 @@
 
                         const link = document.createElement('a');
                         link.href = baseUrl + gambarPath;
-                        link.className = 'btn btn-outline-pale btn-sm m-1';
+                        link.className = 'btn btn-pale btn-sm m-1';
                         link.target = '_blank';
                         link.download = '';
-                        link.innerHTML = `<i class="fas fa-download"></i> Gambar Komplain ${index + 1}`;
+                        link.innerHTML = `Gambar Komplain ${index + 1}`;
                         gambarKomplainContainer.appendChild(link);
                     });
                 } else {
