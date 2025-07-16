@@ -52,7 +52,7 @@
         }
     </style>
 
-    <h1 class="h3 mb-2 text-gray-800">List Kategori Produk</h1>
+    <h1 class="h3 mb-2 text-gray-800">Kategori Produk</h1>
 
     <!-- Tombol buka modal Tambah -->
     <button class="btn btn-pale mb-3" data-toggle="modal" data-target="#addKategoriModal">

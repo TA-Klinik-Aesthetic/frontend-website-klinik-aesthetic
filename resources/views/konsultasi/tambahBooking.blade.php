@@ -51,9 +51,9 @@
         }
     </style>
 
-    <h1 class="h3 mb-2 text-gray-800">Daftar Booking Konsultasi</h1>
+    <h1 class="h3 mb-2 text-gray-800">Booking Konsultasi</h1>
     <button type="button" class="btn btn-pale mb-3" data-toggle="modal" data-target="#tambahKonsultasiModal">
-        <i class="fas fa-plus"></i> Tambah Booking
+        <i class="fas fa-plus"></i> Booking Konsultasi
     </button>
 
     <div class="card shadow mb-4">

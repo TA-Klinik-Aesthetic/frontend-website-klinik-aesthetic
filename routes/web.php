@@ -98,7 +98,7 @@ Route::put('akun-pelanggan/{id}/update-password', [AkunPelangganController::clas
 
 
 
-Route::get('/konsultasi/with-doctor', [KonsultasiController::class, 'indexWithDoctor'])->name('konsultasi.with-doctor');
+Route::get('/konsultasi', [KonsultasiController::class, 'indexWithDoctor'])->name('konsultasi.with-doctor');
 // Route::get('/konsultasi/without-doctor', [KonsultasiController::class, 'indexWithoutDoctor'])->name('konsultasi.without-doctor');
 Route::get('/konsultasi/create', [KonsultasiController::class, 'create'])->name('konsultasi.create');
 Route::post('/konsultasi', [KonsultasiController::class, 'store'])->name('konsultasi.store');

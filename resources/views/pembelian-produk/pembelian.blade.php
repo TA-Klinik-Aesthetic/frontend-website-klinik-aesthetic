@@ -51,10 +51,10 @@
         }
     </style>
 
-    <h1 class="h3 mb-2 text-gray-800">Daftar Penjualan Produk</h1>
+    <h1 class="h3 mb-2 text-gray-800">Penjualan Produk</h1>
     <!-- Tombol untuk buka modal -->
     <button type="button" class="btn btn-pale mb-3" data-toggle="modal" data-target="#addModal">
-        Tambah Penjualan Produk
+        <i class="fas fa-plus"></i>Tambah Penjualan Produk
     </button>
 
     <div class="card shadow mb-4">
@@ -63,7 +63,7 @@
                 <thead>
                     <tr>
                         {{-- <th>No</th> --}}
-                        <th>Nama User</th>
+                        <th>Nama Pelanggan</th>
                         <th>Tanggal Pembelian</th>
                         <th>Harga Akhir</th>
                         <th>Metode Bayar</th>
@@ -292,10 +292,10 @@
                     <div class="modal-body">
                         <!-- Select User -->
                         <div class="form-group">
-                            <label for="id_user">User</label>
+                            <label for="id_user">Nama Pelanggan</label>
                             <select name="id_user" id="id_user" class="form-control" required>
-                                <option value="">-- Pilih User --</option>
-                                @foreach ($users as $user)
+                                <option value="">Pilih Pelanggan</option>
+                                @foreach ($pelanggan as $user)
                                     <option value="{{ $user['id_user'] }}">{{ $user['nama_user'] }}</option>
                                 @endforeach
                             </select>
@@ -308,7 +308,7 @@
                                 <div class="col-12">
                                     <label>Kategori</label>
                                     <select class="form-control kategori-select" required>
-                                        <option value="">-- Pilih Kategori --</option>
+                                        <option value="">Pilih Kategori</option>
                                         @foreach ($categories as $cat)
                                             <option value="{{ $cat['id_kategori'] }}">{{ $cat['nama_kategori'] }}
                                             </option>
@@ -320,7 +320,7 @@
                                 <div class="col-12 mt-2">
                                     <label>Nama Produk</label>
                                     <select name="produk[0][id_produk]" class="form-control produk-select" required>
-                                        <option value="">-- Pilih Produk --</option>
+                                        <option value="">Pilih Produk</option>
                                         @foreach ($products as $product)
                                             <option value="{{ $product['id_produk'] }}">
                                                 {{ $product['nama_produk'] }} —
@@ -442,7 +442,7 @@
                 <div class="col-12">
                 <label>Kategori</label>
                 <select class="form-control kategori-select" required>
-                    <option value="">-- Pilih Kategori --</option>
+                    <option value="">Pilih Kategori</option>
                     ${categoryOptions}
                 </select>
                 </div>
@@ -450,7 +450,7 @@
                 <div class="col-12 mt-2">
                 <label>Nama Produk</label>
                 <select name="produk[${index}][id_produk]" class="form-control produk-select" required>
-                    <option value="">-- Pilih Produk --</option>
+                    <option value="">Pilih Produk</option>
                 </select>
                 </div>
                 <!-- Baris 3: jumlah + hapus -->

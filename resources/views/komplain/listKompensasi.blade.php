@@ -52,7 +52,7 @@
         }
     </style>
 
-    <h1 class="h3 mb-2 text-gray-800">List Kompensasi</h1>
+    <h1 class="h3 mb-2 text-gray-800">Kompensasi</h1>
 
     <button type="button" class="btn btn-pale mb-3" data-toggle="modal" data-target="#tambahKompensasiModal">
         <i class="fas fa-plus"></i> Tambah Kompensasi

@@ -15,7 +15,16 @@ class DetailBookingTreatmentController extends Controller
         $bookingResponse = Http::get('https://klinikneshnavya.com/api/bookingTreatment');
         $bookingTreatments = $bookingResponse->json()['booking_treatments'] ?? [];
 
-        $users = Http::get('https://klinikneshnavya.com/api/user')->json()['data'];
+        // Ambil semua user
+        $allUsers = Http::get('https://klinikneshnavya.com/api/user')->json()['data'] ?? [];
+
+        // Filter hanya yang role == 'pelanggan'
+        $pelanggan = collect($allUsers)
+            ->where('role', 'pelanggan')
+            ->values()
+            ->all();
+
+
 
         // Hanya ambil promo yang jenis_promo-nya Treatment
         $promosResponse = Http::get('https://klinikneshnavya.com/api/promo');
@@ -42,7 +51,7 @@ class DetailBookingTreatmentController extends Controller
 
         // Gabungkan nama user
         $usersMap = [];
-        foreach ($users as $user) {
+        foreach ($pelanggan as $user) {
             $usersMap[$user['id_user']] = $user['nama_user'];
         }
         foreach ($bookingTreatments as &$booking) {
@@ -57,7 +66,7 @@ class DetailBookingTreatmentController extends Controller
 
         return view('treatment.bookingTreatment', compact(
             'bookingTreatments',
-            'users',
+            'pelanggan',
             'promos',
             'treatments',
             'dokters',

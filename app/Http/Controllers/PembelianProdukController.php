@@ -17,7 +17,15 @@ class PembelianProdukController extends Controller
 
         // 2) Data pendukung
         $categories = Http::get('https://klinikneshnavya.com/api/kategori')->json();
-        $users    = collect(Http::get('https://klinikneshnavya.com/api/users')->json('data') ?? []);
+        $allUsers   = collect(Http::get('https://klinikneshnavya.com/api/user')->json('data') ?? []);
+    
+        // **Filter hanya pelanggan**
+        $pelanggan  = $allUsers
+            ->where('role', 'pelanggan')
+            ->values()
+            ->all();
+
+
         $products = Http::get('https://klinikneshnavya.com/api/produk')->json('data') ?? [];
         $promos   = collect(Http::get('https://klinikneshnavya.com/api/promo')
             ->json('data') ?? [])
@@ -30,9 +38,9 @@ class PembelianProdukController extends Controller
             ->json() ?? []);
 
         // 4) Map: tambahkan nama_user, daftar produk, promo dan id_pembayaran
-        $pembelianProduk = $pembelian->map(function ($p) use ($users, $products, $promos, $allPays) {
+        $pembelianProduk = $pembelian->map(function ($p) use ($pelanggan, $products, $promos, $allPays) {
             // nama user
-            $u = $users->firstWhere('id_user', $p['id_user']);
+            $u = collect($pelanggan)->firstWhere('id_user', $p['id_user']);
             $p['nama_user'] = $u['nama_user'] ?? 'Tidak Diketahui';
 
             // list produk (modal edit)
@@ -54,7 +62,7 @@ class PembelianProdukController extends Controller
 
         return view(
             'pembelian-produk.pembelian',
-            compact('pembelianProduk', 'users', 'products', 'promos', 'categories')
+            compact('pembelianProduk', 'pelanggan', 'products', 'promos', 'categories')
         );
     }
 

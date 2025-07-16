@@ -57,7 +57,7 @@
         }
     </style>
 
-    <h1 class="h3 mb-2 text-gray-800">List Produk</h1>
+    <h1 class="h3 mb-2 text-gray-800">Produk</h1>
     <!-- Tombol Tambah Produk (trigger modal) -->
     <button class="btn btn-pale mb-3" data-toggle="modal" data-target="#addProdukModal">
         <i class="fas fa-plus"></i> Tambah Produk

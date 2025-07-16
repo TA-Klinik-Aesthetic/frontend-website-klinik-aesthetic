@@ -12,19 +12,23 @@ class RekamMedisController extends Controller
 
     public function rekamMedis()
     {
-        // Mengambil data rekam medis dari API
-        $rekamMedisResponse = Http::get($this->apiUrlRekamMedis);
-
-        // Cek apakah request berhasil
-        if ($rekamMedisResponse->successful()) {
-            // Ambil data rekam medis
-            $rekamMedisData = $rekamMedisResponse->json();
-            return view('rekam-medis.index', compact('rekamMedisData'));
-        } else {
+        $resp = Http::get($this->apiUrlRekamMedis);
+    
+        if (! $resp->successful()) {
             return back()->with('error', 'Gagal mengambil data rekam medis');
         }
+    
+        // Ambil array mentah
+        $all = $resp->json(); // ini sudah array seperti yang Anda tunjukkan
+    
+        // Hanya ambil yang role-nya 'pelanggan'
+        $rekamMedisData = collect($all)
+            ->filter(fn($item) => data_get($item, 'user.role') === 'pelanggan')
+            ->values()
+            ->all();
+    
+        return view('rekam-medis.index', compact('rekamMedisData'));
     }
-
     public function rekamMedisDetail($id)
     {
         // Mengambil data detail rekam medis berdasarkan ID

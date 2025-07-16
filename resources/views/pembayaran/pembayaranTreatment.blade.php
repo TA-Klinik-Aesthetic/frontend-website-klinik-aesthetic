@@ -51,7 +51,7 @@
         }
     </style>
 
-    <h1 class="h3 mb-2 text-gray-800">Data Pembayaran Treatment</h1>
+    <h1 class="h3 mb-2 text-gray-800">Pembayaran Treatment</h1>
 
     {{-- @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>

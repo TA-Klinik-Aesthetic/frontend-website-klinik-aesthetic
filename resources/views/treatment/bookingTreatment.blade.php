@@ -51,7 +51,7 @@
         }
     </style>
 
-    <h1 class="h3 mb-2 text-gray-800">Booking Treatment List</h1>
+    <h1 class="h3 mb-2 text-gray-800">Booking Treatment</h1>
 
     <button type="button" class="btn btn-pale mb-3" data-toggle="modal" data-target="#bookingModal">
         <i class="fas fa-plus"></i> Tambah Booking
@@ -64,7 +64,7 @@
                 <thead>
                     <tr>
                         <th style="display:none;">ID</th> <!-- kolom ID -->
-                        <th>Nama User</th>
+                        <th>Nama Pelanggan</th>
                         <th>Waktu Treatment</th>
                         <th>Status Booking</th>
                         <th>Treatment Mulai</th>
@@ -244,10 +244,10 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="user">User</label>
+                            <label for="user">Nama Pelanggan</label>
                             <select name="id_user" id="user" class="form-control" required>
-                                <option value="">Pilih User</option>
-                                @foreach ($users as $user)
+                                <option value="">Pilih Pelanggan</option>
+                                @foreach ($pelanggan as $user)
                                     <option value="{{ $user['id_user'] }}">{{ $user['nama_user'] }}</option>
                                 @endforeach
                             </select>

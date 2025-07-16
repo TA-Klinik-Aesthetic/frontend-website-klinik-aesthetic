@@ -52,7 +52,7 @@
         }
     </style>
 
-    <h1 class="h3 mb-2 text-gray-800">List Jenis Treatment</h1>
+    <h1 class="h3 mb-2 text-gray-800">Jenis Treatment</h1>
 
     <button type="button" class="btn btn-pale mb-3" data-toggle="modal" data-target="#tambahJenisTreatmentModal">
         <i class="fas fa-plus"></i> Tambah Jenis Treatment
@@ -112,8 +112,7 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="nama_jenis_treatment">Nama Jenis Treatment</label>
-                            <input type="text" name="nama_jenis_treatment" class="form-control" id="nama_jenis_treatment"
-                                placeholder="Contoh: PISIKAL ATACK" required>
+                            <input type="text" name="nama_jenis_treatment" class="form-control" id="nama_jenis_treatment" required>
                         </div>
                     </div>
                     <div class="modal-footer">

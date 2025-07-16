@@ -22,18 +22,22 @@ class KonsultasiController extends Controller
             return isset($item['dokter']); // Data memiliki dokter
         });
 
-        $usersResponse = Http::get('https://klinikneshnavya.com/api/users');
-        $doktersResponse = Http::get('https://klinikneshnavya.com/api/dokters');
-        $treatmentsResponse = Http::get('https://klinikneshnavya.com/api/treatments');
-        
+        $usersResponse = Http::get('https://klinikneshnavya.com/api/user')->json('data', []);
+        // …lalu sisakan hanya yang role-nya "pelanggan"
+        $pelanggan = collect($usersResponse)
+            ->where('role', 'pelanggan')
+            ->values()
+            ->all();
 
-        $users = $usersResponse->json()['data'];
+        $doktersResponse = Http::get('https://klinikneshnavya.com/api/dokter');
+        $treatmentsResponse = Http::get('https://klinikneshnavya.com/api/treatment');
+
         $dokters = $doktersResponse->json()['data'];
         $treatments = $treatmentsResponse->json()['data'];
 
         return view('konsultasi.tambahBooking', [
             'data' => $dataWithDoctor,
-            'users' => $users,
+            'users' => $pelanggan,
             'dokters' => $dokters,
             'treatments' => $treatments,
         ]);
@@ -61,28 +65,28 @@ class KonsultasiController extends Controller
     //     return view('konsultasi.lihatBooking', ['data' => $dataWithoutDoctor]);
     // }
 
-    public function create()
-    {
-        // $token = session('token'); // Mendapatkan token dari session
+    // public function create()
+    // {
+    //     // $token = session('token'); // Mendapatkan token dari session
 
-        // Ambil data dari API untuk dropdown
+    //     // Ambil data dari API untuk dropdown
 
-        // $usersResponse = Http::withToken($token)->get('https://klinikneshnavya.com/api/users');
-        // $doktersResponse = Http::withToken($token)->get('https://klinikneshnavya.com/api/dokters');
+    //     // $usersResponse = Http::withToken($token)->get('https://klinikneshnavya.com/api/users');
+    //     // $doktersResponse = Http::withToken($token)->get('https://klinikneshnavya.com/api/dokters');
 
-        $usersResponse = Http::get('https://klinikneshnavya.com/api/users');
-        $doktersResponse = Http::get('https://klinikneshnavya.com/api/dokters');
+    //     $usersResponse = Http::get('https://klinikneshnavya.com/api/user');
+    //     $doktersResponse = Http::get('https://klinikneshnavya.com/api/dokters');
 
-        $users = $usersResponse->json()['data'];
-        $dokters = $doktersResponse->json()['data'];
+    //     $users = $usersResponse->json()['data'];
+    //     $dokters = $doktersResponse->json()['data'];
 
-        // Debugging jika data kosong atau bermasalah
-        if (empty($users) || empty($dokters)) {
-            dd('Users:', $users, 'Dokters:', $dokters);
-        }
+    //     // Debugging jika data kosong atau bermasalah
+    //     if (empty($users) || empty($dokters)) {
+    //         dd('Users:', $users, 'Dokters:', $dokters);
+    //     }
 
-        return view('konsultasi.create', compact('users', 'dokters'));
-    }
+    //     return view('konsultasi.create', compact('users', 'dokters'));
+    // }
 
     public function store(Request $request)
     {
@@ -232,21 +236,21 @@ class KonsultasiController extends Controller
     //     }
     // }
 
-    public function tambahDetail($id)
-    {
-        // Ambil data konsultasi berdasarkan ID
-        $konsultasiResponse = Http::get("https://klinikneshnavya.com/api/konsultasi/{$id}");
+    // public function tambahDetail($id)
+    // {
+    //     // Ambil data konsultasi berdasarkan ID
+    //     $konsultasiResponse = Http::get("https://klinikneshnavya.com/api/konsultasi/{$id}");
 
-        if ($konsultasiResponse->successful()) {
-            $konsultasi = $konsultasiResponse->json()['data'];
-            $treatmentsResponse = Http::get('https://klinikneshnavya.com/api/treatments');
-            $treatments = $treatmentsResponse->json()['data'];
+    //     if ($konsultasiResponse->successful()) {
+    //         $konsultasi = $konsultasiResponse->json()['data'];
+    //         $treatmentsResponse = Http::get('https://klinikneshnavya.com/api/treatments');
+    //         $treatments = $treatmentsResponse->json()['data'];
 
-            return view('konsultasi.tambahDetail', compact('konsultasi', 'treatments', 'id'));
-        }
+    //         return view('konsultasi.tambahDetail', compact('konsultasi', 'treatments', 'id'));
+    //     }
 
-        return redirect()->route('konsultasi.with-doctor')->with('error', 'Data konsultasi tidak ditemukan.');
-    }
+    //     return redirect()->route('konsultasi.with-doctor')->with('error', 'Data konsultasi tidak ditemukan.');
+    // }
 
     public function simpanDetail(Request $request, $id)
     {

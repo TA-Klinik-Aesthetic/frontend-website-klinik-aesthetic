@@ -52,7 +52,7 @@
         }
     </style>
 
-    <h1 class="h3 mb-2 text-gray-800">List Treatment</h1>
+    <h1 class="h3 mb-2 text-gray-800">Treatment</h1>
 
     <button type="button" class="btn btn-pale mb-3" data-toggle="modal" data-target="#tambahTreatmentModal">
         <i class="fas fa-plus"></i> Tambah Treatment
@@ -143,7 +143,7 @@
                             <input type="number" name="biaya_treatment" class="form-control" id="biaya_treatment" required>
                         </div>
                         <div class="form-group">
-                            <label for="estimasi_treatment">Estimasi Treatment (HH:MM)</label>
+                            <label for="estimasi_treatment">Estimasi Treatment (Jam:Menit)</label>
                             <input type="time" name="estimasi_treatment" class="form-control" id="estimasi_treatment"
                                 required>
                         </div>

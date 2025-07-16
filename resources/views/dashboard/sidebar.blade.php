@@ -102,7 +102,7 @@
 
         <!-- Nav Item - Promo -->
         <li class="nav-item">
-            <a class="nav-link" href="{{ url('/konsultasi/with-doctor') }}">
+            <a class="nav-link" href="{{ route('konsultasi.with-doctor') }}">
                 <span>Booking Konsultasi</span>
             </a>
         </li>
@@ -121,8 +121,8 @@
                 <div class="bg-white py-2 collapse-inner rounded">
                     <!-- Menggunakan nama rute -->
                     <a class="collapse-item" href="{{ route('jenisTreatment.index') }}">Jenis Treatment</a>
-                    <a class="collapse-item" href="{{ route('treatment.index') }}">List Treatment</a>
-                    <a class="collapse-item" href="{{ route('detailBooking.index') }}">Booking Treatment</a>
+                    <a class="collapse-item" href="{{ route('treatment.index') }}">Treatment</a>
+                    <a class="collapse-item" href="{{ route('bookingTreatment.index') }}">Booking Treatment</a>
                 </div>
             </div>
         </li>
@@ -139,7 +139,7 @@
             <div id="collapseProduk" class="collapse" aria-labelledby="headingProduk" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
                     <a class="collapse-item" href="{{ url('/kategori') }}">Kategori Produk</a>
-                    <a class="collapse-item" href="{{ url('/produk') }}">List Produk</a>
+                    <a class="collapse-item" href="{{ url('/produk') }}">Produk</a>
                 </div>
             </div>
         </li>
@@ -183,7 +183,7 @@
                     <a class="collapse-item" href="{{ route('kompensasi.index') }}">Kompensasi</a>
                     <a class="collapse-item" href="{{ route('komplain.index') }}">Komplain Pelanggan</a>
                     <a class="collapse-item" href="{{ route('kompensasi-diberikan.index') }}">Kompensasi
-                        Diberikan</a>
+                        Pelanggan</a>
                 </div>
             </div>
         </li>
@@ -201,16 +201,6 @@
         <!-- Divider -->
         <hr class="sidebar-divider">
 
-        <!-- Nav Item - Promo -->
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('rekam-medis.index') }}">
-                <span>Rekam Medis</span>
-            </a>
-        </li>
-
-        <!-- Divider -->
-        <hr class="sidebar-divider">
-
         <!-- Nav Item - Feedback -->
         <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" data-target="#collapseLaporan" aria-expanded="true"
@@ -222,6 +212,7 @@
                 <div class="bg-white py-2 collapse-inner rounded">
                     <!-- Menggunakan nama rute -->
                     {{-- <a class="collapse-item" href="{{ route('inventaris-stok.index') }}">Inventaris Stok</a> --}}
+                    <a class="collapse-item" href="{{ route('rekam-medis.index') }}">Rekam Medis</a>
                     <a class="collapse-item" href="{{ route('laporan-treatment.index') }}">Penjualan Treatment</a>
                     <a class="collapse-item" href="{{ route('laporan-produk.index') }}">Penjualan Produk</a>
                 </div>

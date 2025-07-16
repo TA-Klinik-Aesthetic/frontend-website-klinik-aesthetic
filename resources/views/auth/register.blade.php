@@ -51,7 +51,7 @@
         }
     </style>
 
-    <h1 class="h3 mb-4 text-gray-800">Daftar Pelanggan</h1>
+    <h1 class="h3 mb-4 text-gray-800">Akun Pelanggan</h1>
 
     <button class="btn btn-pale mb-3" data-toggle="modal" data-target="#registerModal">
         <i class="fas fa-plus"></i> Tambah Akun Pelanggan
@@ -102,7 +102,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Nama Lengkap</label>
+                        <label>Nama Pengguna</label>
                         <input type="text" name="nama_user" class="form-control" required>
                     </div>
                     <div class="form-group">

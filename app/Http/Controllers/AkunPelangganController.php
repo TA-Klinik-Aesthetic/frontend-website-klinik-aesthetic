@@ -13,13 +13,19 @@ class AkunPelangganController extends Controller
     public function index()
     {
         $resp = Http::get('https://klinikneshnavya.com/api/user');
-        $users = $resp->successful()
-            ? $resp->json('data', [])
-            : [];
-
+    
+        if (! $resp->successful()) {
+            $users = [];
+        } else {
+            // Ambil data "data" dari respons, lalu filter role pelanggan
+            $users = collect($resp->json('data', []))
+                ->where('role', 'pelanggan')
+                ->values()
+                ->all();
+        }
+    
         return view('auth.register', compact('users'));
     }
-
     // Proses pendaftaran via API
     public function register(Request $request)
     {

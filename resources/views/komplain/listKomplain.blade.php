@@ -73,7 +73,7 @@
         }
     </style>
 
-    <h1 class="h3 mb-2 text-gray-800">List Komplain</h1>
+    <h1 class="h3 mb-2 text-gray-800">Komplain Pelanggan</h1>
 
     <div class="card shadow mb-4">
         <div class="card-body">
@@ -81,7 +81,7 @@
                 <thead>
                     <tr>
                         <th style="display:none">ID</th>
-                        <th>Nama Pengguna</th>
+                        <th>Nama Pelanggan</th>
                         <th>Teks Komplain</th>
                         <th>Balasan Komplain</th>
                         <th>Pemberian Kompensasi</th>
@@ -127,7 +127,7 @@
                     <div class="modal-body">
                         <!-- Nama Pengguna -->
                         <div class="form-group">
-                            <label for="edit_nama_user">Nama Pengguna</label>
+                            <label for="edit_nama_user">Nama Pelanggan</label>
                             <input type="text" class="form-control" id="edit_nama_user" disabled>
                         </div>
 
@@ -302,7 +302,7 @@
 
                         const link = document.createElement('a');
                         link.href = baseUrl + gambarPath;
-                        link.className = 'btn btn-outline-primary btn-sm m-1';
+                        link.className = 'btn btn-outline-pale btn-sm m-1';
                         link.target = '_blank';
                         link.download = '';
                         link.innerHTML = `<i class="fas fa-download"></i> Gambar Komplain ${index + 1}`;

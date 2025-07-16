@@ -35,7 +35,7 @@
         }
     </style>
 
-    <h1 class="h3 mb-2 text-gray-800">Daftar Kompensasi Diberikan</h1>
+    <h1 class="h3 mb-2 text-gray-800">Kompensasi Pelanggan</h1>
 
     {{-- <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#tambahKompensasiDiberikanModal">
         <i class="fas fa-plus"></i> Tambah Kompensasi Diberikan
