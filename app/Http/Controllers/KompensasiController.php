@@ -9,7 +9,7 @@ class KompensasiController extends Controller
 {
 
     protected $baseApiUrl = 'https://klinikneshnavya.com/api/kompensasi';
-    protected $ApiTreatment = 'https://klinikneshnavya.com/api/treatments';
+    protected $ApiTreatment = 'https://klinikneshnavya.com/api/treatment';
 
     public function index()
     {

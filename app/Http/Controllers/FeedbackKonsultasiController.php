@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 
 class FeedbackKonsultasiController extends Controller
 {
-    protected $baseApiUrl = 'https://klinikneshnavya.com/api/feedbacks';
+    protected $baseApiUrl = 'https://klinikneshnavya.com/api/feedbackKonsultasi';
     protected $konsultasiApiUrl = 'https://klinikneshnavya.com/api/konsultasi/';
     
     public function index()

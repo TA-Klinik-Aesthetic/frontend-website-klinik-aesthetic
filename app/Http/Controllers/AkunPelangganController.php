@@ -12,7 +12,7 @@ class AkunPelangganController extends Controller
     // Tampilkan form pendaftaran + daftar user
     public function index()
     {
-        $resp = Http::get('https://klinikneshnavya.com/api/users');
+        $resp = Http::get('https://klinikneshnavya.com/api/user');
         $users = $resp->successful()
             ? $resp->json('data', [])
             : [];
@@ -72,7 +72,7 @@ class AkunPelangganController extends Controller
         }
 
         // Panggil API backend
-        $resp = Http::put("https://klinikneshnavya.com/api/users/{$id}/password", [
+        $resp = Http::put("https://klinikneshnavya.com/api/user/{$id}/password", [
             'password'              => $request->password,
             'password_confirmation' => $request->password_confirmation,
         ]);

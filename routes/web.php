@@ -86,7 +86,7 @@ Route::get('/konsultasi', function () {
 
 
 // Form pendaftaran pelanggan
-Route::get('/register', [AkunPelangganController::class, 'index'])
+Route::get('/akun-pelanggan', [AkunPelangganController::class, 'index'])
     ->name('register.form');
 
 // Kirim data pendaftaran
@@ -152,13 +152,6 @@ Route::prefix('feedback/treatment')->name('feedback.feedbackTreatment.')->group(
     Route::delete('/{id}', [FeedbackTreatmentController::class, 'destroy'])->name('destroy');
 });
 
-Route::prefix('booking')->name('bookingTreatment.')->group(function () {
-    // Route::get('/', [BookingTreatmentController::class, 'index'])->name('index');
-    // Route::get('/{id}', [BookingTreatmentController::class, 'show'])->name('show');
-    Route::get('/{id}/edit', [BookingTreatmentController::class, 'edit'])->name('edit');
-    Route::delete('/{id}', [BookingTreatmentController::class, 'destroy'])->name('destroy');
-});
-
 
 Route::prefix('bookingTreatment')->name('bookingTreatment.')->group(function () {
     Route::get('/', [DetailBookingTreatmentController::class, 'index'])->name('index');
@@ -212,20 +205,6 @@ Route::prefix('produk')->group(function () {
     Route::get('/{id}/edit', [ProdukController::class, 'edit'])->name('produk.edit');
     Route::put('/{id}', [ProdukController::class, 'update'])->name('produk.update');
     Route::delete('/{id}', [ProdukController::class, 'destroy'])->name('produk.destroy');
-});
-
-Route::prefix('jadwal-dokter')->group(function () {
-    Route::get('/', [JadwalDokterController::class, 'index'])->name('jadwal-dokter.index');
-    Route::post('/', [JadwalDokterController::class, 'store'])->name('jadwal-dokter.store');
-    Route::put('/{id}', [JadwalDokterController::class, 'update'])->name('jadwal-dokter.update');
-    Route::delete('/{id}', [JadwalDokterController::class, 'destroy'])->name('jadwal-dokter.destroy');
-});
-
-Route::prefix('jadwal-beautician')->group(function () {
-    Route::get('/', [JadwalBeauticianController::class, 'index'])->name('jadwal-beautician.index');
-    Route::post('/', [JadwalBeauticianController::class, 'store'])->name('jadwal-beautician.store');
-    Route::put('/{id}', [JadwalBeauticianController::class, 'update'])->name('jadwal-dokter.update');
-    Route::delete('/{id}', [JadwalBeauticianController::class, 'destroy'])->name('jadwal-beautician.destroy');
 });
 
 Route::prefix('promo')->group(function () {

@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Http;
 
 class TreatmentController extends Controller
 {
-    protected $baseApiUrl = 'https://klinikneshnavya.com/api/treatments';
-    protected $apiJenisTreatment ='https://klinikneshnavya.com/api/jenisTreatments';
+    protected $baseApiUrl = 'https://klinikneshnavya.com/api/treatment';
+    protected $apiJenisTreatment ='https://klinikneshnavya.com/api/jenisTreatment';
 
 
 
