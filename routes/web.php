@@ -163,7 +163,7 @@ Route::prefix('booking')->name('bookingTreatment.')->group(function () {
 Route::prefix('bookingTreatment')->name('bookingTreatment.')->group(function () {
     Route::get('/', [DetailBookingTreatmentController::class, 'index'])->name('index');
 });
-// Route::get('/autocomplete-kompensasi', [DetailBookingTreatmentController::class, 'autocompleteKompensasi']);
+
 Route::put('/detailBooking/{id}/update-status', [DetailBookingTreatmentController::class, 'updateStatus'])->name('bookingTreatment.updateStatus');
 Route::post('/booking', [DetailBookingTreatmentController::class, 'store'])->name('booking.store');
 Route::get('/booking/detail/{id}', [DetailBookingTreatmentController::class, 'show'])->name('booking.detail');
