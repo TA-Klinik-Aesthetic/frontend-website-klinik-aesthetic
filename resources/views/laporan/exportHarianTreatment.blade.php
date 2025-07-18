@@ -63,7 +63,7 @@
                 <tr>
                     <td>{{ $item['waktu_treatment'] }}</td>
                     <td>{{ $item['nama_treatment'] }}</td>
-                    <td>{{ $item['biaya_treatment'] }}</td>
+                    <td>Rp{{ number_format($item['biaya_treatment'], 0, ',', '.') }}</td>
                     <td>{{ $item['dokter'] }}</td>
                     <td>{{ $item['beautician'] }}</td>
                     <td>{{ $item['kompensasi'] }}</td>
@@ -92,7 +92,7 @@
                             @if (isset($promoDetails['tipe_potongan']) && $promoDetails['tipe_potongan'] === 'Diskon')
                                 {{ rtrim(rtrim(number_format($promoDetails['potongan_harga'], 2, '.', ''), '0'), '.') }}%
                             @else
-                                Rp {{ number_format($promoDetails['potongan_harga'], 0, ',', '.') }}
+                                Rp{{ number_format($promoDetails['potongan_harga'], 0, ',', '.') }}
                             @endif
                         </td>
 
@@ -102,7 +102,7 @@
         </table>
     </div>
 
-    <h3>Total Pendapatan: {{ $data['total_pendapatan'] }}</h3>
+    <h3>Total Pendapatan: Rp{{ number_format($data['total_pendapatan'], 0, ',', '.') }}</h3>
 </body>
 
 </html>

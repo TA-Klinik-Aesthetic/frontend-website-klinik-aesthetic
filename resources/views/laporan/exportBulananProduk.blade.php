@@ -61,18 +61,18 @@
                 <tr>
                     <td>{{ $produkName }}</td>
                     <td>{{ $produkDetails['count'] }}</td>
-                    <td>{{ $produkDetails['total_biaya'] }}</td>
+                    <td>Rp{{ number_format($produkDetails['total_biaya'], 0, ',', '.') }}</td>
                 </tr>
             @endforeach
         </tbody>
     </table>
 
-    <h4>Promo Usage</h4>
+    <h4>Penggunaan Promo</h4>
     <table>
         <thead>
             <tr>
-                <th>Promo Name</th>
-                <th>Count</th>
+                <th>Nama Promo</th>
+                <th>Total</th>
                 <th>Potongan Harga</th>
             </tr>
         </thead>
@@ -85,7 +85,7 @@
                         @if (isset($promoDetails['tipe_potongan']) && $promoDetails['tipe_potongan'] === 'Diskon')
                             {{ rtrim(rtrim(number_format($promoDetails['potongan_harga'], 2, '.', ''), '0'), '.') }}%
                         @else
-                            Rp {{ number_format($promoDetails['potongan_harga'], 0, ',', '.') }}
+                            Rp{{ number_format($promoDetails['potongan_harga'], 0, ',', '.') }}
                         @endif
                     </td>
 
@@ -94,7 +94,7 @@
         </tbody>
     </table>
 
-    <h3>Total Penjualan Produk: {{ $data['total_pendapatan'] }}</h3>
+    <h3>Total Penjualan Produk: Rp{{ number_format($data['total_pendapatan'], 0, ',', '.') }}</h3>
 
 </body>
 

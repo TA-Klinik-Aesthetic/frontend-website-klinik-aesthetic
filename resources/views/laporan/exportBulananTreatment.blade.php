@@ -84,7 +84,7 @@
                 <tr>
                     <td>{{ $treatmentName }}</td>
                     <td>{{ $treatmentDetails['count'] }}</td>
-                    <td>{{ $treatmentDetails['total_biaya'] }}</td>
+                    <td>Rp{{ number_format($treatmentDetails['total_biaya'], 0, ',', '.') }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -110,7 +110,7 @@
                             @if (isset($promoDetails['tipe_potongan']) && $promoDetails['tipe_potongan'] === 'Diskon')
                                 {{ rtrim(rtrim(number_format($promoDetails['potongan_harga'], 2, '.', ''), '0'), '.') }}%
                             @else
-                                Rp {{ number_format($promoDetails['potongan_harga'], 0, ',', '.') }}
+                                Rp{{ number_format($promoDetails['potongan_harga'], 0, ',', '.') }}
                             @endif
                         </td>
 
@@ -120,7 +120,7 @@
         </table>
     </div>
 
-    <h3>Total Pendapatan: {{ $data['total_pendapatan'] }}</h3>
+    <h3>Total Pendapatan: Rp{{ number_format($data['total_pendapatan'], 0, ',', '.') }}</h3>
 </body>
 
 </html>

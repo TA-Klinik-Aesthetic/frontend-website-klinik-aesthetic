@@ -28,7 +28,7 @@
                     $akhir = $booking['harga_akhir_treatment'];
                 @endphp
 
-                <p><strong>Harga Total:</strong> Rp{{ number_format($total, 0, ',', '.') }}</p>
+                <p><strong>Subtotal:</strong> Rp{{ number_format($total, 0, ',', '.') }}</p>
                 <p><strong>Potongan Harga:</strong>
                     @if ($promo)
                         @if ($promo['tipe_potongan'] === 'Diskon')
@@ -43,7 +43,7 @@
                 <p><strong>Besaran Pajak ({{ number_format(($tax / $total) * 100, 0) }}%):</strong>
                     Rp{{ number_format($tax, 0, ',', '.') }}
                 </p>
-                <p><strong>Harga Akhir:</strong> Rp{{ number_format($akhir, 0, ',', '.') }}</p>
+                <p><strong>Total:</strong> Rp{{ number_format($akhir, 0, ',', '.') }}</p>
             </div>
         </div>
 

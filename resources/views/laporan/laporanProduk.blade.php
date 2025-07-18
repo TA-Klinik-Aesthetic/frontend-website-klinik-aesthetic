@@ -103,7 +103,7 @@
                             <td>{{ $item['tanggal_pembelian'] }}</td>
                             <td>{{ $item['nama_produk'] }}</td>
                             <td>{{ $item['jumlah_produk'] }}</td>
-                            <td>{{ $item['harga_penjualan_produk'] }}</td>
+                            <td>Rp{{ number_format($item['harga_penjualan_produk'], 0, ',', '.') }}</td>
                         </tr>
                     @endforeach
                 </tbody>

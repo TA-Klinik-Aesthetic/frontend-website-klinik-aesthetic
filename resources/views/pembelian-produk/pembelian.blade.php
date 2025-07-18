@@ -65,7 +65,7 @@
                         {{-- <th>No</th> --}}
                         <th>Nama Pelanggan</th>
                         <th>Tanggal Pembelian</th>
-                        <th>Harga Akhir</th>
+                        <th>Total</th>
                         <th>Metode Bayar</th>
                         <th>Uang</th>
                         <th>Kembalian</th>
@@ -79,7 +79,7 @@
                             {{-- <td>{{ $index + 1 }}</td> --}}
                             <td>{{ $pembelian['nama_user'] }}</td>
                             <td>{{ $pembelian['tanggal_pembelian'] }}</td>
-                            <td>Rp{{ number_format($pembelian['harga_akhir'], 2, ',', '.') }}</td>
+                            <td>Rp{{ number_format($pembelian['harga_akhir'], 0, ',', '.') }}</td>
                             @php $pay = $pembelian['pembayaran_produk'] ?? null; @endphp
                             <td>{{ $pay['metode_pembayaran'] ?? '-' }}</td>
                             <td>

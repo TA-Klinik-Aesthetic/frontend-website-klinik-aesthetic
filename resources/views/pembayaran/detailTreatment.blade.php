@@ -9,6 +9,9 @@
                 <p><strong>Nama Pelanggan:</strong>
                     {{ $payment['booking_treatment']['user']['nama_user'] ?? '-' }}
                 </p>
+                <p><strong>Total:</strong>
+                    Rp{{ number_format($payment['booking_treatment']['harga_akhir_treatment'], 0, ',', '.') }}
+                </p>
                 <p><strong>Metode:</strong> {{ $payment['metode_pembayaran'] }}</p>
                 <p><strong>Uang Bayar:</strong>
                     Rp{{ number_format($payment['uang'], 0, ',', '.') }}
@@ -24,7 +27,7 @@
                     <div class="text-center mb-4">
                         <a href="{{ $payment['gambar_bukti_pembayaran'] }}" target="_blank">
                             <img src="{{ $payment['gambar_bukti_pembayaran'] }}" alt="Bukti Pembayaran" class="img-fluid"
-                                style="max-width:800px; border:1px solid #ddd; padding:4px;">
+                                style="max-width:400px; border:1px solid #ddd; padding:4px;">
                         </a>
                     </div>
                 @endif

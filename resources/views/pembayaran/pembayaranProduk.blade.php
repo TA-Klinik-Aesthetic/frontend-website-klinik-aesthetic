@@ -35,8 +35,8 @@
                                 <td>{{ $pembayaran['user_name'] }}</td>
                                 <td>Rp{{ number_format($pembayaran['harga_akhir'], 0, ',', '.') }}</td>
                                 <td>{{ $pembayaran['metode_pembayaran'] }}</td>
-                                <td>{{ $pembayaran['uang'] }}</td>
-                                <td>{{ $pembayaran['kembalian'] }}</td>
+                                <td>Rp{{ number_format($pembayaran['uang'], 0, ',', '.') }}</td>
+                                <td>Rp{{ number_format($pembayaran['kembalian'], 0, ',', '.') }}</td>
                                 <td>{{ $pembayaran['status_pembayaran'] }}</td>
                                 <td>{{ $pembayaran['waktu_pembayaran'] }}</td>
                                 {{-- <td>{{ $pembayaran['penjualan_produk']['status_pembayaran'] }}</td> --}}

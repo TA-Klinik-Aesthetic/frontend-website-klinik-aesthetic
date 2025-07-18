@@ -104,7 +104,7 @@
                         <tr>
                             <td>{{ $item['waktu_treatment'] }}</td>
                             <td>{{ $item['nama_treatment'] }}</td>
-                            <td>{{ $item['biaya_treatment'] }}</td>
+                            <td>Rp{{ number_format($item['biaya_treatment'], 0, ',', '.') }}</td>
                             <td>{{ $item['dokter'] }}</td>
                             <td>{{ $item['beautician'] }}</td>
                             <td>{{ $item['kompensasi'] }}</td>
