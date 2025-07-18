@@ -101,7 +101,7 @@
     </div>
 
     <!-- Modal Tambah Kategori -->
-    <div class="modal fade" id="addKategoriModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade js-reset-on-show" id="addKategoriModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <form action="{{ route('kategori.store') }}" method="POST" class="modal-content">
                 @csrf

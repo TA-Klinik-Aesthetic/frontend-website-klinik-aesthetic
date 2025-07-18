@@ -106,7 +106,7 @@
     </div>
 
     <!-- Modal Tambah Treatment -->
-    <div class="modal fade" id="tambahTreatmentModal" tabindex="-1" role="dialog"
+    <div class="modal fade js-reset-on-show" id="tambahTreatmentModal" tabindex="-1" role="dialog"
         aria-labelledby="tambahTreatmentModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

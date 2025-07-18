@@ -97,7 +97,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="tambahJenisTreatmentModal" tabindex="-1" role="dialog"
+    <div class="modal fade js-reset-on-show" id="tambahJenisTreatmentModal" tabindex="-1" role="dialog"
         aria-labelledby="tambahJenisTreatmentModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

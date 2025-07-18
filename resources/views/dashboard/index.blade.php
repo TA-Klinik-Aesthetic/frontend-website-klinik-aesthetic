@@ -116,16 +116,17 @@
     @stack('scripts')
 
     <script>
-        // 1) Reset semua modal saat dibuka
         $(document).ready(function() {
-            $('.modal').on('show.bs.modal', function() {
-                const $modal = $(this);
-                // Reset form jika ada
-                const form = $modal.find('form')[0];
+            // Hanya modal dengan class .js-reset-on-show
+            $('.js-reset-on-show').on('show.bs.modal', function() {
+                const modal = this;
+                // Reset form di dalam modal
+                const form = modal.querySelector('form');
                 if (form) form.reset();
-                // Kosongkan field kalkulasi di dalam modal
+                // Jika modal punya field kalkulasi, kosongkan juga
                 ['#calc_subtotal', '#calc_potongan', '#calc_pajak', '#calc_total'].forEach(id => {
-                    $modal.find(id).val('');
+                    const el = modal.querySelector(id);
+                    if (el) el.value = '';
                 });
             });
         });

@@ -112,7 +112,7 @@
         </div>
     </div>
     <!-- Modal Tambah Produk -->
-    <div class="modal fade" id="addProdukModal" tabindex="-1" role="dialog" aria-labelledby="addProdukModalLabel"
+    <div class="modal fade js-reset-on-show" id="addProdukModal" tabindex="-1" role="dialog" aria-labelledby="addProdukModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <form action="{{ route('produk.store') }}" method="POST" enctype="multipart/form-data">

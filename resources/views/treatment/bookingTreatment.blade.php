@@ -230,7 +230,7 @@
     @endforeach
 
     <!-- Modal Tambah Booking -->
-    <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel"
+    <div class="modal fade js-reset-on-show" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">

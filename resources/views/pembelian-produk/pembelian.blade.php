@@ -137,11 +137,16 @@
                                 @endif
 
                                 @php
-                                    // Cek apakah metode Tunai & Belum Dibayar
                                     $pay = $pembelian['pembayaran_produk'] ?? null;
+                                    $pendingStatuses = [
+                                        'Belum Dibayar',
+                                        'Pending',
+                                        'Menunggu Pembayaran',
+                                        // dsb...
+                                    ];
                                 @endphp
 
-                                @if ($pay && $pay['metode_pembayaran'] === 'Tunai' && $pay['status_pembayaran'] === 'Belum Dibayar')
+                                @if ($pay && $pay['metode_pembayaran'] === 'Tunai' && in_array($pay['status_pembayaran'], $pendingStatuses))
                                     <button class="btn btn-pale mb-3 btn-edit-payment"
                                         data-id="{{ $pay['id_pembayaran'] }}" data-uang="{{ $pay['uang'] }}"
                                         data-harga="{{ $pembelian['harga_akhir'] }}" data-toggle="modal"
@@ -171,7 +176,7 @@
     </div>
 
     <!-- Modal Edit Uang Pembayaran Tunai -->
-    <div class="modal fade" id="editPaymentModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade js-reset-on-show" id="editPaymentModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <form id="editPaymentForm" method="POST" action="">
                 @csrf
@@ -215,8 +220,8 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="gambarBukti">Gambar Bukti Pembayaran</label>
-                            <input type="file" name="gambar_bukti_pembayaran" accept=".jpg,.jpeg,.png" id="gambarBukti" class="form-control"
-                                accept="image/*" required>
+                            <input type="file" name="gambar_bukti_pembayaran" accept=".jpg,.jpeg,.png" id="gambarBukti"
+                                class="form-control" accept="image/*" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -276,7 +281,7 @@
 
 
     <!-- Modal Tambah -->
-    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel"
+    <div class="modal fade js-reset-on-show" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -346,8 +351,7 @@
                         </div>
 
                         <!-- Tombol Tambah Produk -->
-                        <button type="button" class="btn btn-pale mb-3"
-                            onclick="addProdukTambah()">Tambah
+                        <button type="button" class="btn btn-pale mb-3" onclick="addProdukTambah()">Tambah
                             Produk</button>
 
                         <!-- Promo -->

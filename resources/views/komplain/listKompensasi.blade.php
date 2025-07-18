@@ -92,7 +92,7 @@
     </div>
 
     <!-- Modal Tambah Kompensasi -->
-    <div class="modal fade" id="tambahKompensasiModal" tabindex="-1" role="dialog"
+    <div class="modal fade js-reset-on-show" id="tambahKompensasiModal" tabindex="-1" role="dialog"
         aria-labelledby="tambahKompensasiModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

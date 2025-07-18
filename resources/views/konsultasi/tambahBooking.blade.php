@@ -120,7 +120,7 @@
 
     @foreach ($data->reverse() as $item)
         <!-- Modal Tambah Detail Konsultasi -->
-        <div class="modal fade" id="tambahDetailModal-{{ $item['id_konsultasi'] }}" tabindex="-1" role="dialog"
+        <div class="modal fade js-reset-on-show" id="tambahDetailModal-{{ $item['id_konsultasi'] }}" tabindex="-1" role="dialog"
             aria-labelledby="tambahDetailModalLabel-{{ $item['id_konsultasi'] }}" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
                 <form action="{{ route('konsultasi.simpanDetail', $item['id_konsultasi']) }}" method="POST">
@@ -216,7 +216,7 @@
     @endforeach
 
     <!-- Modal Tambah Konsultasi -->
-    <div class="modal fade" id="tambahKonsultasiModal" tabindex="-1" role="dialog"
+    <div class="modal fade js-reset-on-show" id="tambahKonsultasiModal" tabindex="-1" role="dialog"
         aria-labelledby="tambahKonsultasiModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <form action="{{ route('konsultasi.store') }}" method="POST">

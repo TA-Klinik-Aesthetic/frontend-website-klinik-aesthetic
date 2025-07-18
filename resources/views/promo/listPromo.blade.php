@@ -102,7 +102,7 @@
     </div>
 
     <!-- Modal Tambah Promo -->
-    <div class="modal fade" id="tambahPromoModal" tabindex="-1" role="dialog" aria-labelledby="tambahPromoModalLabel"
+    <div class="modal fade js-reset-on-show" id="tambahPromoModal" tabindex="-1" role="dialog" aria-labelledby="tambahPromoModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

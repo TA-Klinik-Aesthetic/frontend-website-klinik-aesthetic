@@ -92,7 +92,7 @@
     </div>
 
     {{-- Modal Register --}}
-    <div class="modal fade" id="registerModal" tabindex="-1">
+    <div class="modal fade js-reset-on-show" id="registerModal" tabindex="-1">
         <div class="modal-dialog">
             <form action="{{ route('akun.store') }}" method="POST" class="modal-content">
                 @csrf
