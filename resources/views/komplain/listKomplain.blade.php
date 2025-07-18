@@ -219,6 +219,7 @@
 
     @push('scripts')
         <script>
+
             // ← TAMBAHAN: bawa daftar kompensasi ke JS
             const kompensasiList = @json($kompensasiList);
 
@@ -260,12 +261,26 @@
                 }
                 // ◀️ SELESAI TAMBAHAN
 
-                // Jika ada kompensasi, set input kompensasi
+                const kompSelect = document.getElementById('edit_id_kompensasi');
+                const tanggalInput = document.getElementById('edit_tanggal_berakhir_kompensasi');
+
                 if (komplain.kompensasi_diberikan) {
-                    document.getElementById('edit_id_kompensasi').value = komplain.kompensasi_diberikan.id_kompensasi;
-                    document.getElementById('edit_tanggal_berakhir_kompensasi').value =
-                        komplain.kompensasi_diberikan.tanggal_berakhir_kompensasi;
+                    kompSelect.value = komplain.kompensasi_diberikan.id_kompensasi;
+                    tanggalInput.value = komplain.kompensasi_diberikan.tanggal_berakhir_kompensasi;
+                } else {
+                    kompSelect.value = '';
+                    tanggalInput.value = '';
                 }
+                
+                toggleTanggal();
+
+
+                // Jika ada kompensasi, set input kompensasi
+                // if (komplain.kompensasi_diberikan) {
+                //     document.getElementById('edit_id_kompensasi').value = komplain.kompensasi_diberikan.id_kompensasi;
+                //     document.getElementById('edit_tanggal_berakhir_kompensasi').value =
+                //         komplain.kompensasi_diberikan.tanggal_berakhir_kompensasi;
+                // }
 
                 // Set Treatment List
                 // const treatmentListContainer = document.getElementById('edit_treatment_list');
