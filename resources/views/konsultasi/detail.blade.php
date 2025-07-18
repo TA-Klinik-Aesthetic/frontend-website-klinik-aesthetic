@@ -50,7 +50,7 @@
                                 <td>
                                     @if ($detail['treatment'])
                                         <a href="{{ route('treatment.show', ['id' => $detail['treatment']['id_treatment']]) }}"
-                                            class="btn btn-primary btn-sm">
+                                            class="btn btn-pale btn-sm">
                                             Lihat Detail
                                         </a>
                                     @else
@@ -62,8 +62,6 @@
                     </tbody>
                 </table>
             @endif
-
-            <a href="{{ route('konsultasi.with-doctor') }}" class="btn btn-secondary mt-3">Kembali</a>
         </div>
     </div>
 @endsection

@@ -13,7 +13,9 @@
                 <p><strong>Waktu Treatment:</strong> {{ $booking['waktu_treatment'] }}</p>
                 <p><strong>Treatment Mulai:</strong> {{ $booking['treatment_mulai'] }}</p>
                 <p><strong>Treatment Selesai:</strong> {{ $booking['treatment_selesai'] }}</p>
-                <p><strong>Dokter:</strong> {{ $booking['dokter']['nama_dokter'] }}</p>
+                <p><strong>Dokter:</strong>
+                    {{ $booking['dokter']['nama_dokter'] ?? '–' }}
+                  </p>
                 <p><strong>Beautician:</strong> {{ $booking['beautician']['nama_beautician'] }}</p>
                 <p><strong>Status Booking:</strong> {{ $booking['status_booking_treatment'] }}</p>
 
