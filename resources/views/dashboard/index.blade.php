@@ -114,6 +114,23 @@
     @endpush
 
     @stack('scripts')
+
+    <script>
+        // 1) Reset semua modal saat dibuka
+        $(document).ready(function() {
+            $('.modal').on('show.bs.modal', function() {
+                const $modal = $(this);
+                // Reset form jika ada
+                const form = $modal.find('form')[0];
+                if (form) form.reset();
+                // Kosongkan field kalkulasi di dalam modal
+                ['#calc_subtotal', '#calc_potongan', '#calc_pajak', '#calc_total'].forEach(id => {
+                    $modal.find(id).val('');
+                });
+            });
+        });
+    </script>
+
 </body>
 
 </html>
