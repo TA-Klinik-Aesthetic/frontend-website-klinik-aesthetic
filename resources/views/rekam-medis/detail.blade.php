@@ -75,9 +75,6 @@
                     <p><strong>Waktu Treatment:</strong> {{ $booking['waktu_treatment'] }}</p>
                     <p><strong>Dokter:</strong> {{ $booking['dokter']['nama_dokter'] ?? 'Tidak ada dokter' }}</p>
                     <p><strong>Beautician:</strong> {{ $booking['beautician']['nama_beautician'] ?? 'Tidak ada beautician' }}</p>
-                    <p><strong>Harga Total:</strong> {{ $booking['harga_total'] }}</p>
-                    <p><strong>Potongan Harga:</strong> {{ $booking['potongan_harga'] }}</p>
-                    <p><strong>Harga Akhir Treatment:</strong> {{ $booking['harga_akhir_treatment'] }}</p>
 
                     <h6>Detail Booking:</h6>
                     <table class="table table-bordered mb-3">
@@ -91,7 +88,7 @@
                             @foreach ($booking['detail_booking'] as $detail)
                                 <tr>
                                     <td>{{ $detail['treatment']['nama_treatment'] }}</td>
-                                    <td>{{ $detail['biaya_treatment'] }}</td>
+                                    <td>Rp{{ number_format($detail['biaya_treatment'], 0, ',', '.') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

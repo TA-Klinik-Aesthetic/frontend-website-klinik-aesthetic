@@ -69,7 +69,7 @@
                             <td>{{ $konsul['dokter']['nama_dokter'] }}</td>
                             <td>{{ $det['diagnosis'] }}</td>
                             <td>{{ $det['saran_tindakan'] }}</td>
-                            <td>{{ $det['treatment']['nama_treatment'] }}</td>
+                            <td>{{ $det['treatment']['nama_treatment'] ?? '–' }}</td>
                         </tr>
                     @endforeach
                 @else
@@ -98,7 +98,6 @@
                 <th>Dokter</th>
                 <th>Beautician</th>
                 <th>Status</th>
-                <th>Total (Rp)</th>
             </tr>
         </thead>
         <tbody>
@@ -116,10 +115,9 @@
                             —
                         @endif
                     </td>
-                    <td>{{ $book['dokter']['nama_dokter'] }}</td>
+                    <td>{{ $book['dokter']['nama_dokter'] ?? '–' }}</td>
                     <td>{{ $book['beautician']['nama_beautician'] }}</td>
                     <td>{{ $book['status_booking_treatment'] }}</td>
-                    <td>{{ number_format($book['harga_akhir_treatment'], 0, ',', '.') }}</td>
                 </tr>
             @empty
                 <tr>

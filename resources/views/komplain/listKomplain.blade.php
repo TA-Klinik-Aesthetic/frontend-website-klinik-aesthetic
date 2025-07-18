@@ -192,180 +192,129 @@
 
     @push('scripts')
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const kompSelect = document.getElementById('edit_id_kompensasi');
-                const tanggalWrapper = document.getElementById('wrapper_tanggal_berakhir_kompensasi');
-                const tanggalInput = document.getElementById('edit_tanggal_berakhir_kompensasi');
-
-                function toggleTanggal() {
-                    if (kompSelect.value) {
-                        // ada kompensasi terpilih → tampilkan
-                        tanggalWrapper.style.display = 'block';
-                    } else {
-                        // tidak ada kompensasi → sembunyikan dan kosongkan
-                        tanggalWrapper.style.display = 'none';
-                        tanggalInput.value = '';
-                    }
+            // 1) Fungsi global untuk toggle tanggal
+            function toggleTanggal() {
+                const komp = document.getElementById('edit_id_kompensasi');
+                const wrap = document.getElementById('wrapper_tanggal_berakhir_kompensasi');
+                const inp = document.getElementById('edit_tanggal_berakhir_kompensasi');
+                if (komp.value) {
+                    wrap.style.display = 'block';
+                } else {
+                    wrap.style.display = 'none';
+                    inp.value = '';
                 }
-
-                // Saat modal Komplain dibuka, jalankan sekali untuk set initial visibility
-                $('#editKomplainModal').on('show.bs.modal', toggleTanggal);
-
-                // Saat pilihan kompensasi berubah
-                kompSelect.addEventListener('change', toggleTanggal);
-            });
-        </script>
-    @endpush
-
-    @push('scripts')
-        <script>
-
-            // ← TAMBAHAN: bawa daftar kompensasi ke JS
-            const kompensasiList = @json($kompensasiList);
-
-            function populateEditModalFromButton(button) {
-                const komplain = JSON.parse(button.getAttribute('data-komplain'));
-                populateEditModal(komplain);
             }
 
+            // 2) Populate modal lengkap dengan gambar
             function populateEditModal(komplain) {
                 const form = document.getElementById('editKomplainForm');
                 form.action = `/komplain/${komplain.id_komplain}`;
-
-                // pasang detail-treatment-id agar skrip validasi tahu mana yang dibandingkan
                 form.dataset.detailTreatmentId = komplain.detail_booking_treatment.id_treatment;
 
+                // isi field disabled
                 document.getElementById('edit_nama_user').value = komplain.user.nama_user;
-                // 2) Waktu Treatment dari booking_treatment
-                document.getElementById('edit_waktu_treatment').value = komplain.booking_treatment.waktu_treatment; // ← DIUBAH
-
-                // 3) Nama Treatment dari detail_booking_treatment.treatment.nama_treatment
-                document.getElementById('edit_treatment').value = komplain.detail_booking_treatment.treatment
-                    .nama_treatment; // ← DIUBAH
-
+                document.getElementById('edit_waktu_treatment').value = komplain.booking_treatment.waktu_treatment;
+                document.getElementById('edit_treatment').value = komplain.detail_booking_treatment.treatment.nama_treatment;
                 document.getElementById('edit_teks_komplain').value = komplain.teks_komplain;
-                document.getElementById('edit_balasan_komplain').value = komplain.balasan_komplain ?? '';
+                document.getElementById('edit_balasan_komplain').value = komplain.balasan_komplain || '';
 
-                // —————— ▶️ TAMBAHAN: disable form jika kompensasi sudah diberikan
-                const submitBtn = form.querySelector('button[type="submit"]');
+                // kompensasi & tanggal
+                const kompSelect = document.getElementById('edit_id_kompensasi');
+                const tanggalInp = document.getElementById('edit_tanggal_berakhir_kompensasi');
                 if (komplain.kompensasi_diberikan) {
+                    kompSelect.value = komplain.kompensasi_diberikan.id_kompensasi;
+                    tanggalInp.value = komplain.kompensasi_diberikan.tanggal_berakhir_kompensasi;
+                } else {
+                    kompSelect.value = '';
+                    tanggalInp.value = '';
+                }
+                toggleTanggal();
+
+                // —————— ▶️ TAMBAHAN DISABLE JIKA SUDAH ADA BALASAN
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (komplain.balasan_komplain) {
+                    // jika sudah ada balasan → semua readonly/disabled
                     document.getElementById('edit_balasan_komplain').disabled = true;
                     document.getElementById('edit_id_kompensasi').disabled = true;
                     document.getElementById('edit_tanggal_berakhir_kompensasi').disabled = true;
                     submitBtn.disabled = true;
                 } else {
+                    // jika belum → pastikan enabled
                     document.getElementById('edit_balasan_komplain').disabled = false;
                     document.getElementById('edit_id_kompensasi').disabled = false;
                     document.getElementById('edit_tanggal_berakhir_kompensasi').disabled = false;
                     submitBtn.disabled = false;
                 }
-                // ◀️ SELESAI TAMBAHAN
 
-                const kompSelect = document.getElementById('edit_id_kompensasi');
-                const tanggalInput = document.getElementById('edit_tanggal_berakhir_kompensasi');
-
-                if (komplain.kompensasi_diberikan) {
-                    kompSelect.value = komplain.kompensasi_diberikan.id_kompensasi;
-                    tanggalInput.value = komplain.kompensasi_diberikan.tanggal_berakhir_kompensasi;
-                } else {
-                    kompSelect.value = '';
-                    tanggalInput.value = '';
-                }
-                
-                toggleTanggal();
-
-
-                // Jika ada kompensasi, set input kompensasi
-                // if (komplain.kompensasi_diberikan) {
-                //     document.getElementById('edit_id_kompensasi').value = komplain.kompensasi_diberikan.id_kompensasi;
-                //     document.getElementById('edit_tanggal_berakhir_kompensasi').value =
-                //         komplain.kompensasi_diberikan.tanggal_berakhir_kompensasi;
-                // }
-
-                // Set Treatment List
-                // const treatmentListContainer = document.getElementById('edit_treatment_list');
-                // treatmentListContainer.innerHTML = ''; // Clear previous treatment list
-
-                // komplain.treatments.forEach(function(treatment, index) {
-                //     const treatmentItem = document.createElement('li');
-                //     treatmentItem.classList.add('list-group-item');
-                //     treatmentItem.innerHTML = treatment; // Menampilkan nama treatment
-                //     treatmentListContainer.appendChild(treatmentItem);
-                // });
-
-                const baseUrl = 'https://klinikneshnavya.com/';
-
-                // Debugging gambar_komplain
-                console.log('gambar_komplain:', komplain.gambar_komplain);
-
-                // Pastikan gambar_komplain adalah array yang valid
-                let gambarKomplainArray = [];
+                // render gambar
+                const container = document.getElementById('gambar_komplain_links');
+                container.innerHTML = '';
+                let arr = [];
                 try {
-                    gambarKomplainArray = JSON.parse(komplain.gambar_komplain); // Mengonversi string menjadi array
+                    arr = Array.isArray(komplain.gambar_komplain) ?
+                        komplain.gambar_komplain :
+                        JSON.parse(komplain.gambar_komplain || '[]');
                 } catch (e) {
-                    console.error('Gagal parsing gambar_komplain:', e);
+                    console.error(e);
                 }
-
-                // Kosongkan dulu link download sebelumnya
-                const gambarKomplainContainer = document.getElementById('gambar_komplain_links');
-                gambarKomplainContainer.innerHTML = '';
-
-                if (Array.isArray(gambarKomplainArray) && gambarKomplainArray.length > 0) {
-                    gambarKomplainArray.forEach(function(gambarPath, index) {
-                        // Menghapus tanda kutip ganda atau escape karakter dalam path gambar
-                        gambarPath = gambarPath.replace(/['"]+/g, '');
-
-                        const link = document.createElement('a');
-                        link.href = baseUrl + gambarPath;
-                        link.className = 'btn btn-pale btn-sm m-1';
-                        link.target = '_blank';
-                        link.download = '';
-                        link.innerHTML = `Gambar Komplain ${index + 1}`;
-                        gambarKomplainContainer.appendChild(link);
+                if (arr.length) {
+                    arr.forEach((p, i) => {
+                        p = p.replace(/['"]+/g, '');
+                        const a = document.createElement('a');
+                        a.href = `https://klinikneshnavya.com/${p}`;
+                        a.className = 'btn btn-pale btn-sm m-1';
+                        a.target = '_blank';
+                        a.innerText = `Gambar Komplain ${i+1}`;
+                        container.appendChild(a);
                     });
                 } else {
-                    gambarKomplainContainer.innerHTML = '<p class="text-muted">Tidak ada gambar komplain.</p>';
+                    container.innerHTML = '<p class="text-muted">Tidak ada gambar komplain.</p>';
                 }
-
-                // document.getElementById('download_gambar_bukti_transaksi').href = komplain.gambar_bukti_transaksi ? (baseUrl +
-                //     komplain.gambar_bukti_transaksi) : '#';
             }
-            // ← TAMBAHAN: validasi sebelum submit form
+
+            // 3) Binding event
             document.addEventListener('DOMContentLoaded', () => {
-                const form = document.getElementById('editKomplainForm');
-                form.addEventListener('submit', function(e) {
-                    // 1) Validasi tanggal berakhir kompensasi
-                    const endDateStr = document.getElementById('edit_tanggal_berakhir_kompensasi').value;
-                    if (endDateStr) {
-                        // parse jadi year, month, day
-                        const [y, m, d] = endDateStr.split('-').map(Number);
-                        // buat Date lokal (monthIndex = m-1)
-                        const endDate = new Date(y, m - 1, d);
-                        // buat objek hari ini jam 00:00:00
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
+                // a) tombol Balas
+                window.populateEditModalFromButton = button => {
+                    const komplain = JSON.parse(button.getAttribute('data-komplain'));
+                    populateEditModal(komplain);
+                };
 
-                        if (endDate <= today) {
-                            alert('Tanggal berakhir kompensasi harus setelah hari ini.');
-                            e.preventDefault();
-                            return;
-                        }
-                    }
-
-                    // 2) Validasi kecocokan kompensasi ↔ treatment
-                    const detailTreatId = parseInt(this.dataset.detailTreatmentId, 10);
-                    const kompSelect = document.getElementById('edit_id_kompensasi');
-                    const opt = kompSelect.options[kompSelect.selectedIndex];
-                    const kompTreatId = parseInt(opt.dataset.treatmentId, 10); // ⬅️ TAMBAHAN
-
-                    if (kompSelect.value && (isNaN(kompTreatId) || kompTreatId !== detailTreatId)) {
-                        alert('Kompensasi yang Anda pilih tidak cocok dengan treatment yang dikomplain.');
-                        e.preventDefault();
-                    }
+                // b) when modal opens, pastikan toggleTanggal() dan render sudah jalan
+                $('#editKomplainModal').on('show.bs.modal', function() {
+                    toggleTanggal();
                 });
+
+                // c) validasi sebelum submit
+                document.getElementById('editKomplainForm')
+                    .addEventListener('submit', function(e) {
+                        // validasi tanggal
+                        const d = document.getElementById('edit_tanggal_berakhir_kompensasi').value;
+                        if (d) {
+                            const [y, m, day] = d.split('-').map(Number);
+                            const end = new Date(y, m - 1, day);
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            if (end <= today) {
+                                alert('Tanggal berakhir kompensasi harus setelah hari ini.');
+                                e.preventDefault();
+                                return;
+                            }
+                        }
+                        // kecocokan treatment
+                        const dtId = parseInt(this.dataset.detailTreatmentId, 10);
+                        const opt = document.getElementById('edit_id_kompensasi')
+                            .selectedOptions[0];
+                        const trId = parseInt(opt?.dataset.treatmentId, 10);
+                        if (opt.value && trId !== dtId) {
+                            alert('Kompensasi tidak cocok dengan treatment.');
+                            e.preventDefault();
+                        }
+                    });
             });
         </script>
     @endpush
+
 
     @push('scripts')
         <script>
