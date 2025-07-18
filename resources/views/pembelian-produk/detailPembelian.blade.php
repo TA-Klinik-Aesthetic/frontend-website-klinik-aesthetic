@@ -44,6 +44,13 @@
                     </div>
                     <div class="card-body p-0">
                         <table class="table table-bordered mb-0">
+                            {{-- optional: atur lebar kolom dengan colgroup --}}
+                            <colgroup>
+                                <col style="width:50%;"> {{-- Nama Produk --}}
+                                <col style="width:10%;"> {{-- Jumlah --}}
+                                <col style="width:20%;"> {{-- Harga Satuan (lebih lebar) --}}
+                                <col style="width:20%;"> {{-- Subtotal --}}
+                            </colgroup>
                             <thead class="thead-light">
                                 <tr>
                                     <th>Nama Produk</th>
