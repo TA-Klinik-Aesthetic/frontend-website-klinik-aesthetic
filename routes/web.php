@@ -230,10 +230,10 @@ Route::get('/kompensasi-diberikan', [KompensasiDiberikanController::class, 'inde
 Route::post('/kompensasi-diberikan', [KompensasiDiberikanController::class, 'store'])->name('kompensasi-diberikan.store');
 
 Route::get('/pembayaran-treatment', [PembayaranTreatmentController::class, 'index'])->name('pembayaran-treatment.index');
+Route::get('pembayaran-treatment/invoice/{id}', [PembayaranTreatmentController::class, 'generateInvoice'])->name('invoice.pembayaran-treatment');
 Route::get('pembayaran-treatment/{id}', [PembayaranTreatmentController::class, 'show'])->name('pembayaran-treatment.show');
 Route::post('/pembayaran-treatment', [PembayaranTreatmentController::class, 'store'])->name('pembayaran-treatment.store');
 Route::put('/pembayaran-treatment/{id}', [PembayaranTreatmentController::class, 'update'])->name('pembayaran-treatment.update');
-Route::get('pembayaran-treatment/invoice/{id}', [PembayaranTreatmentController::class, 'generateInvoice'])->name('invoice.pembayaran-treatment');
 Route::put('pembayaran-treatment/{id}/konfirmasi', [PembayaranTreatmentController::class, 'confirmPaymentTreatment'])->name('pembayaran-treatment.confirm');
 
 

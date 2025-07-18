@@ -14,7 +14,7 @@ class PembayaranTreatmentController extends Controller
     protected $apiUrlPembayaran = 'https://klinikneshnavya.com/api/pembayaran-treatment';
 
     // URL API untuk booking treatment
-    protected $apiUrlBooking = 'https://klinikneshnavya.com/api/detailBookingTreatments';
+    protected $apiUrlBooking = 'https://klinikneshnavya.com/api/bookingTreatment';
 
     // Menampilkan semua pembayaran treatment
     public function index()
