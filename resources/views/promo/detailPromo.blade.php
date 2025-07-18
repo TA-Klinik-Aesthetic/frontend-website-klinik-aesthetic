@@ -1,56 +1,71 @@
 @extends('dashboard.index')
 
 @section('content')
-    <h1>Detail Promo</h1>
+    <div class="container">
+        <h2>Detail Promo</h2>
 
-    <table class="table table-bordered">
-        <tr>
-            <th>Nama</th>
-            <td>{{ $promo['nama_promo'] }}</td>
-        </tr>
-        <tr>
-            <th>Jenis Promo</th>
-            <td>{{ $promo['jenis_promo'] }}</td>
-        </tr>
-        <tr>
-            <th>Deskripsi</th>
-            <td>{{ $promo['deskripsi_promo'] }}</td>
-        </tr>
-        <tr>
-            <th>Tipe Potongan</th>
-            <td>{{ $promo['tipe_potongan'] }}</td>
-        </tr>
-        <tr>
-            <th>Potongan Harga</th>
-            <td>
-                @if ($promo['tipe_potongan'] === 'Diskon')
-                    {{ number_format($promo['potongan_harga']) }}%
-                @else
-                    Rp {{ number_format($promo['potongan_harga']) }}
-                @endif
-            </td>
-        </tr>
-        <tr>
-            <th>Minimal Belanja</th>
-            <td>Rp {{ number_format($promo['minimal_belanja']) }}</td>
-        </tr>
-        <tr>
-            <th>Tanggal Mulai</th>
-            <td>{{ $promo['tanggal_mulai'] }}</td>
-        </tr>
-        <tr>
-            <th>Tanggal Berakhir</th>
-            <td>{{ $promo['tanggal_berakhir'] }}</td>
-        </tr>
-        <tr>
-            <th>Status</th>
-            <td>{{ ucfirst($promo['status_promo']) }}</td>
-        </tr>
-        <tr>
-            <th>Gambar</th>
-            <td>
-                <img src="{{ $promo['gambar_promo'] }}" alt="Gambar Promo" class="img-fluid">
-            </td>
-        </tr>
-    </table>
+        <div class="card">
+            <div class="card-body">
+                <!-- Judul Promo -->
+                <h5 class="card-title">{{ $promo['nama_promo'] }}</h5>
+
+                <!-- Jenis Promo -->
+                <p class="card-text">
+                    <strong>Jenis Promo:</strong>
+                    {{ $promo['jenis_promo'] }}
+                </p>
+
+                <!-- Deskripsi -->
+                <p class="card-text">
+                    <strong>Deskripsi:</strong>
+                    {{ $promo['deskripsi_promo'] }}
+                </p>
+
+                <!-- Tipe & Potongan -->
+                <p class="card-text">
+                    <strong>Potongan:</strong>
+                    @if ($promo['tipe_potongan'] === 'Diskon')
+                        {{ number_format($promo['potongan_harga']) }}%
+                    @else
+                        Rp{{ number_format($promo['potongan_harga'], 0, ',', '.') }}
+                    @endif
+                    <small class="text-muted">({{ $promo['tipe_potongan'] }})</small>
+                </p>
+
+                <!-- Minimal Belanja -->
+                <p class="card-text">
+                    <strong>Minimal Belanja:</strong>
+                    Rp{{ number_format($promo['minimal_belanja'], 0, ',', '.') }}
+                </p>
+
+                <!-- Tanggal Mulai & Berakhir -->
+                <p class="card-text">
+                    <strong>Periode:</strong>
+                    {{ \Carbon\Carbon::parse($promo['tanggal_mulai'])->format('d M Y') }}
+                    &mdash;
+                    {{ \Carbon\Carbon::parse($promo['tanggal_berakhir'])->format('d M Y') }}
+                </p>
+
+                <!-- Status -->
+                <p class="card-text">
+                    <strong>Status:</strong>
+                    {{ ucfirst($promo['status_promo']) }}
+                </p>
+
+                <!-- Gambar Promo -->
+                <div class="text-center my-3">
+                    @if (!empty($promo['gambar_promo']))
+                        <img
+                          src="{{ $promo['gambar_promo'] }}"
+                          alt="{{ $promo['nama_promo'] }}"
+                          class="img-fluid mx-auto d-block"
+                          style="max-width: 400px; height: auto;"
+                        >
+                    @else
+                        <p>Gambar tidak tersedia.</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection

@@ -125,6 +125,17 @@
                         </button>
                     </div>
                     <div class="modal-body">
+                        <!-- Kategori -->
+                        <div class="form-group">
+                            <label for="id_kategori">Kategori Produk</label>
+                            <select name="id_kategori" id="id_kategori" class="form-control" required>
+                                <option value="">Pilih Kategori</option>
+                                @foreach ($kategoriList as $kat)
+                                    <option value="{{ $kat['id_kategori'] }}">{{ $kat['nama_kategori'] }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <!-- Nama Produk -->
                         <div class="form-group">
                             <label for="nama_produk">Nama Produk</label>
@@ -158,22 +169,11 @@
                             </select>
                         </div>
 
-                        <!-- Kategori -->
-                        <div class="form-group">
-                            <label for="id_kategori">Kategori Produk</label>
-                            <select name="id_kategori" id="id_kategori" class="form-control" required>
-                                <option value="">-- Pilih Kategori --</option>
-                                @foreach ($kategoriList as $kat)
-                                    <option value="{{ $kat['id_kategori'] }}">{{ $kat['nama_kategori'] }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
                         <!-- Gambar Produk -->
                         <div class="form-group">
                             <label for="gambar_produk">Upload Gambar Produk</label>
-                            <input type="file" name="gambar_produk" id="gambar_produk" class="form-control-file"
-                                required>
+                            <input type="file" name="gambar_produk" accept=".jpg,.jpeg,.png" id="gambar_produk"
+                                class="form-control-file" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -210,6 +210,17 @@
                             <!-- Hidden ID -->
                             <input type="hidden" name="id_produk" value="{{ $produk['id_produk'] }}">
 
+                            <!-- Kategori -->
+                            <div class="form-group">
+                                <label for="edit_id_kategori_{{ $produk['id_produk'] }}">Kategori Produk</label>
+                                <select name="id_kategori" id="edit_id_kategori_{{ $produk['id_produk'] }}"
+                                    class="form-control" required>
+                                    @foreach ($kategoriList as $kat)
+                                        <option value="{{ $kat['id_kategori'] }}">{{ $kat['nama_kategori'] }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
                             <!-- Nama Produk -->
                             <div class="form-group">
                                 <label for="edit_nama_produk_{{ $produk['id_produk'] }}">Nama Produk</label>
@@ -243,16 +254,6 @@
                                     <option value="Habis">Habis</option>
                                 </select>
                             </div>
-                            <!-- Kategori -->
-                            <div class="form-group">
-                                <label for="edit_id_kategori_{{ $produk['id_produk'] }}">Kategori Produk</label>
-                                <select name="id_kategori" id="edit_id_kategori_{{ $produk['id_produk'] }}"
-                                    class="form-control" required>
-                                    @foreach ($kategoriList as $kat)
-                                        <option value="{{ $kat['id_kategori'] }}">{{ $kat['nama_kategori'] }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
                             <!-- Gambar Produk -->
                             <div class="form-group">
                                 {{-- <label>Gambar Produk Saat Ini</label><br>
@@ -261,10 +262,11 @@
                                         alt="" style="max-width:100px; display:block; margin-bottom:10px;">
                                 @endif --}}
                                 <label for="edit_gambar_produk_{{ $produk['id_produk'] }}">
-                                    Ubah Gambar Produk
+                                    Edit Gambar Produk
                                 </label>
-                                <input type="file" name="gambar_produk"
+                                <input type="file" name="gambar_produk" accept=".jpg,.jpeg,.png"
                                     id="edit_gambar_produk_{{ $produk['id_produk'] }}" class="form-control-file">
+                                    <small class="form-text text-muted">Kosongkan jika tidak ingin memperbarui gambar.</small>
                             </div>
                         </div>
                         <div class="modal-footer">

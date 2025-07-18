@@ -1,61 +1,64 @@
 @extends('dashboard.index')
 
 @section('content')
-    <h1>Detail Treatment</h1>
+    <div class="container">
+        <h2>Detail Treatment</h2>
 
-    <table class="table table-bordered">
-        <tr>
-            <th>Nama</th>
-            <td>{{ $treatment['nama_treatment'] }}</td>
-        </tr>
-        <tr>
-            <th>Jenis</th>
-            <td>{{ $treatment['jenis_treatment']['nama_jenis_treatment'] }}</td>
-        </tr>
-        <tr>
-            <th>Deskripsi</th>
-            <td>{{ $treatment['deskripsi_treatment'] }}</td>
-        </tr>
-        <tr>
-            <th>Biaya</th>
-            <td>Rp {{ number_format($treatment['biaya_treatment']) }}</td>
-        </tr>
-        <tr>
-            <th>Estimasi</th>
-            <td>
-                @php
-                    // Cek apakah estimasi ada dan valid
-                    if ($treatment['estimasi_treatment']) {
-                        // Gunakan Carbon untuk memformat waktu
-                        $estimasi = \Carbon\Carbon::createFromFormat('H:i:s', $treatment['estimasi_treatment']);
-                        $hours = $estimasi->hour;
-                        $minutes = $estimasi->minute;
+        <div class="card">
+            <div class="card-body">
+                <!-- Judul Treatment -->
+                <h5 class="card-title">{{ $treatment['nama_treatment'] }}</h5>
 
-                        // Format estimasi dalam jam dan menit
-                        $formatted_estimasi = '';
-                        if ($hours > 0) {
-                            $formatted_estimasi .= $hours . ' jam';
+                <!-- Jenis Treatment -->
+                <p class="card-text">
+                    <strong>Jenis:</strong>
+                    {{ $treatment['jenis_treatment']['nama_jenis_treatment'] }}
+                </p>
+
+                <!-- Deskripsi -->
+                <p class="card-text">
+                    <strong>Deskripsi:</strong>
+                    {{ $treatment['deskripsi_treatment'] }}
+                </p>
+
+                <!-- Biaya -->
+                <p class="card-text">
+                    <strong>Biaya:</strong>
+                    Rp{{ number_format($treatment['biaya_treatment'], 0, ',', '.') }}
+                </p>
+
+                <!-- Estimasi -->
+                <p class="card-text">
+                    <strong>Estimasi:</strong>
+                    @php
+                        if ($treatment['estimasi_treatment']) {
+                            $estimasi = \Carbon\Carbon::createFromFormat('H:i:s', $treatment['estimasi_treatment']);
+                            $hours   = $estimasi->hour;
+                            $minutes = $estimasi->minute;
+                            $fmt     = '';
+                            if ($hours > 0)   $fmt .= $hours . ' jam';
+                            if ($minutes > 0) $fmt .= ' ' . $minutes . ' menit';
+                            echo trim($fmt);
+                        } else {
+                            echo 'Tidak ada estimasi';
                         }
-                        if ($minutes > 0) {
-                            $formatted_estimasi .= ' ' . $minutes . ' menit';
-                        }
+                    @endphp
+                </p>
 
-                        echo $formatted_estimasi;
-                    } else {
-                        echo 'Tidak ada estimasi';
-                    }
-                @endphp
-            </td>
-        </tr>
-        <tr>
-            <th>Gambar</th>
-            <td>
-                @if (!empty($treatment['gambar_treatment']))
-                    <img src="{{ $treatment['gambar_treatment'] }}" alt="Gambar Treatment" class="img-fluid">
-                @else
-                    <p>Gambar tidak tersedia.</p>
-                @endif
-            </td>
-        </tr>
-    </table>
+                <!-- Gambar Treatment -->
+                <div class="text-center my-3">
+                    @if (!empty($treatment['gambar_treatment']))
+                        <img
+                          src="{{ $treatment['gambar_treatment'] }}"
+                          alt="{{ $treatment['nama_treatment'] }}"
+                          class="img-fluid mx-auto d-block"
+                          style="max-width: 400px; height: auto;"
+                        >
+                    @else
+                        <p>Gambar tidak tersedia.</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection

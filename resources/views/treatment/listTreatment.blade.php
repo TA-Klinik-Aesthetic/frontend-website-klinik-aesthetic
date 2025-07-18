@@ -148,8 +148,8 @@
                                 required>
                         </div>
                         <div>
-                            <label for="gambar_treatment">Upload Gambar:</label>
-                            <input type="file" name="gambar_treatment" id="gambar_treatment" required>
+                            <label for="gambar_treatment">Upload Gambar Treatment</label>
+                            <input type="file" name="gambar_treatment" accept=".jpg,.jpeg,.png" id="gambar_treatment" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -199,7 +199,7 @@
 
                         {{-- Deskripsi --}}
                         <div class="form-group">
-                            <label for="edit_deskripsi_treatment">Deskripsi</label>
+                            <label for="edit_deskripsi_treatment">Deskripsi Treatment</label>
                             <textarea name="deskripsi_treatment" class="form-control" id="edit_deskripsi_treatment" rows="3"></textarea>
                         </div>
 
@@ -219,11 +219,11 @@
 
                         {{-- Gambar (opsional) --}}
                         <div class="form-group">
-                            <label for="edit_gambar_treatment">Ganti Gambar Treatment</label>
-                            <input type="file" name="gambar_treatment" id="edit_gambar_treatment"
+                            <label for="edit_gambar_treatment">Edit Gambar Treatment</label>
+                            <input type="file" name="gambar_treatment" accept=".jpg,.jpeg,.png" id="edit_gambar_treatment"
                                 class="form-control-file">
                             <small class="form-text text-muted">
-                                Kosongkan jika tidak ingin mengubah gambar.
+                                Kosongkan jika tidak ingin memperbarui gambar.
                             </small>
                         </div>
                     </div>

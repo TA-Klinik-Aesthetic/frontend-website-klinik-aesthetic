@@ -132,7 +132,7 @@
                                     <!-- Button trigger modal -->
                                     <button type="button" class="btn btn-pale mb-3 btn-confirm-non-tunai"
                                         data-id="{{ $pembelian['id_pembayaran'] }}">
-                                        <i class="fas fa-check-circle"></i> Konfirmasi Non Tunai
+                                        Konfirmasi Non Tunai
                                     </button>
                                 @endif
 
@@ -215,12 +215,12 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="gambarBukti">Gambar Bukti Pembayaran</label>
-                            <input type="file" name="gambar_bukti_pembayaran" id="gambarBukti" class="form-control"
+                            <input type="file" name="gambar_bukti_pembayaran" accept=".jpg,.jpeg,.png" id="gambarBukti" class="form-control"
                                 accept="image/*" required>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-pale">Kirim & Konfirmasi</button>
+                        <button type="submit" class="btn btn-pale">Simpan</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                     </div>
                 </div>

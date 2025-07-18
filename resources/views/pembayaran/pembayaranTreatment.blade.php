@@ -184,12 +184,12 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="gambarBuktiTreatment">Gambar Bukti Pembayaran</label>
-                            <input type="file" name="gambar_bukti_pembayaran" id="gambarBuktiTreatment"
+                            <input type="file" name="gambar_bukti_pembayaran" accept=".jpg,.jpeg,.png" id="gambarBuktiTreatment"
                                 class="form-control" accept="image/*" required>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-pale">Kirim & Konfirmasi</button>
+                        <button type="submit" class="btn btn-pale">Simpan</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                     </div>
                 </div>

@@ -127,7 +127,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="deskripsi_promo">Deskripsi</label>
+                            <label for="deskripsi_promo">Deskripsi Promo</label>
                             <textarea name="deskripsi_promo" class="form-control" rows="3" required></textarea>
                         </div>
                         <div class="form-group">
@@ -160,11 +160,11 @@
                             <input type="date" name="tanggal_berakhir" class="form-control" required>
                         </div>
                         <div>
-                            <label for="gambar_promo">Upload Gambar</label>
-                            <input type="file" name="gambar_promo" required>
+                            <label for="gambar_promo">Upload Gambar Promo</label>
+                            <input type="file" name="gambar_promo" accept=".jpg,.jpeg,.png" required>
                         </div>
                         <div class="form-group">
-                            <label for="status_promo">Status</label>
+                            <label for="status_promo">Status Promo</label>
                             <select name="status_promo" class="form-control" required>
                                 <option value="aktif">Aktif</option>
                                 <option value="tidak aktif">Tidak aktif</option>
@@ -204,7 +204,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Deskripsi</label>
+                        <label>Deskripsi Promo</label>
                         <textarea name="deskripsi_promo" class="form-control" rows="3" required></textarea>
                     </div>
                     <div class="form-group">
@@ -237,9 +237,9 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Ganti Gambar</label>
-                        <input type="file" name="gambar_promo" class="form-control-file">
-                        <small class="form-text text-muted">Kosongkan jika tidak diubah</small>
+                        <label>Edit Gambar Promo</label>
+                        <input type="file" name="gambar_promo" accept=".jpg,.jpeg,.png" class="form-control-file">
+                        <small class="form-text text-muted">Kosongkan jika tidak ingin memperbarui gambar.</small>
                     </div>
                     <div class="form-group">
                         <label>Status Promo</label>

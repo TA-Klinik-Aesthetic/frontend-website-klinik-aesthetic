@@ -77,9 +77,9 @@
                     <p><strong>Kembalian:</strong> Rp{{ number_format($pay['kembalian'], 2, ',', '.') }}</p>
                     <p><strong>Status:</strong> {{ $pay['status_pembayaran'] }}</p>
                     <p><strong>Waktu Bayar:</strong> {{ $pay['waktu_pembayaran'] }}</p>
-                    <p><strong>Gambar Bukti Pembayaran:</strong></p>
                     {{-- Gambar Bukti Pembayaran --}}
                     @if (!empty($pembelian['pembayaran_produk']['gambar_bukti_pembayaran'] ?? null))
+                    <p><strong>Gambar Bukti Pembayaran:</strong></p>
                         <div class="text-center mb-4">
                             <a href="{{ $pembelian['pembayaran_produk']['gambar_bukti_pembayaran'] }}" target="_blank">
                                 <img src="{{ $pembelian['pembayaran_produk']['gambar_bukti_pembayaran'] }}"
