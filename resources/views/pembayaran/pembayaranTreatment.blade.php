@@ -68,7 +68,7 @@
             <table id="laporanPembayaranTreatmentTable" class="table table-bordered" width="100%" cellspacing="0">
                 <thead>
                     <tr>
-                        <th>Nama User</th>
+                        <th>Nama Pelanggan</th>
                         <th>Total</th>
                         <th>Metode Pembayaran</th>
                         <th>Uang</th>

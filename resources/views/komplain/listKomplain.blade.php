@@ -285,8 +285,13 @@
                     toggleTanggal();
                 });
 
-                // c) validasi sebelum submit
+                // c) ketika user memilih kompensasi → jalankan toggleTanggal
+                document.getElementById('edit_id_kompensasi')
+                    .addEventListener('change', toggleTanggal);
+
+                // d) validasi sebelum submit
                 document.getElementById('editKomplainForm')
+
                     .addEventListener('submit', function(e) {
                         // validasi tanggal
                         const d = document.getElementById('edit_tanggal_berakhir_kompensasi').value;
