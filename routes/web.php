@@ -145,12 +145,12 @@ Route::prefix('feedback/konsultasi')->name('feedback.feedbackKonsultasi.')->grou
 });
 
 
-Route::prefix('feedback/treatment')->name('feedback.feedbackTreatment.')->group(function () {
-    Route::get('/', [FeedbackTreatmentController::class, 'index'])->name('index');
-    Route::get('/{id}', [FeedbackTreatmentController::class, 'show'])->name('show');
-    Route::put('/{id}', [FeedbackTreatmentController::class, 'update'])->name('update');
-    Route::delete('/{id}', [FeedbackTreatmentController::class, 'destroy'])->name('destroy');
-});
+// Route::prefix('feedback/treatment')->name('feedback.feedbackTreatment.')->group(function () {
+//     Route::get('/', [FeedbackTreatmentController::class, 'index'])->name('index');
+//     Route::get('/{id}', [FeedbackTreatmentController::class, 'show'])->name('show');
+//     Route::put('/{id}', [FeedbackTreatmentController::class, 'update'])->name('update');
+//     Route::delete('/{id}', [FeedbackTreatmentController::class, 'destroy'])->name('destroy');
+// });
 
 
 Route::prefix('bookingTreatment')->name('bookingTreatment.')->group(function () {

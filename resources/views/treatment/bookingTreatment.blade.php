@@ -126,7 +126,8 @@
     </div>
 
     @foreach ($bookingTreatments as $booking)
-        <div class="modal fade" id="editModal{{ $booking['id_booking_treatment'] }}" tabindex="-1" role="dialog"
+        <div class="modal fade" id="editModal{{ $booking['id_booking_treatment'] }}"
+            data-current-status="{{ $booking['status_booking_treatment'] }}" tabindex="-1" role="dialog"
             aria-labelledby="editModalLabel{{ $booking['id_booking_treatment'] }}" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -230,8 +231,8 @@
     @endforeach
 
     <!-- Modal Tambah Booking -->
-    <div class="modal fade js-reset-on-show" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel"
-        aria-hidden="true">
+    <div class="modal fade js-reset-on-show" id="bookingModal" tabindex="-1" role="dialog"
+        aria-labelledby="bookingModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <form action="{{ route('booking.store') }}" method="POST">
@@ -682,6 +683,7 @@
                         e.preventDefault();
                     }
 
+
                     // 2) Cek tanggal kalau pilih "Treatment dimulai"
                     if (selectedStatus === 'Treatment dimulai') {
                         // Jika tanggal booking masih di masa depan
@@ -803,7 +805,43 @@
             });
         });
     </script>
+    <script>
+        $(document).ready(function() {
+            // 1) Tangani semua form ubah status
+            $('.status-update-form').on('submit', function(e) {
+                var sel = $(this).find('.status-select');
+                var newStatus = sel.val();
+                var current = sel.data('current'); // harus sama persis dengan teks option lama
+
+                // jika mau ubah ke 'Dibatalkan' dari 'Treatment dimulai' atau 'Selesai' → blokir
+                if (newStatus === 'Dibatalkan' &&
+                    (current === 'Treatment dimulai' || current === 'Selesai')) {
+                    e.preventDefault();
+                    alert('Status "' + current + '" tidak bisa diubah menjadi "Dibatalkan".');
+                }
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            // Tangani submit pada form di setiap modal editBooking
+            $('[id^="editModal"]').each(function() {
+                const modal = $(this);
+                const current = modal.data('current-status'); // ambil dari data-current-status
+
+                // form di dalam modal
+                modal.find('form').on('submit', function(e) {
+                    if (current !== 'Verifikasi') {
+                        e.preventDefault();
+                        alert(
+                            'Anda hanya dapat mengedit booking treatment jika status masih “Verifikasi”.');
+                    }
+                });
+            });
+        });
+    </script>
 @endpush
+
 
 @push('scripts')
     <script>

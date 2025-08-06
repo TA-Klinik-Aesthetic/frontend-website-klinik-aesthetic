@@ -119,11 +119,10 @@
     </div>
 
     @foreach ($data->reverse() as $item)
-        <!-- Modal Tambah Detail Konsultasi -->
-        <div class="modal fade js-reset-on-show" id="tambahDetailModal-{{ $item['id_konsultasi'] }}" tabindex="-1" role="dialog"
-            aria-labelledby="tambahDetailModalLabel-{{ $item['id_konsultasi'] }}" aria-hidden="true">
+        <div class="modal fade js-reset-on-show" id="tambahDetailModal-{{ $item['id_konsultasi'] }}" …>
             <div class="modal-dialog modal-lg" role="document">
-                <form action="{{ route('konsultasi.simpanDetail', $item['id_konsultasi']) }}" method="POST">
+                <form action="{{ route('konsultasi.simpanDetail', $item['id_konsultasi']) }}" method="POST"
+                    class="form-detail" data-prev-status="{{ $item['status_booking_konsultasi'] }}">
                     @csrf
                     <div class="modal-content">
                         <div class="modal-header">
@@ -176,7 +175,8 @@
 
     {{-- Modal-Modal Ubah Status --}}
     @foreach ($data->reverse() as $item)
-        <div class="modal fade" id="statusModal-{{ $item['id_konsultasi'] }}" tabindex="-1" role="dialog"
+        <div class="modal fade" id="statusModal-{{ $item['id_konsultasi'] }}"
+            data-prev-status="{{ $item['status_booking_konsultasi'] }}" tabindex="-1" role="dialog"
             aria-labelledby="statusModalLabel-{{ $item['id_konsultasi'] }}" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <form action="{{ route('konsultasi.updateStatus', $item['id_konsultasi']) }}" method="POST">
@@ -251,7 +251,7 @@
                         <!-- Nama Dokter -->
                         <div class="form-group">
                             <label for="id_dokter">Nama Dokter</label>
-                            <select class="form-control" id="id_dokter" name="id_dokter">
+                            <select class="form-control" id="id_dokter" name="id_dokter" required>
                                 <option value="">Pilih Dokter</option>
                                 @foreach ($dokters as $dokter)
                                     <option value="{{ $dokter['id_dokter'] }}">{{ $dokter['nama_dokter'] }}</option>
@@ -374,10 +374,77 @@
                 // 3) Jam harus antara 10:00–20:00
                 const jam = sel.getHours();
                 if (jam < 10 || jam >= 20) {
-                    alert('Waktu konsultasi harus antara jam 10:00 dan 20:00.');
+                    alert('Waktu konsultasi dibuka dari jam 10:00 hingga 20:00.');
                     return $(this).val('');
                 }
             });
         });
     </script>
-@endpush
+
+    @push('scripts')
+        <script>
+            $(document).ready(function() {
+                // tangkap semua form-detail
+                $(document).on('submit', '.form-detail', function(e) {
+                    const $form = $(this);
+                    const prevStatus = $form.data('prev-status');
+                    if (prevStatus === 'Dibatalkan') {
+                        e.preventDefault();
+                        alert(
+                            'Anda hanya dapat mengirim hasil konsultasi jika status adalah “Berhasil dibooking”.');
+                    }
+                    if (prevStatus === 'Verifikasi') {
+                        e.preventDefault();
+                        alert(
+                            'Anda hanya dapat mengirim hasil konsultasi jika status adalah “Berhasil dibooking”.');
+                    }
+
+                    if (prevStatus === 'Selesai') {
+                        e.preventDefault();
+                        alert(
+                            'Anda hanya dapat mengirim hasil konsultasi jika status adalah “Berhasil dibooking”.');
+                    }
+                });
+            });
+        </script>
+    @endpush
+
+    @push('scripts')
+        <script>
+            $(function() {
+                // Untuk setiap modal status
+                $('[id^="statusModal-"]').each(function() {
+                    const modal = $(this);
+                    const prev = modal.data('prev-status'); // ambil status lama
+                    const form = modal.find('form'); // form di dalam modal
+
+                    form.on('submit', function(e) {
+                        const sel = $(this).find('select[name="status_booking_konsultasi"]');
+                        const neu = sel.val();
+
+                        // Kalau sebelumnya Dibatalkan dan sekarang Berhasil Dibooking → block
+                        if (prev === 'Dibatalkan' && neu === 'Berhasil Dibooking') {
+                            e.preventDefault();
+                            alert(
+                                'Status konsultasi yang sudah dibatalkan sudah tidak bisa diperbarui lagi.'
+                            );
+                        }
+
+                        if (prev === 'Selesai' && neu === 'Dibatalkan') {
+                            e.preventDefault();
+                            alert(
+                                'Status konsultasi yang sudah selesai sudah tidak bisa diperbarui lagi.'
+                            );
+                        }
+
+                        if (prev === 'Selesai' && neu === 'Berhasil Dibooking') {
+                            e.preventDefault();
+                            alert(
+                                'Status konsultasi yang sudah selesai sudah tidak bisa diperbarui lagi.'
+                            );
+                        }
+                    });
+                });
+            });
+        </script>
+    @endpush

@@ -16,7 +16,7 @@
                 <p><strong>Dokter:</strong>
                     {{ $booking['dokter']['nama_dokter'] ?? '–' }}
                   </p>
-                <p><strong>Beautician:</strong> {{ $booking['beautician']['nama_beautician'] }}</p>
+                <p><strong>Beautician:</strong> {{ $booking['beautician']['nama_beautician'] ?? '–' }}</p>
                 <p><strong>Status Booking:</strong> {{ $booking['status_booking_treatment'] }}</p>
 
                 <hr>

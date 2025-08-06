@@ -161,8 +161,8 @@
                     <!-- Menggunakan nama rute -->
                     <a class="collapse-item" href="{{ route('feedback.feedbackKonsultasi.index') }}">Feedback
                         Konsultasi</a>
-                    <a class="collapse-item" href="{{ route('feedback.feedbackTreatment.index') }}">Feedback
-                        Treatment</a>
+                    {{-- <a class="collapse-item" href="{{ route('feedback.feedbackTreatment.index') }}">Feedback
+                        Treatment</a> --}}
                 </div>
             </div>
         </li>
