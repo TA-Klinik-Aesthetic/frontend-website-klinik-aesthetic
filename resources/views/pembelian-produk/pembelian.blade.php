@@ -723,7 +723,7 @@
                 const harga = this.dataset.harga; // grab the total due
 
                 // set action to your PUT route
-                form.action = `/pembelian-produk/${id}/pembayaran`;
+                form.action = `/penjualan-produk/${id}/pembayaran`;
                 // remember the total for validation
                 form.dataset.hargaAkhir = harga;
                 // prefill
