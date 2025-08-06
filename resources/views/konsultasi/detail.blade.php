@@ -24,11 +24,11 @@
                 </tr>
             </table>
 
-            <h4 class="mt-4">Detail Konsultasi</h4>
+            <h4 class="mt-4">Detail Hasil Konsultasi</h4>
             
             <!-- Menampilkan pesan jika tidak ada detail konsultasi -->
             @if(count($konsultasi['detail_konsultasi']) === 0)
-                <p class="text-muted">Belum ada detail konsultasi yang ditambahkan.</p>
+                <p class="text-muted">Belum ada detail hasil konsultasi yang ditambahkan.</p>
             @else
                 <table class="table table-bordered">
                     <thead>
@@ -51,7 +51,7 @@
                                     @if ($detail['treatment'])
                                         <a href="{{ route('treatment.show', ['id' => $detail['treatment']['id_treatment']]) }}"
                                             class="btn btn-pale btn-sm">
-                                            Lihat Detail
+                                            Detail
                                         </a>
                                     @else
                                         <span class="text-muted">Tidak tersedia</span>

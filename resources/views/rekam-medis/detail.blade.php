@@ -13,7 +13,7 @@
         </div>
 
         <!-- Gabungan Konsultasi & Booking -->
-        <h3 class="mt-5">Riwayat Konsultasi & Booking</h3>
+        <h3 class="mt-5">Riwayat Konsultasi & Booking Treatment</h3>
 
         @php
             $dataGabungan = [];
@@ -42,7 +42,7 @@
                         <p><strong>Waktu Konsultasi:</strong> {{ $konsultasi['waktu_konsultasi'] }}</p>
                         <p><strong>Nama Dokter:</strong> {{ $konsultasi['dokter']['nama_dokter'] }}</p>
                         <p><strong>Keluhan Pelanggan:</strong> {{ $konsultasi['keluhan_pelanggan'] }}</p>
-                        <h6>Detail Konsultasi:</h6>
+                        <h6>Detail Hasil Konsultasi:</h6>
                         <table class="table table-bordered mb-3">
                             <thead>
                                 <tr>
