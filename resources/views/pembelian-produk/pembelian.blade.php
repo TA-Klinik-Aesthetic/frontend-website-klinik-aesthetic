@@ -67,8 +67,7 @@
                         <th>Tanggal Pembelian</th>
                         <th>Total</th>
                         <th>Metode Bayar</th>
-                        <th>Uang</th>
-                        <th>Kembalian</th>
+                        <th>Status Pembayaran</th>
                         <th>Status Pengambilan</th>
                         <th>Action</th>
                     </tr>
@@ -82,20 +81,7 @@
                             <td>Rp{{ number_format($pembelian['harga_akhir'], 0, ',', '.') }}</td>
                             @php $pay = $pembelian['pembayaran_produk'] ?? null; @endphp
                             <td>{{ $pay['metode_pembayaran'] ?? '-' }}</td>
-                            <td>
-                                @if ($pay && $pay['uang'] !== null)
-                                    Rp{{ number_format($pay['uang'], 0, ',', '.') }}
-                                @else
-                                    -
-                                @endif
-                            </td>
-                            <td>
-                                @if ($pay && $pay['kembalian'] !== null)
-                                    Rp{{ number_format($pay['kembalian'], 0, ',', '.') }}
-                                @else
-                                    -
-                                @endif
-                            </td>
+                            <td>{{ $pay['status_pembayaran'] ?? '-' }}</td>
                             <td>{{ $pembelian['status_pengambilan_produk'] }}</td>
                             <td>
                                 <a href="{{ route('pembelian-produk.show', $pembelian['id_penjualan_produk']) }}"
@@ -156,7 +142,12 @@
                                 @endif
 
 
-                                @if ($pembelian['id_pembayaran'] && $pembelian['status_pembayaran'] === 'Sudah Dibayar')
+                                @php
+                                    // boleh ditarik ke Controller kalau mau
+                                    $paidStatuses = ['Sudah Dibayar', 'Berhasil'];
+                                @endphp
+
+                                @if ($pembelian['id_pembayaran'] && in_array($pembelian['status_pembayaran'], $paidStatuses))
                                     <a href="{{ route('pembelian-produk.invoice', $pembelian['id_pembayaran']) }}"
                                         class="btn btn-pale mb-3">
                                         <i class="fas fa-file-invoice"></i> Invoice
@@ -281,8 +272,8 @@
 
 
     <!-- Modal Tambah -->
-    <div class="modal fade js-reset-on-show" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel"
-        aria-hidden="true">
+    <div class="modal fade js-reset-on-show" id="addModal" tabindex="-1" role="dialog"
+        aria-labelledby="addModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <form action="{{ url('pembelian-produk/store') }}" method="POST">
