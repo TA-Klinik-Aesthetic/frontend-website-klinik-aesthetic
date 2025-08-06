@@ -276,7 +276,7 @@
         aria-labelledby="addModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
-                <form action="{{ url('pembelian-produk/store') }}" method="POST">
+                <form action="{{ url('penjualan-produk/store') }}" method="POST">
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title">Tambah Penjualan Produk</h5>
