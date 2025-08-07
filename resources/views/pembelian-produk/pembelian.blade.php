@@ -133,10 +133,9 @@
                                 @endphp
 
                                 @if ($pay && $pay['metode_pembayaran'] === 'Tunai' && in_array($pay['status_pembayaran'], $pendingStatuses))
-                                    <button class="btn btn-pale mb-3 btn-edit-payment"
-                                        data-id="{{ $pay['id_pembayaran'] }}" data-uang="{{ $pay['uang'] }}"
-                                        data-harga="{{ $pembelian['harga_akhir'] }}" data-toggle="modal"
-                                        data-target="#editPaymentModal">
+                                    <button class="btn btn-pale mb-3 btn-edit-payment" data-id="{{ $pay['id_pembayaran'] }}"
+                                        data-uang="{{ $pay['uang'] }}" data-harga="{{ $pembelian['harga_akhir'] }}"
+                                        data-toggle="modal" data-target="#editPaymentModal">
                                         Bayar Tunai
                                     </button>
                                 @endif
@@ -534,10 +533,17 @@
                 // 1) Hitung subtotal
                 let subtotal = 0;
                 document.querySelectorAll('#produk-list-tambah .row').forEach(row => {
-                    const sel = row.querySelector('select');
-                    const qty = parseFloat(row.querySelector('input[type="number"]').value) || 0;
-                    const prod = products.find(p => p.id_produk == sel.value);
-                    if (prod) subtotal += prod.harga_produk * qty;
+                    // ambil SELECT yang benar-benar produk
+                    const prodSel = row.querySelector('select.produk-select');
+                    // ambil INPUT jumlah
+                    const qtyInput = row.querySelector('input[name$="[jumlah_produk]"]');
+                    const prodId = prodSel ? prodSel.value : null;
+                    const qty = parseFloat(qtyInput?.value) || 0;
+
+                    const prod = products.find(p => p.id_produk == prodId);
+                    if (prod) {
+                        subtotal += prod.harga_produk * qty;
+                    }
                 });
 
                 // 2) Ambil promo
