@@ -380,6 +380,7 @@
             });
         });
     </script>
+     @endpush
 
     @push('scripts')
         <script>

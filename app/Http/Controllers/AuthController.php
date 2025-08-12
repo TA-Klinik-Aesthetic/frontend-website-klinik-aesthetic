@@ -83,7 +83,7 @@ class AuthController extends Controller
 
         // Redirect berdasarkan role user (hanya staf klinik)
         $role = $user['role'];
-        if (in_array($role, ['front office', 'kasir'])) {
+        if (in_array($role, ['front office', 'kasir', 'dokter', 'beautician'])) {
             return redirect()->route('dashboard')->with('success', 'Login successful.');
         }
 

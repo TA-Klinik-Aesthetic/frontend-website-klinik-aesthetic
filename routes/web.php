@@ -50,7 +50,7 @@ Route::get('/', function () {
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/dashboard', [DashboardController::class, 'index'])
-->name('dashboard');
+    ->name('dashboard');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Route::get('/user/home', function () {
@@ -85,7 +85,37 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // })->name('users.konsultasi');
 Route::middleware('session.auth')->group(function () {
 
-    Route::middleware('check.role:front office')->group(function(){
+
+ // ===== KONSULTASI — FO + DOKTER (semua fitur) =====
+Route::middleware('check.role:front office,dokter')->group(function () {
+    Route::get('/konsultasi', [KonsultasiController::class, 'indexWithDoctor'])->name('konsultasi.with-doctor');
+    Route::get('/konsultasi/create', [KonsultasiController::class, 'create'])->name('konsultasi.create');
+    Route::post('/konsultasi', [KonsultasiController::class, 'store'])->name('konsultasi.store');
+    Route::delete('/konsultasi/{id}', [KonsultasiController::class, 'destroy'])->name('konsultasi.destroy');
+    Route::get('/konsultasi/{id}/detail', [KonsultasiController::class, 'show'])->name('konsultasi.show');
+    Route::get('/konsultasi/{id}/tambah-detail', [KonsultasiController::class, 'tambahDetail'])->name('konsultasi.tambahDetail');
+
+    // Route untuk proses simpan detail konsultasi
+    Route::post('/konsultasi/{id}/tambah-detail', [KonsultasiController::class, 'simpanDetail'])->name('konsultasi.simpanDetail');
+
+    // Jika untuk AJAX dari frontend, bisa di web.php:
+    Route::post('konsultasi/{id}/update-status', [KonsultasiController::class, 'updateStatus'])
+        ->name('konsultasi.updateStatus');
+});
+
+// ===== BOOKING TREATMENT — FO + DOKTER + BEAUTICIAN (semua fitur kecuali pembayaran) =====
+Route::middleware('check.role:front office,dokter,beautician')->group(function () {
+    Route::prefix('bookingTreatment')->name('bookingTreatment.')->group(function () {
+        Route::get('/', [DetailBookingTreatmentController::class, 'index'])->name('index');
+    });
+
+    Route::put('/detailBooking/{id}/update-status', [DetailBookingTreatmentController::class, 'updateStatus'])->name('bookingTreatment.updateStatus');
+    Route::post('/booking', [DetailBookingTreatmentController::class, 'store'])->name('booking.store');
+    Route::get('/booking/detail/{id}', [DetailBookingTreatmentController::class, 'show'])->name('booking.detail');
+    Route::put('/detailBooking/update/{id}', [DetailBookingTreatmentController::class, 'update'])->name('detailBooking.update');
+});
+
+    Route::middleware('check.role:front office')->group(function () {
         // Form pendaftaran pelanggan
         Route::get('/akun-pelanggan', [AkunPelangganController::class, 'index'])
             ->name('register.form');
@@ -96,27 +126,6 @@ Route::middleware('session.auth')->group(function () {
 
         Route::put('akun-pelanggan/{id}/update-password', [AkunPelangganController::class, 'updatePassword'])
             ->name('akun.updatePassword');
-
-
-        Route::get('/konsultasi', [KonsultasiController::class, 'indexWithDoctor'])->name('konsultasi.with-doctor');
-        // Route::get('/konsultasi/without-doctor', [KonsultasiController::class, 'indexWithoutDoctor'])->name('konsultasi.without-doctor');
-        Route::get('/konsultasi/create', [KonsultasiController::class, 'create'])->name('konsultasi.create');
-        Route::post('/konsultasi', [KonsultasiController::class, 'store'])->name('konsultasi.store');
-        // Route::get('/konsultasi/{id}/edit', [KonsultasiController::class, 'edit'])->name('konsultasi.edit');
-        // Route::put('/konsultasi/{id}', [KonsultasiController::class, 'update'])->name('konsultasi.update');
-        Route::delete('/konsultasi/{id}', [KonsultasiController::class, 'destroy'])->name('konsultasi.destroy');
-        Route::get('/konsultasi/{id}/detail', [KonsultasiController::class, 'show'])->name('konsultasi.show');
-        // Route::get('/konsultasi/edit-keluhan/{id}', [KonsultasiController::class, 'editKeluhan'])->name('konsultasi.editKeluhan');
-        // Route::put('/konsultasi/edit-keluhan/{id}', [KonsultasiController::class, 'updateKeluhan'])->name('konsultasi.updateKeluhan');
-        // Route untuk menampilkan form tambah detail konsultasi
-        Route::get('/konsultasi/{id}/tambah-detail', [KonsultasiController::class, 'tambahDetail'])->name('konsultasi.tambahDetail');
-
-        // Route untuk proses simpan detail konsultasi
-        Route::post('/konsultasi/{id}/tambah-detail', [KonsultasiController::class, 'simpanDetail'])->name('konsultasi.simpanDetail');
-
-        // Jika untuk AJAX dari frontend, bisa di web.php:
-        Route::post('konsultasi/{id}/update-status', [KonsultasiController::class, 'updateStatus'])
-            ->name('konsultasi.updateStatus');
 
 
         Route::prefix('treatment')->group(function () {
@@ -151,14 +160,7 @@ Route::middleware('session.auth')->group(function () {
         // });
 
 
-        Route::prefix('bookingTreatment')->name('bookingTreatment.')->group(function () {
-            Route::get('/', [DetailBookingTreatmentController::class, 'index'])->name('index');
-        });
 
-        Route::put('/detailBooking/{id}/update-status', [DetailBookingTreatmentController::class, 'updateStatus'])->name('bookingTreatment.updateStatus');
-        Route::post('/booking', [DetailBookingTreatmentController::class, 'store'])->name('booking.store');
-        Route::get('/booking/detail/{id}', [DetailBookingTreatmentController::class, 'show'])->name('booking.detail');
-        Route::put('/detailBooking/update/{id}', [DetailBookingTreatmentController::class, 'update'])->name('detailBooking.update');
 
         // Kategorizes
         Route::prefix('kategori')->group(function () {
@@ -220,7 +222,7 @@ Route::middleware('session.auth')->group(function () {
         Route::get('/laporan-produk/export-bulanan', [LaporanController::class, 'exportBulananProduk'])->name('laporan-produk.export-bulanan');
     });
 
-    Route::middleware('check.role:kasir')->group(function(){
+    Route::middleware('check.role:kasir')->group(function () {
 
         Route::get(
             '/penjualan-produk/{paymentId}/invoice',

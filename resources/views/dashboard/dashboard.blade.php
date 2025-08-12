@@ -89,6 +89,32 @@
         </div>
     </div>
 
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-secondary">Populer Treatment (Top 3)</h6>
+                </div>
+                <div class="card-body" style="height: 320px;">
+                    <canvas id="barTopTreatments" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-secondary">Populer Produk (Top 3)</h6>
+                </div>
+                <div class="card-body" style="height: 320px;">
+                    <canvas id="barTopProducts" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Filter Tahun -->
     <form method="GET" class="form-inline mb-4">
         <label class="mr-2 font-weight-bold">Pilih Tahun:</label>
@@ -203,5 +229,65 @@
                 }
             }
         );
+    </script>
+@endpush
+
+@push('scripts')
+    <script>
+        // data dari controller
+        const tLabels = @json($topTreatLabels);
+        const tValues = @json($topTreatValues);
+        const pLabels = @json($topProdLabels);
+        const pValues = @json($topProdValues);
+
+        function makeBar(id, labels, values) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            new Chart(el.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Total Dibeli',
+                        data: values,
+                        backgroundColor: '#F3A14B'
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    legend: {
+                        display: false
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function(t, d) {
+                                return 'Total: ' + d.datasets[0].data[t.index];
+                            }
+                        }
+                    },
+                    scales: {
+                        xAxes: [{
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 0,
+                                minRotation: 0,
+                                callback: function(v) {
+                                    return v.length > 22 ? v.slice(0, 22) + '…' : v;
+                                }
+                            }
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                precision: 0
+                            }
+                        }]
+                    }
+                }
+            });
+        }
+
+        makeBar('barTopTreatments', tLabels, tValues);
+        makeBar('barTopProducts', pLabels, pValues);
     </script>
 @endpush

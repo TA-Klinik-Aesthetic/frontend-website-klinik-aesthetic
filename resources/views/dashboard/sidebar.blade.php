@@ -67,7 +67,7 @@
                 </div>
             </div>
         </li> --}}
-    @else
+    @elseif ($role === 'front office')
         <!-- Divider -->
         <hr class="sidebar-divider">
 
@@ -217,6 +217,32 @@
                     <a class="collapse-item" href="{{ route('laporan-produk.index') }}">Penjualan Produk</a>
                 </div>
             </div>
+        </li>
+
+
+        {{-- ================= DOKTER ================= --}}
+    @elseif ($role === 'dokter')
+        <hr class="sidebar-divider">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('konsultasi.with-doctor') }}">
+                <span>Konsultasi</span>
+            </a>
+        </li>
+
+        <hr class="sidebar-divider">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('bookingTreatment.index') }}">
+                <span>Booking Treatment</span>
+            </a>
+        </li>
+
+        {{-- ================= BEAUTICIAN ================= --}}
+    @elseif ($role === 'beautician')
+        <hr class="sidebar-divider">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('bookingTreatment.index') }}">
+                <span>Booking Treatment</span>
+            </a>
         </li>
     @endif
 </ul>
