@@ -55,8 +55,7 @@
                         <th style="display:none;">ID</th>
                         <th>Nama Pelanggan</th>
                         <th>Tanggal</th>
-                        <th>Jumlah Paket</th>
-                        <th>Promo</th>
+                        <th>Total</th>
                         <th>Metode</th>
                         <th>Status Pembayaran</th>
                         <th>Aksi</th>
@@ -69,8 +68,6 @@
                             $nama = $p['nama_user'] ?? ($p['user']['nama_user'] ?? '-');
                             $tgl = $p['created_at'] ?? ($p['tanggal_penjualan'] ?? '-');
                             $items = $p['paket'] ?? ($p['details'] ?? ($p['pakets'] ?? []));
-                            $jml = $p['jumlah_paket'] ?? (is_array($items) ? count($items) : 0);
-                            $promo = $p['promo_dipakai']['nama_promo'] ?? ($p['promo']['nama_promo'] ?? '-');
 
                             $pay = $p['pembayaran_paket_treatment'] ?? ($p['pembayaran'] ?? null);
                             // ✅ normalisasi biar aman terhadap kapitalisasi/whitespace
@@ -94,8 +91,7 @@
                             <td style="display:none;">{{ $id }}</td>
                             <td>{{ $nama }}</td>
                             <td>{{ $tgl }}</td>
-                            <td>{{ $jml }}</td>
-                            <td>{{ $promo }}</td>
+                            <td>Rp{{ number_format((float) $p['harga_akhir'], 0, ',', '.') }}</td>
                             <td>{{ $pay['metode_pembayaran'] ?? '-' }}</td>
                             <td>{{ $pay['status_pembayaran'] ?? ($p['status_pembayaran'] ?? 'Belum Dibayar') }}</td>
                             <td>
@@ -127,11 +123,11 @@
                                 @endif
 
                                 {{-- DEBUG sementara, hapus setelah beres --}}
-                                <small class="text-muted d-block">
+                                {{-- <small class="text-muted d-block">
                                     pay_id={{ $payId ?? 'null' }},
                                     status={{ $statusNow ?? '-' }},
                                     canInvoice={{ $canInvoice ? '1' : '0' }}
-                                </small>
+                                </small> --}}
 
                             </td>
                         </tr>
@@ -180,7 +176,7 @@
                     {{-- Daftar paket (dinamis; 1 baris = 1 unit paket) --}}
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h6 class="mb-0">Daftar Paket</h6>
-                        <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddPaketRow">Tambah
+                        <button type="button" class="btn btn-pale btn-outline-pale" id="btnAddPaketRow">Tambah
                             Baris</button>
                     </div>
                     <div class="table-responsive">
@@ -432,17 +428,62 @@
                     return;
                 }
 
-                // uang wajib jika Tunai
-                if ($('#pp_metode').val() === 'Tunai') {
-                    const uang = parseFloat($('#pp_uang').val() || 'NaN');
+                // uang wajib jika Tunai (valid angka non-negatif)
+                const isTunai = $('#pp_metode').val() === 'Tunai';
+                const uangVal = $('#pp_uang').val();
+                const uang = parseFloat(uangVal || 'NaN');
+                if (isTunai) {
                     if (isNaN(uang) || uang < 0) {
                         alert('Isi nominal uang yang valid untuk pembayaran Tunai.');
                         e.preventDefault();
                         return;
                     }
                 }
-            });
 
+                // ⭐ BARU: hitung TOTAL (Harga Akhir) dari pilihan user, lalu pastikan uang ≥ total
+                // hitung subtotal dari paket yang dipilih
+                let subtotal = 0;
+                $('#pp_rows .sel-paket').each(function() {
+                    const id = $(this).val();
+                    if (!id) return;
+                    const pkg = PAKETS.find(x => String(x.id_paket_treatment) === String(id));
+                    if (pkg) subtotal += Number(pkg.harga_paket_treatment || 0);
+                });
+
+                // hitung potongan dari promo (Diskon % atau Rupiah)
+                const prId = $('#pp_promo').val();
+                const promo = PROMOS.find(x => String(x.id_promo) === String(prId));
+                let potongan = 0;
+                if (promo) {
+                    const tipe = (promo.tipe_potongan || '').toLowerCase(); // 'diskon' atau 'rupiah'
+                    const nilai = Number(promo.potongan_harga || 0);
+                    potongan = (tipe === 'diskon') ? subtotal * nilai / 100 : nilai;
+                }
+                if (potongan > subtotal) potongan = subtotal;
+
+                const dpp = subtotal - potongan;
+                const pajak = dpp * 0.10; // 10%
+                const total = dpp + pajak;
+
+                // jika Tunai, cek kecukupan uang
+                if (isTunai) {
+                    if (uang < total) {
+                        const fmt = n => new Intl.NumberFormat('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR'
+                        }).format(n);
+                        const kurang = Math.max(0, total - uang);
+                        alert(
+                            'Uang tunai kurang dari total yang harus dibayar.\n' +
+                            'Total: ' + fmt(total) + '\n' +
+                            'Uang: ' + fmt(uang) + '\n' +
+                            'Kurang: ' + fmt(kurang)
+                        );
+                        e.preventDefault();
+                        return;
+                    }
+                }
+            });
             // ====== Konfirmasi Non-Tunai (set form action) ======
             $('#confirmNonTunaiModal').on('show.bs.modal', function(e) {
                 const btn = $(e.relatedTarget);

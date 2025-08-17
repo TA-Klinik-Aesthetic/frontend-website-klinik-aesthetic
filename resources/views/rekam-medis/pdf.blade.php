@@ -87,7 +87,7 @@
         </tbody>
     </table>
 
-    <h2>Riwayat Booking Treatment</h2>
+    <h2>Riwayat Booking Treatment (Reguler)</h2>
     <table>
         <thead>
             <tr>
@@ -101,7 +101,12 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($data['booking_treatment'] as $book)
+            @php
+                $bk = $data['booking_treatment'] ?? [];
+                $bookReg = $bk['reguler'] ?? [];
+            @endphp
+
+            @forelse($bookReg as $book)
                 <tr>
                     <td>{{ $book['waktu_treatment'] }}</td>
                     <td>{{ $book['treatment_mulai'] ?? '-' }}</td>
@@ -109,19 +114,72 @@
                     <td>
                         @if (!empty($book['detail_booking']))
                             @foreach ($book['detail_booking'] as $d)
-                                • {{ $d['treatment']['nama_treatment'] }}<br>
+                                • {{ data_get($d, 'treatment.nama_treatment', '-') }}<br>
                             @endforeach
                         @else
                             —
                         @endif
                     </td>
-                    <td>{{ $book['dokter']['nama_dokter'] ?? '–' }}</td>
-                    <td>{{ $book['beautician']['nama_beautician'] }}</td>
-                    <td>{{ $book['status_booking_treatment'] }}</td>
+                    <td>{{ data_get($book, 'dokter.nama_dokter', '–') }}</td>
+                    <td>{{ data_get($book, 'beautician.nama_beautician', '–') }}</td>
+                    <td>{{ $book['status_booking_treatment'] ?? '-' }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" style="text-align:center">Tidak ada riwayat booking treatment.</td>
+                    <td colspan="7" style="text-align:center">Tidak ada riwayat booking reguler.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    <h2>Riwayat Booking Treatment (Paket)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Tanggal</th>
+                <th>Treatment Mulai</th>
+                <th>Treatment Selesai</th>
+                <th>Detail</th>
+                <th>Dokter</th>
+                <th>Beautician</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $bookPkg = $bk['paket'] ?? [];
+            @endphp
+
+            @forelse($bookPkg as $book)
+                @php
+                    $detailsPaket =
+                        $book['detail_booking_paket'] ?? ($book['detail_booking'] ?? ($book['details'] ?? []));
+                @endphp
+                <tr>
+                    <td>{{ $book['waktu_treatment'] }}</td>
+                    <td>{{ $book['treatment_mulai'] ?? '-' }}</td>
+                    <td>{{ $book['treatment_selesai'] ?? '-' }}</td>
+                    <td>
+                        @if (!empty($detailsPaket))
+                            @foreach ($detailsPaket as $d)
+                                •
+                                {{ data_get($d, 'treatment.nama_treatment') ??
+                                    (data_get($d, 'paket.nama_paket_treatment') ?? data_get($d, 'nama_treatment', '-')) }}
+                                @php $biaya = data_get($d,'biaya_treatment', data_get($d,'harga_treatment', 0)); @endphp
+                                {!! $biaya ? ' — Rp' . number_format((float) $biaya, 0, ',', '.') : '' !!}
+                                <br>
+                            @endforeach
+                        @else
+                            —
+                        @endif
+                    </td>
+                    <td>{{ data_get($book, 'dokter.nama_dokter', '–') }}</td>
+                    <td>{{ data_get($book, 'beautician.nama_beautician', '–') }}</td>
+                    <td>{{ $book['status_booking_treatment'] ?? '-' }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="7" style="text-align:center">Tidak ada riwayat booking paket.</td>
                 </tr>
             @endforelse
         </tbody>

@@ -114,8 +114,8 @@
                         <input type="text" name="nama_paket_treatment" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label>Deskripsi (opsional)</label>
-                        <textarea name="deskripsi_paket_treatment" class="form-control" rows="3"></textarea>
+                        <label>Deskripsi</label>
+                        <textarea name="deskripsi_paket_treatment" class="form-control" rows="3" required></textarea>
                     </div>
                     <div class="form-group">
                         <label>Harga Paket</label>
@@ -125,7 +125,7 @@
                     <hr>
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h6 class="mb-0">Detail Paket</h6>
-                        <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddRowCreate">Tambah
+                        <button type="button" class="btn btn-pale btn-outline-pale" id="btnAddRowCreate">Tambah
                             Baris</button>
                     </div>
                     <div class="table-responsive">

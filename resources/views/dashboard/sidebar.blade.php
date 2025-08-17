@@ -53,7 +53,7 @@
         <!-- Penjualan Produk -->
         <li class="nav-item">
             <a class="nav-link" href="{{ route('penjualanPaketTreatment.index') }}">
-                <span>Pembayaran Treatment (Paket)</span>
+                <span>Penjualan Paket Treatment</span>
             </a>
         </li>
 

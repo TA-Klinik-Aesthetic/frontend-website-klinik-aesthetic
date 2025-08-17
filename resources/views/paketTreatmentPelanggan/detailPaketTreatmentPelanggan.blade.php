@@ -18,7 +18,6 @@
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">Informasi Paket</h4>
-                <a href="{{ route('ptp.index') }}" class="btn btn-secondary">Kembali</a>
             </div>
             <div class="card-body">
                 <div class="row g-3">

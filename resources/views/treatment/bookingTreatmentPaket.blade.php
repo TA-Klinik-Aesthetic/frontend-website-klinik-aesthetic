@@ -135,7 +135,7 @@
                     {{-- Detail Paket (dinamis) --}}
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h6 class="mb-0">Detail Paket</h6>
-                        <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddDetailRow">Tambah
+                        <button type="button" class="btn btn-pale btn-outline-pale" id="btnAddDetailRow">Tambah
                             Baris</button>
                     </div>
 
@@ -170,8 +170,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Beautician (opsional)</label>
-                        <select name="id_beautician" class="form-control">
+                        <label>Beautician</label>
+                        <select name="id_beautician" class="form-control" required>
                             <option value="">— tidak ada —</option>
                             @foreach ($beauticians as $b)
                                 <option value="{{ $b['id_beautician'] ?? $b['id_user'] }}">
