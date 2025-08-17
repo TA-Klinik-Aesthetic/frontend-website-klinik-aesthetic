@@ -190,4 +190,67 @@ class LaporanController extends Controller
         $pdf = PDF::loadView('laporan.exportBulananProduk', compact('data', 'bulan', 'tahun'));
         return $pdf->download('laporan_bulanan_' . $bulan . '-' . $tahun . '.pdf');
     }
+
+     // ❗️SESUIKAN kalau endpoint backend-mu beda nama/path
+     protected string $BASE = 'https://klinikneshnavya.com/api';
+     protected string $EP_ALL    = '/laporan-penjualan-paket-treatment';
+     protected string $EP_DAILY  = '/laporan-paket-treatment-hari';    // ?tanggal=YYYY-MM-DD
+     protected string $EP_MONTH  = '/laporan-paket-treatment-bulan';   // ?bulan=MM&tahun=YYYY
+ 
+     // Default: semua data
+     public function indexPaketTreatment()
+     {
+         $response = Http::get($this->BASE . $this->EP_ALL);
+         $data = $response->successful() ? $response->json() : [];
+ 
+         return view('laporan.laporanPaketTreatment', compact('data'));
+     }
+ 
+     // Harian
+     public function laporanHarianPaketTreatment(Request $request)
+     {
+         $tanggal = $request->input('tanggal'); // YYYY-MM-DD
+         $response = Http::get($this->BASE . $this->EP_DAILY . "?tanggal={$tanggal}");
+         $data = $response->successful() ? $response->json() : [];
+ 
+         return view('laporan.laporanPaketTreatment', compact('data'));
+     }
+ 
+     // Bulanan
+     public function laporanBulananPaketTreatment(Request $request)
+     {
+         $bulanInput = $request->input('bulan'); // "YYYY-MM"
+         $tahun = substr($bulanInput, 0, 4);
+         $bulan = substr($bulanInput, 5, 2);
+ 
+         $response = Http::get($this->BASE . $this->EP_MONTH . "?bulan={$bulan}&tahun={$tahun}");
+         $data = $response->successful() ? $response->json() : [];
+ 
+         return view('laporan.laporanPaketTreatment', compact('data'));
+     }
+ 
+     // Export Harian → PDF
+     public function exportHarianPaketTreatment(Request $request)
+     {
+         $tanggal = $request->query('tanggal');
+         $response = Http::get($this->BASE . $this->EP_DAILY . "?tanggal={$tanggal}");
+         $data = $response->successful() ? $response->json() : [];
+ 
+         $pdf = PDF::loadView('laporan.exportHarianPaketTreatment', compact('data', 'tanggal'));
+         return $pdf->download('laporan_paket_treatment_harian_' . $tanggal . '.pdf');
+     }
+ 
+     // Export Bulanan → PDF
+     public function exportBulananPaketTreatment(Request $request)
+     {
+         $bulanInput = $request->input('bulan'); // "YYYY-MM"
+         $tahun = substr($bulanInput, 0, 4);
+         $bulan = substr($bulanInput, 5, 2);
+ 
+         $response = Http::get($this->BASE . $this->EP_MONTH . "?bulan={$bulan}&tahun={$tahun}");
+         $data = $response->successful() ? $response->json() : [];
+ 
+         $pdf = PDF::loadView('laporan.exportBulananPaketTreatment', compact('data', 'bulan', 'tahun'));
+         return $pdf->download("laporan_paket_treatment_bulanan_{$bulan}-{$tahun}.pdf");
+     }
 }

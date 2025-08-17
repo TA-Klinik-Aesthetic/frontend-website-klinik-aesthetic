@@ -48,6 +48,15 @@
             </a>
         </li>
 
+        <hr class="sidebar-divider">
+
+        <!-- Penjualan Produk -->
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('penjualanPaketTreatment.index') }}">
+                <span>Pembayaran Treatment (Paket)</span>
+            </a>
+        </li>
+
 
         {{-- <hr class="sidebar-divider">
 
@@ -122,7 +131,18 @@
                     <!-- Menggunakan nama rute -->
                     <a class="collapse-item" href="{{ route('jenisTreatment.index') }}">Jenis Treatment</a>
                     <a class="collapse-item" href="{{ route('treatment.index') }}">Treatment</a>
+                    <a class="collapse-item" href="{{ route('paketTreatment.index') }}">Paket Treatment</a>
+                    {{-- ⬇️ Pecah jadi 2 baris --}}
+                    <a class="collapse-item" href="{{ route('ptp.index') }}">
+                        Paket Treatment
+                        <span class="d-block">Pelanggan</span>
+                    </a>
                     <a class="collapse-item" href="{{ route('bookingTreatment.index') }}">Booking Treatment</a>
+                    {{-- ⬇️ Pecah jadi 2 baris --}}
+                    <a class="collapse-item" href="{{ route('bookingTreatmentPaket.index') }}">
+                        Booking Treatment
+                        <span class="d-block">(Paket)</span>
+                    </a>                    
                 </div>
             </div>
         </li>
@@ -214,6 +234,7 @@
                     {{-- <a class="collapse-item" href="{{ route('inventaris-stok.index') }}">Inventaris Stok</a> --}}
                     <a class="collapse-item" href="{{ route('rekam-medis.index') }}">Rekam Medis</a>
                     <a class="collapse-item" href="{{ route('laporan-treatment.index') }}">Penjualan Treatment</a>
+                    <a class="collapse-item" href="{{ route('laporan-paket.index') }}">Penjualan Paket Treatment</a>
                     <a class="collapse-item" href="{{ route('laporan-produk.index') }}">Penjualan Produk</a>
                 </div>
             </div>

@@ -76,20 +76,6 @@ class DetailBookingTreatmentController extends Controller
         ));
     }
 
-    // public function getSlots($tanggal)
-    // {
-    //     $response = Http::get("https://klinikneshnavya.com/api/jadwal-treatment/{$tanggal}");
-
-    //     if ($response->successful()) {
-    //         return response()->json($response->json());
-    //     }
-
-    //     return response()->json([
-    //         'success' => false,
-    //         'message' => 'Gagal mengambil slot jadwal.'
-    //     ], 500);
-    // }
-
     // Menyimpan data booking treatment
     public function store(Request $request)
     {
@@ -178,22 +164,4 @@ class DetailBookingTreatmentController extends Controller
         return back()->with('error', 'Gagal mengubah status booking treatment. ' . $response->body());
     }
 
-    // public function autocompleteKompensasi(Request $request)
-    // {
-    //     $term = $request->input('term');
-
-    //     $results = KompensasiDiberikan::where('kode_kompensasi', 'like', '%' . $term . '%')
-    //         ->limit(10)
-    //         ->get();
-
-    //     return response()->json(
-    //         $results->map(function ($item) {
-    //             return [
-    //                 'id' => $item->id_kompensasi_diberikan,
-    //                 'label' => $item->kode_kompensasi,
-    //                 'value' => $item->kode_kompensasi, // ini yang ditampilkan di input
-    //             ];
-    //         })
-    //     );
-    // }
 }

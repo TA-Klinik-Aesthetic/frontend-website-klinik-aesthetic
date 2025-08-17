@@ -26,7 +26,10 @@ use App\Http\Controllers\RekamMedisController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventarisStokController;
-
+use App\Http\Controllers\PaketTreatmentController;
+use App\Http\Controllers\PaketTreatmentPelangganController;
+use App\Http\Controllers\BookingTreatmentPaketController;
+use App\Http\Controllers\PenjualanPaketTreatmentController;
 
 
 
@@ -86,34 +89,52 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware('session.auth')->group(function () {
 
 
- // ===== KONSULTASI — FO + DOKTER (semua fitur) =====
-Route::middleware('check.role:front office,dokter')->group(function () {
-    Route::get('/konsultasi', [KonsultasiController::class, 'indexWithDoctor'])->name('konsultasi.with-doctor');
-    Route::get('/konsultasi/create', [KonsultasiController::class, 'create'])->name('konsultasi.create');
-    Route::post('/konsultasi', [KonsultasiController::class, 'store'])->name('konsultasi.store');
-    Route::delete('/konsultasi/{id}', [KonsultasiController::class, 'destroy'])->name('konsultasi.destroy');
-    Route::get('/konsultasi/{id}/detail', [KonsultasiController::class, 'show'])->name('konsultasi.show');
-    Route::get('/konsultasi/{id}/tambah-detail', [KonsultasiController::class, 'tambahDetail'])->name('konsultasi.tambahDetail');
+    // ===== KONSULTASI — FO + DOKTER (semua fitur) =====
+    Route::middleware('check.role:front office,dokter')->group(function () {
+        Route::get('/konsultasi', [KonsultasiController::class, 'indexWithDoctor'])->name('konsultasi.with-doctor');
+        Route::get('/konsultasi/create', [KonsultasiController::class, 'create'])->name('konsultasi.create');
+        Route::post('/konsultasi', [KonsultasiController::class, 'store'])->name('konsultasi.store');
+        Route::delete('/konsultasi/{id}', [KonsultasiController::class, 'destroy'])->name('konsultasi.destroy');
+        Route::get('/konsultasi/{id}/detail', [KonsultasiController::class, 'show'])->name('konsultasi.show');
+        Route::get('/konsultasi/{id}/tambah-detail', [KonsultasiController::class, 'tambahDetail'])->name('konsultasi.tambahDetail');
 
-    // Route untuk proses simpan detail konsultasi
-    Route::post('/konsultasi/{id}/tambah-detail', [KonsultasiController::class, 'simpanDetail'])->name('konsultasi.simpanDetail');
+        // Route untuk proses simpan detail konsultasi
+        Route::post('/konsultasi/{id}/tambah-detail', [KonsultasiController::class, 'simpanDetail'])->name('konsultasi.simpanDetail');
 
-    // Jika untuk AJAX dari frontend, bisa di web.php:
-    Route::post('konsultasi/{id}/update-status', [KonsultasiController::class, 'updateStatus'])
-        ->name('konsultasi.updateStatus');
-});
-
-// ===== BOOKING TREATMENT — FO + DOKTER + BEAUTICIAN (semua fitur kecuali pembayaran) =====
-Route::middleware('check.role:front office,dokter,beautician')->group(function () {
-    Route::prefix('bookingTreatment')->name('bookingTreatment.')->group(function () {
-        Route::get('/', [DetailBookingTreatmentController::class, 'index'])->name('index');
+        // Jika untuk AJAX dari frontend, bisa di web.php:
+        Route::post('konsultasi/{id}/update-status', [KonsultasiController::class, 'updateStatus'])
+            ->name('konsultasi.updateStatus');
     });
 
-    Route::put('/detailBooking/{id}/update-status', [DetailBookingTreatmentController::class, 'updateStatus'])->name('bookingTreatment.updateStatus');
-    Route::post('/booking', [DetailBookingTreatmentController::class, 'store'])->name('booking.store');
-    Route::get('/booking/detail/{id}', [DetailBookingTreatmentController::class, 'show'])->name('booking.detail');
-    Route::put('/detailBooking/update/{id}', [DetailBookingTreatmentController::class, 'update'])->name('detailBooking.update');
-});
+    // ===== BOOKING TREATMENT — FO + DOKTER + BEAUTICIAN (semua fitur kecuali pembayaran) =====
+    Route::middleware('check.role:front office,dokter,beautician')->group(function () {
+        Route::prefix('bookingTreatment')->name('bookingTreatment.')->group(function () {
+            Route::get('/', [DetailBookingTreatmentController::class, 'index'])->name('index');
+        });
+
+        Route::put('/detailBooking/{id}/update-status', [DetailBookingTreatmentController::class, 'updateStatus'])->name('bookingTreatment.updateStatus');
+        Route::post('/booking', [DetailBookingTreatmentController::class, 'store'])->name('booking.store');
+        Route::get('/booking/detail/{id}', [DetailBookingTreatmentController::class, 'show'])->name('booking.detail');
+        Route::put('/detailBooking/update/{id}', [DetailBookingTreatmentController::class, 'update'])->name('detailBooking.update');
+
+        Route::prefix('booking-treatment-paket')->group(function () {
+            Route::get('/',        [BookingTreatmentPaketController::class, 'index'])->name('bookingTreatmentPaket.index');
+            Route::post('/',       [BookingTreatmentPaketController::class, 'store'])->name('bookingTreatmentPaket.store');
+
+            // ⬇️ customerPackages DIGANTI menjadi show detail
+            Route::get('/{id}',    [BookingTreatmentPaketController::class, 'show'])->name('bookingTreatmentPaket.show');
+
+            // update dokter/beautician & status
+            Route::put('/{id}',            [BookingTreatmentPaketController::class, 'update'])->name('bookingTreatmentPaket.update');
+            Route::put('/{id}/status',     [BookingTreatmentPaketController::class, 'updateStatus'])->name('bookingTreatmentPaket.updateStatus');
+        });
+
+        // ⬇️ AJAX helper (proxy ke API paket-treatment-pelanggan)
+        Route::get('/pelanggan/{id}/paket', [BookingTreatmentPaketController::class, 'paketByUser'])
+            ->name('bookingTreatmentPaket.paketByUser');
+        Route::get('/paket/{id}/detail',    [BookingTreatmentPaketController::class, 'paketDetail'])
+            ->name('bookingTreatmentPaket.paketDetail');
+    });
 
     Route::middleware('check.role:front office')->group(function () {
         // Form pendaftaran pelanggan
@@ -142,6 +163,19 @@ Route::middleware('check.role:front office,dokter,beautician')->group(function (
             Route::post('/', [JenisTreatmentController::class, 'store'])->name('jenisTreatment.store');
             Route::put('/{id}', [JenisTreatmentController::class, 'update'])->name('jenisTreatment.update');
             Route::delete('/{id}', [JenisTreatmentController::class, 'destroy'])->name('jenisTreatment.destroy');
+        });
+
+        Route::prefix('paket-treatment')->group(function () {
+            Route::get('/', [PaketTreatmentController::class, 'index'])->name('paketTreatment.index');
+            Route::post('/', [PaketTreatmentController::class, 'store'])->name('paketTreatment.store');
+            Route::get('/{id}', [PaketTreatmentController::class, 'show'])->name('paketTreatment.show');
+            Route::put('/{id}', [PaketTreatmentController::class, 'update'])->name('paketTreatment.update');
+            // (hapus tidak diminta — kalau perlu nanti kita tambah)
+        });
+
+        Route::prefix('paket-treatment-pelanggan')->group(function () {
+            Route::get('/', [PaketTreatmentPelangganController::class, 'index'])->name('ptp.index');
+            Route::get('/{id}', [PaketTreatmentPelangganController::class, 'show'])->name('ptp.show');
         });
 
         Route::prefix('feedback/konsultasi')->name('feedback.feedbackKonsultasi.')->group(function () {
@@ -220,6 +254,13 @@ Route::middleware('check.role:front office,dokter,beautician')->group(function (
         Route::get('/laporan-produk-bulan', [LaporanController::class, 'laporanBulananProduk'])->name('laporan-produk.bulanan');
         Route::get('/laporan-produk/export-harian', [LaporanController::class, 'exportHarianProduk'])->name('laporan-produk.export-harian');
         Route::get('/laporan-produk/export-bulanan', [LaporanController::class, 'exportBulananProduk'])->name('laporan-produk.export-bulanan');
+
+        Route::get('/laporan-paket-treatment', [LaporanController::class, 'indexPaketTreatment'])->name('laporan-paket.index');
+        Route::get('/laporan-paket-treatment-hari', [LaporanController::class, 'laporanHarianPaketTreatment'])->name('laporan-paket.harian');
+        Route::get('/laporan-paket-treatment-bulanan', [LaporanController::class, 'laporanBulananPaketTreatment'])->name('laporan-paket.bulanan');
+
+        Route::get('/laporan-paket-treatment/export-harian', [LaporanController::class, 'exportHarianPaketTreatment'])->name('laporan-paket.export-harian');
+        Route::get('/laporan-paket-treatment/export-bulanan', [LaporanController::class, 'exportBulananPaketTreatment'])->name('laporan-paket.export-bulanan');
     });
 
     Route::middleware('check.role:kasir')->group(function () {
@@ -252,6 +293,26 @@ Route::middleware('check.role:front office,dokter,beautician')->group(function (
         Route::post('/pembayaran-treatment', [PembayaranTreatmentController::class, 'store'])->name('pembayaran-treatment.store');
         Route::put('/pembayaran-treatment/{id}', [PembayaranTreatmentController::class, 'update'])->name('pembayaran-treatment.update');
         Route::put('pembayaran-treatment/{id}/konfirmasi', [PembayaranTreatmentController::class, 'confirmPaymentTreatment'])->name('pembayaran-treatment.confirm');
+
+        Route::prefix('penjualan-paket-treatment')
+            ->name('penjualanPaketTreatment.')
+            ->group(function () {
+                // ➜ Invoice (stream ke tab baru)
+                Route::get('/pembayaran/{paymentId}/invoice', [PenjualanPaketTreatmentController::class, 'generateInvoice'])
+                    ->name('invoice');
+
+                // Konfirmasi NON TUNAI (PUT)
+                Route::put('/pembayaran/{id}/konfirmasi', [PenjualanPaketTreatmentController::class, 'confirmPayment'])
+                    ->name('confirmPayment');
+
+                Route::get('/',  [PenjualanPaketTreatmentController::class, 'index'])->name('index');
+                Route::post('/', [PenjualanPaketTreatmentController::class, 'store'])->name('store');
+                Route::get('/{id}', [PenjualanPaketTreatmentController::class, 'show'])->name('show');
+
+
+                // ⬇️ invoice di-dalam group
+                // ⬇︎ Invoice (id = id pembayaran paket treatment)
+            });
     });
 });
 
