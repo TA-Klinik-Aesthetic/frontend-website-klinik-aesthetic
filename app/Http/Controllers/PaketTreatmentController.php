@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Http;
 class PaketTreatmentController extends Controller
 {
     // Sesuaikan ke endpoint backend-mu
-    protected $baseApiUrl   = 'http://127.0.0.1:8080/api/paket-treatment';
-    protected $apiTreatment = 'http://127.0.0.1:8080/api/treatment';
+    protected $baseApiUrl   = 'https://klinikneshnavya.com/api/paket-treatment';
+    protected $apiTreatment = 'https://klinikneshnavya.com/api/treatment';
 
     public function index()
     {
