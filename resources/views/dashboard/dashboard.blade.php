@@ -191,6 +191,22 @@
             </div>
         </div>
     </div>
+
+    <!-- Chart Pembayaran Paket Treatment per Bulan -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-secondary">
+                        Pembayaran Paket Treatment / Bulan ({{ $year }})
+                    </h6>
+                </div>
+                <div class="card-body" style="height: 300px;">
+                    <canvas id="monthlyPaketChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -200,6 +216,10 @@
         const treatData = {!! json_encode($treatmentData) !!};
         const prodLabels = {!! json_encode($productLabels) !!};
         const prodData = {!! json_encode($productData) !!};
+
+        // NEW: paket
+        const paketLabels = {!! json_encode($paketLabels) !!};
+        const paketData = {!! json_encode($paketData) !!};
 
         // Hitung max dinamis kelipatan 10
         const maxTreat = treatData.length ?
@@ -262,6 +282,31 @@
                 }
             }
         );
+
+        // NEW: Chart Pembayaran Paket Treatment
+        new Chart(document.getElementById('monthlyPaketChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: paketLabels,
+                datasets: [{
+                    label: 'Jumlah Pembayaran',
+                    backgroundColor: '#F3A14B',
+                    data: paketData
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 10,
+                            max: maxPaket
+                        }
+                    }]
+                }
+            }
+        });
     </script>
 @endpush
 

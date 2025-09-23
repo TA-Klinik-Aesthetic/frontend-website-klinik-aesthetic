@@ -70,6 +70,21 @@ class DashboardController extends Controller
         $productLabels = $allMonths;
         $productData   = array_map(fn($mo) => $mapP[$mo] ?? 0, $allMonths);
 
+        // 1b) Panggil API pembayaran PAKET treatment (per tahun)
+        $respTPaket   = Http::get("https://klinikneshnavya.com/api/pembayaran-paket-treatment/total-bayar?year={$year}");
+        $paketMonthly = $respTPaket->successful() ? $respTPaket->json('bayar_perbulan', []) : [];
+
+        // 2b) Map total per bulan paket treatment
+        $mapTPaket = [];
+        foreach ($paketMonthly as $row) {
+            $mapTPaket[$row['bulan']] = $row['total'];
+        }
+
+        // 3b) Siapkan labels & data paket lengkap (0 jika tidak ada)
+        $paketLabels = $allMonths;
+        $paketData   = array_map(fn($mo) => $mapTPaket[$mo] ?? 0, $allMonths);
+
+
         // ==== Chart: Top Treatments & Top Products ====
         $base = 'https://klinikneshnavya.com/api'; // atau pakai config/services kalau mau
 
@@ -115,7 +130,10 @@ class DashboardController extends Controller
             'topPaketLabels',
             'topPaketValues',
             // NEW
-            'treatPaketCount'
+            'treatPaketCount',
+            // NEW
+            'paketLabels',
+            'paketData',
         ));
     }
 
