@@ -229,6 +229,9 @@
             Math.ceil(Math.max(...prodData) / 10) * 10 :
             10;
 
+        // NEW: paket
+        const maxPaket = paketData.length ? Math.ceil(Math.max(...paketData) / 10) * 10 : 10;
+
         // Chart Pembayaran Treatment
         new Chart(
             document.getElementById('monthlyTreatmentChart').getContext('2d'), {
