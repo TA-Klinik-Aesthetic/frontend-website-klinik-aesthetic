@@ -68,6 +68,26 @@
                 </div>
             </div>
         </div>
+        <!-- Booking Treatment Paket -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-pale shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-pale text-uppercase mb-1">
+                                Booking Treatment Paket (Verifikasi)
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ $treatPaketCount }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-box fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-pale shadow h-100 py-2">
                 <div class="card-body">
@@ -109,6 +129,19 @@
                 </div>
                 <div class="card-body" style="height: 320px;">
                     <canvas id="barTopProducts" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-secondary">Populer Paket Treatment (Top 3)</h6>
+                </div>
+                <div class="card-body" style="height: 320px;">
+                    <canvas id="barTopPaket" height="300"></canvas>
                 </div>
             </div>
         </div>
@@ -239,6 +272,9 @@
         const tValues = @json($topTreatValues);
         const pLabels = @json($topProdLabels);
         const pValues = @json($topProdValues);
+        // NEW: paket
+        const pkLabels = @json($topPaketLabels);
+        const pkValues = @json($topPaketValues);
 
         function makeBar(id, labels, values) {
             const el = document.getElementById(id);
@@ -289,5 +325,7 @@
 
         makeBar('barTopTreatments', tLabels, tValues);
         makeBar('barTopProducts', pLabels, pValues);
+        // NEW: render paket
+        makeBar('barTopPaket', pkLabels, pkValues);
     </script>
 @endpush

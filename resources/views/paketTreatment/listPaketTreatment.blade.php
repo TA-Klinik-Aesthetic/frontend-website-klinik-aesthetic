@@ -171,7 +171,7 @@
                             required>
                     </div>
                     <div class="form-group">
-                        <label>Deskripsi (opsional)</label>
+                        <label>Deskripsi</label>
                         <textarea name="deskripsi_paket_treatment" id="edit_deskripsi_paket" class="form-control" rows="3"></textarea>
                     </div>
                     <div class="form-group">

@@ -249,10 +249,9 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group mb-0">
-                        <label>Gambar Bukti (opsional)</label>
+                        <label>Gambar Bukti</label>
                         <input type="file" name="gambar_bukti_pembayaran" accept=".jpg,.jpeg,.png,.gif,.webp"
                             class="form-control-file">
-                        <small class="text-muted">Boleh dikosongkan bila tidak diperlukan.</small>
                     </div>
                 </div>
                 <div class="modal-footer">

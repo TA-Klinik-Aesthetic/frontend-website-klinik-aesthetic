@@ -26,44 +26,41 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">Informasi Booking</h4>
             </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <div class="text-muted small">Pelanggan</div>
-                        <div class="fw-semibold">{{ $pelanggan }}</div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="text-muted small">Status</div>
-                        <div class="fw-semibold">{{ $status }}</div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="text-muted small">Waktu Treatment</div>
-                        <div class="fw-semibold">{{ $waktu }}</div>
-                    </div>
-                </div>
-
-                <div class="row g-3 mt-2">
-                    <div class="col-md-6">
-                        <div class="text-muted small">Treatment Mulai</div>
-                        <div class="fw-semibold">{{ $mulai }}</div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="text-muted small">Treatment Selesai</div>
-                        <div class="fw-semibold">{{ $selesai }}</div>
-                    </div>
-                </div>
-
-                <div class="row g-3 mt-2">
-                    <div class="col-md-6">
-                        <div class="text-muted small">Dokter</div>
-                        <div class="fw-semibold">{{ $dokter }}</div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="text-muted small">Beautician</div>
-                        <div class="fw-semibold">{{ $beauty }}</div>
-                    </div>
-                </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr>
+                            <th style="width:260px;">Pelanggan</th>
+                            <td>{{ $pelanggan }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td>{{ $status }}</td>
+                        </tr>
+                        <tr>
+                            <th>Waktu Treatment</th>
+                            <td>{{ $waktu }}</td>
+                        </tr>
+                        <tr>
+                            <th>Treatment Mulai</th>
+                            <td>{{ $mulai }}</td>
+                        </tr>
+                        <tr>
+                            <th>Treatment Selesai</th>
+                            <td>{{ $selesai }}</td>
+                        </tr>
+                        <tr>
+                            <th>Dokter</th>
+                            <td>{{ $dokter }}</td>
+                        </tr>
+                        <tr>
+                            <th>Beautician</th>
+                            <td>{{ $beauty }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+            
         </div>
 
         {{-- Detail sesuai JSON: Paket, Treatment, Jumlah Dipakai --}}

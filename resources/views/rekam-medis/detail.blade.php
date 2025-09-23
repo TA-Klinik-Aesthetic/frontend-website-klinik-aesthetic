@@ -121,33 +121,36 @@
 
                         <h6>Detail Booking Paket:</h6>
                         @php
-                            // Antisipasi nama relasi yang mungkin berbeda
+                            // Ambil array detail dari beberapa kemungkinan key
                             $detailsPaket =
-                                $booking['detail_booking_paket'] ??
-                                ($booking['detail_booking'] ?? ($booking['details'] ?? []));
+                                $booking['details'] ??
+                                ($booking['detail_booking_paket'] ?? ($booking['detail_booking'] ?? []));
                         @endphp
                         <table class="table table-bordered mb-3">
                             <thead>
                                 <tr>
+                                    <th>Nama Paket Treatment</th>
                                     <th>Nama Treatment</th>
-                                    <th>Biaya (jika ada)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($detailsPaket as $detail)
+                                    @php
+                                        $namaPaket =
+                                            data_get($detail, 'paket_pelanggan.paket.nama_paket_treatment') ??
+                                            (data_get($detail, 'paket.nama_paket_treatment') ??
+                                                (data_get($detail, 'paket_pelanggan.nama_paket_treatment') ?? '—'));
+                                        $namaTreatment =
+                                            data_get($detail, 'treatment.nama_treatment') ??
+                                            data_get($detail, 'nama_treatment', '—');
+                                    @endphp
                                     <tr>
-                                        <td>
-                                            {{ data_get($detail, 'treatment.nama_treatment') ??
-                                                (data_get($detail, 'paket.nama_paket_treatment') ?? data_get($detail, 'nama_treatment', '-')) }}
-                                        </td>
-                                        <td>
-                                            @php $biaya = data_get($detail,'biaya_treatment', data_get($detail,'harga_treatment', 0)); @endphp
-                                            {{ $biaya ? 'Rp' . number_format((float) $biaya, 0, ',', '.') : '—' }}
-                                        </td>
+                                        <td>{{ $namaPaket }}</td>
+                                        <td>{{ $namaTreatment }}</td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="2" class="text-center">— Tidak ada detail —</td>
+                                        <td colspan="2" class="text-center text-muted">— Tidak ada detail —</td>
                                     </tr>
                                 @endforelse
                             </tbody>

@@ -246,24 +246,56 @@
         <hr class="sidebar-divider">
         <li class="nav-item">
             <a class="nav-link" href="{{ route('konsultasi.with-doctor') }}">
-                <span>Konsultasi</span>
+                <span>Booking Konsultasi</span>
             </a>
         </li>
 
         <hr class="sidebar-divider">
+
+        <!-- Nav Item - Treatment -->
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('bookingTreatment.index') }}">
-                <span>Booking Treatment</span>
+            <a class="nav-link" data-toggle="collapse" data-target="#collapseTreatment" aria-expanded="true"
+                aria-controls="collapseTreatment">
+                <span>Treatment</span>
             </a>
+            <div id="collapseTreatment" class="collapse" aria-labelledby="headingTreatment"
+                data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+
+                    <a class="collapse-item" href="{{ route('bookingTreatment.index') }}">Booking Treatment</a>
+                    {{-- ⬇️ Pecah jadi 2 baris --}}
+                    <a class="collapse-item" href="{{ route('bookingTreatmentPaket.index') }}">
+                        Booking Treatment
+                        <span class="d-block">(Paket)</span>
+                    </a>
+
+                </div>
+            </div>
         </li>
 
         {{-- ================= BEAUTICIAN ================= --}}
     @elseif ($role === 'beautician')
         <hr class="sidebar-divider">
+
+        <!-- Nav Item - Treatment -->
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('bookingTreatment.index') }}">
-                <span>Booking Treatment</span>
+            <a class="nav-link" data-toggle="collapse" data-target="#collapseTreatment" aria-expanded="true"
+                aria-controls="collapseTreatment">
+                <span>Treatment</span>
             </a>
+            <div id="collapseTreatment" class="collapse" aria-labelledby="headingTreatment"
+                data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+
+                    <a class="collapse-item" href="{{ route('bookingTreatment.index') }}">Booking Treatment</a>
+                    {{-- ⬇️ Pecah jadi 2 baris --}}
+                    <a class="collapse-item" href="{{ route('bookingTreatmentPaket.index') }}">
+                        Booking Treatment
+                        <span class="d-block">(Paket)</span>
+                    </a>
+                                        
+                </div>
+            </div>
         </li>
     @endif
 </ul>

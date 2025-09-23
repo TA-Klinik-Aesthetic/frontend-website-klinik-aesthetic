@@ -202,7 +202,7 @@
                 <form action="{{ route('bookingTreatmentPaket.update', $id) }}" method="POST" class="modal-content">
                     @csrf @method('PUT')
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalEditLabel-{{ $id }}">Edit Petugas</h5>
+                        <h5 class="modal-title" id="modalEditLabel-{{ $id }}">Edit Booking Treatment Paket</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -222,7 +222,7 @@
                         </div>
                         <div class="form-group">
                             <label>Beautician</label>
-                            <select name="id_beautician" class="form-control">
+                            <select name="id_beautician" class="form-control" required>
                                 <option value="">— tidak ada —</option>
                                 @foreach ($beauticians as $bt)
                                     <option value="{{ $bt['id_beautician'] ?? $bt['id_user'] }}"
